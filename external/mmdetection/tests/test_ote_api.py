@@ -36,7 +36,7 @@ from ote_sdk.entities.image import Image
 from ote_sdk.entities.inference_parameters import InferenceParameters
 from ote_sdk.entities.model_template import TaskType, task_type_to_label_domain
 from ote_sdk.entities.metrics import Performance
-from ote_sdk.entities.model import ModelEntity, ModelFormat, ModelOptimizationType
+from ote_sdk.entities.model import ModelEntity, ModelFormat, ModelOptimizationType, ModelPrecision
 from ote_sdk.entities.model_template import parse_model_template
 from ote_sdk.entities.optimization_parameters import OptimizationParameters
 from ote_sdk.entities.resultset import ResultSetEntity
@@ -214,7 +214,7 @@ class API(unittest.TestCase):
         def progress_callback(progress: float, score: Optional[float] = None):
             training_progress_curve.append(progress)
 
-        train_parameters = TrainParameters
+        train_parameters = TrainParameters()
         train_parameters.update_progress = progress_callback
 
         # Test stopping after some time
@@ -254,7 +254,7 @@ class API(unittest.TestCase):
         def progress_callback(progress: float, score: Optional[float] = None):
             training_progress_curve.append(progress)
 
-        train_parameters = TrainParameters
+        train_parameters = TrainParameters()
         train_parameters.update_progress = progress_callback
         output_model = ModelEntity(
             dataset,
@@ -282,7 +282,7 @@ class API(unittest.TestCase):
             dataset,
             detection_environment.get_model_configuration(),
         )
-        task.train(dataset, original_model, TrainParameters)
+        task.train(dataset, original_model, TrainParameters())
 
         # Create NNCFTask
         detection_environment.model = original_model
@@ -301,7 +301,7 @@ class API(unittest.TestCase):
         def progress_callback(progress: float, score: Optional[float] = None):
             training_progress_curve.append(progress)
 
-        optimization_parameters = OptimizationParameters
+        optimization_parameters = OptimizationParameters()
         optimization_parameters.update_progress = progress_callback
         nncf_model = ModelEntity(
             dataset,
@@ -329,7 +329,7 @@ class API(unittest.TestCase):
             assert isinstance(progress, int)
             inference_progress_curve.append(progress)
 
-        inference_parameters = InferenceParameters
+        inference_parameters = InferenceParameters()
         inference_parameters.update_progress = progress_callback
 
         task.infer(dataset.with_empty_annotations(), inference_parameters)
@@ -352,7 +352,7 @@ class API(unittest.TestCase):
             dataset,
             detection_environment.get_model_configuration(),
         )
-        train_task.train(dataset, trained_model, TrainParameters)
+        train_task.train(dataset, trained_model, TrainParameters())
         performance_after_train = self.eval(train_task, trained_model, val_dataset)
 
         # Create InferenceTask
@@ -520,6 +520,14 @@ class API(unittest.TestCase):
                 print(f'Performance of NNCF model: {nncf_performance.score.value:.4f}')
                 self.check_threshold(validation_performance, nncf_performance, nncf_perf_delta_tolerance,
                     'Too big performance difference after NNCF optimization.')
+                    
+                # Check whether optimize & export assigns correct model precision
+                nncf_task.export(ExportType.OPENVINO, nncf_model)
+
+                if nncf_task._hyperparams.nncf_optimization.enable_quantization:
+                    assert nncf_model.precision[0] == ModelPrecision.INT8
+                else:
+                    assert nncf_model.precision[0] == nncf_task._precision_from_config[0]
             else:
                 print('Skipped test of OTEDetectionNNCFTask. Required NNCF module.')
 
@@ -542,7 +550,6 @@ class API(unittest.TestCase):
             osp.join('configs', 'custom-object-detection', 'cspdarknet_YOLOX'))
 
     @e2e_pytest_api
-    # @pytest.mark.xfail(reason='CVS-83115')
     def test_training_maskrcnn_resnet50(self):
         self.end_to_end(osp.join('/home/yuchunli/git/training_extensions/external/mmdetection/configs',
                         'custom-counting-instance-seg', 'resnet50_maskrcnn'),
