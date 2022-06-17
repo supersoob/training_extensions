@@ -18,6 +18,7 @@ from contextlib import contextmanager
 from enum import Enum, auto
 import importlib
 import json
+import math
 import os
 import shutil
 import tempfile
@@ -464,7 +465,7 @@ def sigmoid_numpy(x: np.ndarray):
 
 
 def softmax_numpy(x: np.ndarray):
-    x = np.exp(x)
+    x = np.exp(x - np.max(x))
     x /= np.sum(x)
     return x
 
@@ -474,6 +475,8 @@ def get_multiclass_predictions(logits: np.ndarray, labels: List[LabelEntity],
     i = np.argmax(logits)
     if activate:
         logits = softmax_numpy(logits)
+    if math.isnan(float(logits[i])):
+        return []
     return [ScoredLabel(labels[i], probability=float(logits[i]))]
 
 
