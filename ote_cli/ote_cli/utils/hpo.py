@@ -525,7 +525,15 @@ class HpoManager:
         )
 
         self.algo = hpopt_cfg.get("search_algorithm", "smbo")
-        self.metric = hpopt_cfg.get("metric", "mAP")
+        if _is_cls_framework_task(task_type):
+            impl_class = get_impl_class(environment.model_template.entrypoints.base)
+            task = impl_class(task_environment=environment)
+            if task._multilabel:
+                self.metric = "mAP"
+            elif task._hierarchical:
+                self.metric = "MHAcc"
+        else:
+            self.metric = hpopt_cfg.get("metric", "mAP")
 
         num_available_gpus = torch.cuda.device_count()
 
