@@ -14,12 +14,11 @@ from ote_sdk.entities.metrics import (
     ScoreMetric,
 )
 from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
-from ote_sdk.usecases.evaluation.dice import DiceAverage
 from ote_sdk.usecases.evaluation.f_measure import FMeasure
 from ote_sdk.usecases.evaluation.performance_provider_interface import (
     IPerformanceProvider,
 )
+from ote_sdk.usecases.evaluation.pro_score import PROScore
 from ote_sdk.utils.dataset_utils import (
     contains_anomalous_images,
     split_local_global_resultset,
@@ -107,7 +106,8 @@ class AnomalySegmentationScores(AnomalyLocalizationScores):
 
     @staticmethod
     def _get_local_metric(local_resultset: ResultSetEntity) -> IPerformanceProvider:
-        return DiceAverage(resultset=local_resultset, average=MetricAverageMethod.MICRO)
+        # return DiceAverage(resultset=local_resultset, average=MetricAverageMethod.MICRO)
+        return PROScore(resultset=local_resultset)
 
 
 class AnomalyDetectionScores(AnomalyLocalizationScores):
