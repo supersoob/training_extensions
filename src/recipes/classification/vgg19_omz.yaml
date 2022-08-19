@@ -1,0 +1,4 @@
+_base_: _base_/vgg19_omz.py
+
+model:
+  task: classification

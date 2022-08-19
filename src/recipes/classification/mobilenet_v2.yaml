@@ -1,0 +1,4 @@
+_base_: _base_/mobilenet_v2.py
+
+model:
+  task: classification

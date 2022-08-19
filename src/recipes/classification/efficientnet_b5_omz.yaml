@@ -1,0 +1,4 @@
+_base_: _base_/efficientnet_b5_omz.py
+
+model:
+  task: classification
