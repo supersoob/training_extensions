@@ -18,7 +18,6 @@ from mpa.utils.config_utils import update_or_add_custom_hook
 from mpa.utils.logger import get_logger
 from ote_sdk.entities.datasets import DatasetEntity
 from ote_sdk.entities.model import ModelEntity, ModelPrecision
-from ote_sdk.entities.subset import Subset
 from ote_sdk.entities.task_environment import TaskEnvironment
 from ote_sdk.serialization.label_mapper import LabelSchemaMapper
 
@@ -37,6 +36,7 @@ class BaseTask:
         self._task_environment = task_environment
         self._hyperparams = task_environment.get_hyper_parameters(self._task_config)
         self._model_name = task_environment.model_template.name
+        self._task_type = task_environment.model_template.task_type
         self._labels = task_environment.get_labels(include_empty=False)
         self._output_path = tempfile.mkdtemp(prefix='MPA-task-')
         logger.info(f'created output path at {self._output_path}')
@@ -44,8 +44,8 @@ class BaseTask:
         # Set default model attributes.
         self._model_label_schema = []
         self._optimization_methods = []
-        self._precision = [ModelPrecision.FP32]
         self._model_ckpt = None
+        self._anchors = {}
         if task_environment.model is not None:
             logger.info('loading the model from the task env.')
             state_dict = self._load_model_state_dict(self._task_environment.model)
@@ -60,6 +60,7 @@ class BaseTask:
         self._recipe_cfg = None
         self._stage_module = None
         self._model_cfg = None
+        self._precision = None
         self._data_cfg = None
         self._mode = None
         self._time_monitor = None
@@ -70,14 +71,17 @@ class BaseTask:
         self.reserved_cancel = False
         self.on_hook_initialized = self.OnHookInitialized(self)
 
+        # to override configuration at runtime
+        self.override_configs = {}
+
     def _run_task(self, stage_module, mode=None, dataset=None, parameters=None, **kwargs):
-        self._initialize(dataset)
+        self._initialize()
         # update model config -> model label schema
         data_classes = [label.name for label in self._labels]
         model_classes = [label.name for label in self._model_label_schema]
         self._model_cfg['model_classes'] = model_classes
         if dataset is not None:
-            train_data_cfg = Stage.get_train_data_cfg(self._data_cfg)
+            train_data_cfg = Stage.get_data_cfg(self._data_cfg, "train")
             train_data_cfg['data_classes'] = data_classes
             new_classes = np.setdiff1d(data_classes, model_classes).tolist()
             train_data_cfg['new_classes'] = new_classes
@@ -144,24 +148,40 @@ class BaseTask:
     def hyperparams(self):
         return self._hyperparams
 
-    def _initialize(self, dataset, output_model=None):
+    def _initialize(self, dataset=None, output_model=None):
         """ prepare configurations to run a task through MPA's stage
         """
         logger.info('initializing....')
         self._init_recipe()
-        recipe_hparams = self._init_recipe_hparam()
-        if len(recipe_hparams) > 0:
-            self._recipe_cfg.merge_from_dict(recipe_hparams)
+        self._overwrite_parameters()
+        if "custom_hooks" in self.override_configs:
+            override_custom_hooks = self.override_configs.pop("custom_hooks")
+            for override_custom_hook in override_custom_hooks:
+                update_or_add_custom_hook(self._recipe_cfg, ConfigDict(override_custom_hook))
+        if len(self.override_configs) > 0:
+            logger.info(f"before override configs merging = {self._recipe_cfg}")
+            self._recipe_cfg.merge_from_dict(self.override_configs)
+            logger.info(f"after override configs merging = {self._recipe_cfg}")
 
         # prepare model config
         self._model_cfg = self._init_model_cfg()
+
+        # Remove FP16 config if running on CPU device and revert to FP32
+        # https://github.com/pytorch/pytorch/issues/23377
+        if not torch.cuda.is_available() and 'fp16' in self._model_cfg:
+            logger.info('Revert FP16 to FP32 on CPU device')
+            if isinstance(self._model_cfg, Config):
+                del self._model_cfg._cfg_dict['fp16']
+            elif isinstance(self._model_cfg, ConfigDict):
+                del self._model_cfg['fp16']
+        self._precision = [ModelPrecision.FP32]
 
         # add Cancel tranining hook
         update_or_add_custom_hook(self._recipe_cfg, ConfigDict(
             type='CancelInterfaceHook', init_callback=self.on_hook_initialized))
         if self._time_monitor is not None:
             update_or_add_custom_hook(self._recipe_cfg, ConfigDict(
-                type='OTEProgressHook', time_monitor=self._time_monitor, verbose=True))
+                type='OTEProgressHook', time_monitor=self._time_monitor, verbose=True, priority=71))
         if self._learning_curves is not None:
             self._recipe_cfg.log_config.hooks.append(
                 {'type': 'OTELoggerHook', 'curves': self._learning_curves}
@@ -197,11 +217,32 @@ class BaseTask:
         """
         return None
 
-    def _init_recipe_hparam(self) -> dict:
+    def _overwrite_parameters(self):
+        """ Overwrite mmX config parameters with TaskEnvironment hyperparameters. 
+
+        Hyper Parameters defined in TaskEnvironment will overwrite the below mmX config parameters.
+
+        * lr_config.warmup_iters <- learning_parameters.learning_rate_warmup_iters
+        * optimizer.lr <- learning_parameters.learning_rate
+        * data.samples_per_gpu <- learning_parameters.batch_size
+        * data.workers_per_gpu <- learning_parameters.num_workers
+        * runner.max_epochs <- learning_parameters.num_iters
         """
-        initialize recipe hyperparamter as dict.
-        """
-        return dict()
+
+        warmup_iters = int(self._hyperparams.learning_parameters.learning_rate_warmup_iters)
+        lr_config = ConfigDict(warmup_iters=warmup_iters) if warmup_iters > 0 \
+            else ConfigDict(warmup_iters=warmup_iters, warmup=None)
+        new_params = ConfigDict(
+            optimizer=ConfigDict(lr=self._hyperparams.learning_parameters.learning_rate),
+            lr_config=lr_config,
+            data=ConfigDict(
+                samples_per_gpu=int(self._hyperparams.learning_parameters.batch_size),
+                workers_per_gpu=int(self._hyperparams.learning_parameters.num_workers),
+            ),
+            runner=ConfigDict(max_epochs=int(self._hyperparams.learning_parameters.num_iters)),
+        )
+
+        self._recipe_cfg.merge_from_dict(new_params)
 
     def _load_model_state_dict(self, model: ModelEntity):
         if 'weights.pth' in model.model_adapters:
@@ -210,9 +251,19 @@ class BaseTask:
             model_data = torch.load(buffer, map_location=torch.device('cpu'))
 
             # set confidence_threshold as well
+            # TODO[EUGENE]: LOAD TILING PARAMETERS FROM SAVED MODEL
             self.confidence_threshold = model_data.get('confidence_threshold', self.confidence_threshold)
+            if model_data.get('anchors'):
+                self._anchors = model_data['anchors']
+            if model_data.get('tiling_parameters'):
+                tiling_parameters = model_data['tiling_parameters']
+                if tiling_parameters['enable_tiling']:
+                    self._hyperparams.tiling_parameters.enable_tiling = tiling_parameters['enable_tiling']
+                    self._hyperparams.tiling_parameters.tile_size = tiling_parameters['tile_size']
+                    self._hyperparams.tiling_parameters.tile_overlap = tiling_parameters['tile_overlap']
+                    self._hyperparams.tiling_parameters.tile_max_number = tiling_parameters['tile_max_number']
 
-            return model_data['model']
+            return model_data.get('model', model_data.get('state_dict', None))
         else:
             return None
 
@@ -258,3 +309,8 @@ class BaseTask:
 
         def __reduce__(self):
             return (self.__class__, (id(self.task_instance),))
+
+    def update_override_configurations(self, config):
+        logger.info(f"update override config with: {config}")
+        config = ConfigDict(**config)
+        self.override_configs.update(config)

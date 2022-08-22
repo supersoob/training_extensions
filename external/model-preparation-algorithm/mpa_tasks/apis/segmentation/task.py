@@ -16,6 +16,7 @@ from segmentation_tasks.extension.utils.hooks import OTELoggerHook
 from mpa import MPAConstants
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.segmentation import SegmentationConfig
+from mpa_tasks.utils.data_utils import get_actmap
 from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 from ote_sdk.configuration import cfg_helper
@@ -49,6 +50,10 @@ from ote_sdk.utils.segmentation_utils import (
     create_annotation_from_segmentation_map,
     create_hard_prediction_from_soft_prediction)
 
+from segmentation_tasks.apis.segmentation import OTESegmentationNNCFTask
+from ote_sdk.utils.argument_checks import check_input_parameters_type
+from ote_sdk.entities.model_template import parse_model_template
+
 
 logger = get_logger()
 
@@ -67,6 +72,8 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
               inference_parameters: Optional[InferenceParameters] = None
               ) -> DatasetEntity:
         logger.info('infer()')
+        dump_features = True
+        dump_saliency_map = not inference_parameters.is_evaluation if inference_parameters else True
 
         if inference_parameters is not None:
             update_progress_callback = inference_parameters.update_progress
@@ -80,15 +87,13 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         stage_module = 'SegInferrer'
         self._data_cfg = self._init_test_data_cfg(dataset)
         self._label_dictionary = dict(enumerate(self._labels, 1))
-        results = self._run_task(stage_module, mode='train', dataset=dataset)
+        results = self._run_task(stage_module, mode='train', dataset=dataset, dump_features=dump_features,
+                                  dump_saliency_map=dump_saliency_map)
         logger.debug(f'result of run_task {stage_module} module = {results}')
         predictions = results['outputs']
-        # TODO: feature maps should be came from the inference results
-        featuremaps = [None for _ in range(len(predictions))]
-        for i in range(len(dataset)):
-            result, featuremap, dataset_item = predictions[i], featuremaps[i], dataset[i]
-            self._add_predictions_to_dataset_item(result, featuremap, dataset_item,
-                                                  save_mask_visualization=not is_evaluation)
+        prediction_results = zip(predictions['eval_predictions'], predictions['feature_vectors'],
+                                  predictions['saliency_maps'])
+        self._add_predictions_to_dataset(prediction_results, dataset, dump_saliency_map=not is_evaluation)
         return dataset
 
     def evaluate(self,
@@ -123,7 +128,8 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         output_model.optimization_type = ModelOptimizationType.MO
 
         stage_module = 'SegExporter'
-        results = self._run_task(stage_module, mode='train')
+        self._initialize()
+        results = self._run_task(stage_module, mode='train', precision=self._precision[0].name)
         results = results.get('outputs')
         logger.debug(f'results of run_task = {results}')
         if results is None:
@@ -142,17 +148,6 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
             output_model.optimization_methods = self._optimization_methods
             output_model.set_data("label_schema.json", label_schema_to_bytes(self._task_environment.label_schema))
         logger.info('Exporting completed')
-
-    def _init_recipe_hparam(self) -> dict:
-        return ConfigDict(
-            optimizer=ConfigDict(lr=self._hyperparams.learning_parameters.learning_rate),
-            lr_config=ConfigDict(warmup_iters=int(self._hyperparams.learning_parameters.learning_rate_warmup_iters)),
-            data=ConfigDict(
-                samples_per_gpu=int(self._hyperparams.learning_parameters.batch_size),
-                workers_per_gpu=int(self._hyperparams.learning_parameters.num_workers),
-            ),
-            runner=ConfigDict(max_epochs=int(self._hyperparams.learning_parameters.num_iters)),
-        )
 
     def _init_recipe(self):
         logger.info('called _init_recipe()')
@@ -201,45 +196,33 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         )
         return data_cfg
 
-    def _add_predictions_to_dataset_item(self, prediction, feature_vector, dataset_item, save_mask_visualization):
-        soft_prediction = np.transpose(prediction, axes=(1, 2, 0))
-        hard_prediction = create_hard_prediction_from_soft_prediction(
-            soft_prediction=soft_prediction,
-            soft_threshold=self._hyperparams.postprocessing.soft_threshold,
-            blur_strength=self._hyperparams.postprocessing.blur_strength,
-        )
-        annotations = create_annotation_from_segmentation_map(
-            hard_prediction=hard_prediction,
-            soft_prediction=soft_prediction,
-            label_map=self._label_dictionary,
-        )
-        dataset_item.append_annotations(annotations=annotations)
+    def _add_predictions_to_dataset(self, prediction_results, dataset, dump_saliency_map):
+        """ Loop over dataset again to assign predictions. Convert from MMSegmentation format to OTE format. """
 
-        if feature_vector is not None:
-            active_score = TensorEntity(name="representation_vector", numpy=feature_vector)
-            dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
+        for dataset_item, (prediction, feature_vector, saliency_map) in zip(dataset, prediction_results):
+            soft_prediction = np.transpose(prediction[0], axes=(1, 2, 0))
+            hard_prediction = create_hard_prediction_from_soft_prediction(
+                soft_prediction=soft_prediction,
+                soft_threshold=self._hyperparams.postprocessing.soft_threshold,
+                blur_strength=self._hyperparams.postprocessing.blur_strength,
+            )
+            annotations = create_annotation_from_segmentation_map(
+                hard_prediction=hard_prediction,
+                soft_prediction=soft_prediction,
+                label_map=self._label_dictionary,
+            )
+            dataset_item.append_annotations(annotations=annotations)
 
-        if save_mask_visualization:
-            for label_index, label in self._label_dictionary.items():
-                if label_index == 0:
-                    continue
+            if feature_vector is not None:
+                active_score = TensorEntity(name="representation_vector", numpy=feature_vector.reshape(-1))
+                dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
 
-                if len(soft_prediction.shape) == 3:
-                    current_label_soft_prediction = soft_prediction[:, :, label_index]
-                else:
-                    current_label_soft_prediction = soft_prediction
-                min_soft_score = np.min(current_label_soft_prediction)
-                max_soft_score = np.max(current_label_soft_prediction)
-                factor = 255.0 / (max_soft_score - min_soft_score + 1e-12)
-                result_media_numpy = (factor * (current_label_soft_prediction - min_soft_score)).astype(np.uint8)
-
-                result_media = ResultMediaEntity(name=f'{label.name}',
-                                                 type='Soft Prediction',
-                                                 label=label,
-                                                 annotation_scene=dataset_item.annotation_scene,
-                                                 roi=dataset_item.roi,
-                                                 numpy=result_media_numpy)
-                dataset_item.append_metadata_item(result_media, model=self._task_environment.model)
+            if dump_saliency_map and saliency_map is not None:
+                saliency_map = get_actmap(saliency_map, (dataset_item.width, dataset_item.height) )
+                saliency_map_media = ResultMediaEntity(name="saliency_map", type="Saliency map",
+                                                annotation_scene=dataset_item.annotation_scene,
+                                                numpy=saliency_map, roi=dataset_item.roi)
+                dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
 
     @staticmethod
     def _patch_datasets(config: MPAConfig, domain=Domain.SEGMENTATION):
@@ -296,7 +279,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
 
 class SegmentationTrainTask(SegmentationInferenceTask, ITrainingTask):
     def save_model(self, output_model: ModelEntity):
-        logger.info('called save_model')
+        logger.info(f'called save_model: {self._model_ckpt}')
         buffer = io.BytesIO()
         hyperparams_str = ids_to_strings(cfg_helper.convert(self._hyperparams, dict, enum_to_str=True))
         labels = {label.name: label.color.rgb_tuple for label in self._labels}
@@ -306,7 +289,7 @@ class SegmentationTrainTask(SegmentationInferenceTask, ITrainingTask):
         torch.save(modelinfo, buffer)
         output_model.set_data("weights.pth", buffer.getvalue())
         output_model.set_data("label_schema.json", label_schema_to_bytes(self._task_environment.label_schema))
-        output_model.precision = [ModelPrecision.FP32]
+        output_model.precision = self._precision
 
     def cancel_training(self):
         """
@@ -426,3 +409,22 @@ class SegmentationTrainTask(SegmentationInferenceTask, ITrainingTask):
             visualization_info = LineChartInfo(name=key, x_axis_label="Epoch", y_axis_label=key)
             output.append(MetricsGroup(metrics=[metric_curve], visualization_info=visualization_info))
         return output, best_score
+
+
+class SegmentationNNCFTask(OTESegmentationNNCFTask):
+
+    @check_input_parameters_type()
+    def __init__(self, task_environment: TaskEnvironment):
+        """"
+        Task for compressing segmentation models using NNCF.
+        """
+        curr_model_path = task_environment.model_template.model_template_path
+        base_model_path = os.path.join(
+            os.path.dirname(os.path.abspath(curr_model_path)),
+            task_environment.model_template.base_model_path
+        )
+        if os.path.isfile(base_model_path):
+            logger.info(f'Base model for NNCF: {base_model_path}')
+            # Redirect to base model
+            task_environment.model_template = parse_model_template(base_model_path)
+        super().__init__(task_environment)

@@ -144,8 +144,63 @@ class BaseConfig(ConfigurableParameters):
         )
 
     class BaseAlgoBackendParameters(ParameterGroup):
-        train_type = selectable(default_value=TrainType.SelfSupervised,
+        train_type = selectable(default_value=TrainType.Incremental,
                                 header='train type',
                                 description='training schema for the MPA task',
                                 editable=False,
                                 visible_in_ui=True)
+
+    class BaseTilingParameters(ParameterGroup):
+
+        enable_tiling = configurable_boolean(
+            default_value=False,
+            header="Enable tiling",
+            description="Enable tiling",
+            warning="",
+            affects_outcome_of=ModelLifecycle.NONE
+        )
+
+        tile_size = configurable_integer(
+            header="Tile Dimension",
+            description="Tile Dimension",
+            default_value=400,
+            min_value=100,
+            max_value=maxsize,
+            affects_outcome_of=ModelLifecycle.NONE
+        )
+
+        tile_overlap = configurable_float(
+            header="Tile Overlap",
+            description="Tile Overlap",
+            default_value=0.2,
+            min_value=0.0,
+            max_value=1.0,
+            affects_outcome_of=ModelLifecycle.NONE
+        )
+
+        tile_max_number = configurable_integer(
+            header="Max object per image",
+            description="Max object per image",
+            default_value=1500,
+            min_value=0,
+            max_value=maxsize,
+            affects_outcome_of=ModelLifecycle.NONE
+        )
+
+        enable_adaptive_params = configurable_boolean(
+            default_value=True,
+            header="Enable adaptive tiling parameters",
+            description="Enable adaptive tiling parameters",
+            warning="",
+            affects_outcome_of=ModelLifecycle.NONE
+        )
+
+        adaptive_object_tile_ratio = configurable_float(
+            header="Object Tile Ratio",
+            description="Object Tile Ratio",
+            default_value=0.01,
+            min_value=0.0,
+            max_value=1.0,
+            warning="",
+            affects_outcome_of=ModelLifecycle.NONE
+        )

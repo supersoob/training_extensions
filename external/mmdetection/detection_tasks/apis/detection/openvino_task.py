@@ -14,12 +14,14 @@
 
 import attr
 import copy
+import cv2
 import io
 import json
 import numpy as np
 import os
 import ote_sdk.usecases.exportable_code.demo as demo
 import tempfile
+import warnings
 from addict import Dict as ADDict
 from compression.api import DataLoader
 from compression.engines.ie_engine import IEEngine
@@ -41,8 +43,10 @@ from ote_sdk.entities.model import (
 )
 from ote_sdk.entities.model_template import TaskType
 from ote_sdk.entities.optimization_parameters import OptimizationParameters
+from ote_sdk.entities.result_media import ResultMediaEntity
 from ote_sdk.entities.resultset import ResultSetEntity
 from ote_sdk.entities.task_environment import TaskEnvironment
+from ote_sdk.entities.tensor import TensorEntity
 from ote_sdk.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
 from ote_sdk.usecases.evaluation.metrics_helper import MetricsHelper
 from ote_sdk.usecases.exportable_code.inference import BaseInferencer
@@ -66,6 +70,7 @@ from zipfile import ZipFile
 
 from mmdet.utils.logger import get_root_logger
 from .configuration import OTEDetectionConfig
+from . import model_wrappers
 
 logger = get_root_logger()
 
@@ -87,6 +92,22 @@ class BaseInferencerWithConverter(BaseInferencer):
         detections = self.model.postprocess(prediction, metadata)
 
         return self.converter.convert_to_annotation(detections, metadata)
+    
+    @check_input_parameters_type()
+    def predict(self, image: np.ndarray) -> Tuple[AnnotationSceneEntity, np.ndarray, np.ndarray]:
+        image, metadata = self.pre_process(image)
+        raw_predictions = self.forward(image)
+        predictions = self.post_process(raw_predictions, metadata)
+        if 'feature_vector' not in raw_predictions or 'saliency_map' not in raw_predictions:
+            warnings.warn('Could not find Feature Vector and Saliency Map in OpenVINO output. '
+                          'Please rerun OpenVINO export or retrain the model.')
+            features = [None, None]
+        else:
+            features = [
+                raw_predictions['feature_vector'].reshape(-1),
+                raw_predictions['saliency_map']
+            ]
+        return predictions, features
 
     @check_input_parameters_type()
     def forward(self, inputs: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
@@ -119,7 +140,7 @@ class OpenVINODetectionInferencer(BaseInferencerWithConverter):
         model_adapter = OpenvinoAdapter(create_core(), model_file, weight_file, device=device, max_num_requests=num_requests)
         configuration = {**attr.asdict(hparams.postprocessing,
                               filter=lambda attr, value: attr.name not in ['header', 'description', 'type', 'visible_in_ui'])}
-        model = Model.create_model('ssd', model_adapter, configuration, preload=True)
+        model = Model.create_model('OTE_SSD', model_adapter, configuration, preload=True)
         converter = DetectionBoxToAnnotationConverter(label_schema)
 
         super().__init__(configuration, model, converter)
@@ -150,7 +171,7 @@ class OpenVINOMaskInferencer(BaseInferencerWithConverter):
               'header', 'description', 'type', 'visible_in_ui'])}
 
         model = Model.create_model(
-          'maskrcnn',
+          'ote_maskrcnn',
           model_adapter,
           configuration,
           preload=True)
@@ -185,7 +206,7 @@ class OpenVINORotatedRectInferencer(BaseInferencerWithConverter):
               'header', 'description', 'type', 'visible_in_ui'])}
 
         model = Model.create_model(
-          'maskrcnn',
+          'ote_maskrcnn',
           model_adapter,
           configuration,
           preload=True)
@@ -250,13 +271,27 @@ class OpenVINODetectionTask(IDeploymentTask, IInferenceTask, IEvaluationTask, IO
     def infer(self, dataset: DatasetEntity, inference_parameters: Optional[InferenceParameters] = None) -> DatasetEntity:
         logger.info('Start OpenVINO inference')
         update_progress_callback = default_progress_callback
+        add_saliency_map = True
         if inference_parameters is not None:
             update_progress_callback = inference_parameters.update_progress
+            add_saliency_map = not inference_parameters.is_evaluation
         dataset_size = len(dataset)
         for i, dataset_item in enumerate(dataset, 1):
-            predicted_scene = self.inferencer.predict(dataset_item.numpy)
+            predicted_scene, features = self.inferencer.predict(dataset_item.numpy)
             dataset_item.append_annotations(predicted_scene.annotations)
             update_progress_callback(int(i / dataset_size * 100))
+            feature_vector, saliency_map = features
+            if feature_vector is not None:
+                representation_vector = TensorEntity(name="representation_vector", numpy=feature_vector.reshape(-1))
+                dataset_item.append_metadata_item(representation_vector, model=self.model)
+
+            if add_saliency_map and saliency_map is not None:
+                width, height = dataset_item.width, dataset_item.height
+                saliency_map = cv2.resize(saliency_map[0], (width, height), interpolation=cv2.INTER_NEAREST)
+                saliency_map_media = ResultMediaEntity(name="saliency_map", type="Saliency map",
+                                                annotation_scene=dataset_item.annotation_scene, 
+                                                numpy=saliency_map, roi=dataset_item.roi)
+                dataset_item.append_metadata_item(saliency_map_media, model=self.model)
         logger.info('OpenVINO inference completed')
         return dataset
 
@@ -290,6 +325,12 @@ class OpenVINODetectionTask(IDeploymentTask, IInferenceTask, IEvaluationTask, IO
             arch.writestr(
                 os.path.join("model", "config.json"), json.dumps(parameters, ensure_ascii=False, indent=4)
             )
+            # model_wrappers files
+            for root, dirs, files in os.walk(os.path.dirname(model_wrappers.__file__)):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arch.write(file_path, 
+                              os.path.join("python", "model_wrappers", file_path.split("model_wrappers/")[1]))
             # python files
             arch.write(os.path.join(work_dir, "requirements.txt"), os.path.join("python", "requirements.txt"))
             arch.write(os.path.join(work_dir, "LICENSE"), os.path.join("python", "LICENSE"))

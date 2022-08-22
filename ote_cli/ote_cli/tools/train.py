@@ -18,6 +18,8 @@ Model training tool.
 
 import argparse
 import os.path as osp
+import shutil
+import glob
 
 from ote_sdk.configuration.helper import create
 from ote_sdk.entities.inference_parameters import InferenceParameters
@@ -163,15 +165,24 @@ def main():
         )
 
     if args.enable_hpo:
-        run_hpo(args, environment, dataset, template.task_type)
-
-    task = task_class(task_environment=environment)
+        task = run_hpo(args, environment, dataset, template.task_type)
+        if task is None:
+            print("cannot run HPO for this task. will train a model without HPO.")
+            task = task_class(task_environment=environment)
+    else:
+        task = task_class(task_environment=environment)
 
     output_model = ModelEntity(dataset, environment.get_model_configuration())
 
     task.train(dataset, output_model, train_parameters=TrainParameters())
 
     save_model_data(output_model, args.save_model_to)
+
+    if len(glob.glob(task._output_path + '/**/*.json')):
+        log_json = glob.glob(task._output_path + '/**/*.json')[0]
+        log_txt = glob.glob(task._output_path + '/**/*.log')[0]
+        shutil.copy(log_json, args.save_model_to)
+        shutil.copy(log_txt, args.save_model_to)
 
     validation_dataset = dataset.get_subset(Subset.VALIDATION)
     predicted_validation_dataset = task.infer(

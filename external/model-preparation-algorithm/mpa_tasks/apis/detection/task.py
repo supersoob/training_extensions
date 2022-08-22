@@ -5,14 +5,17 @@
 import io
 import os
 from collections import defaultdict
-from typing import List, Optional
+from typing import List, Optional, Tuple, Iterable
 
+import cv2
 import numpy as np
+import pycocotools.mask as mask_util
 import torch
 from mmcv.utils import ConfigDict
 from detection_tasks.apis.detection.config_utils import remove_from_config
 from detection_tasks.apis.detection.ote_utils import TrainingProgressCallback, InferenceProgressCallback
 from detection_tasks.extension.utils.hooks import OTELoggerHook
+from detection_tasks.extension.datasets import adaptive_tile_params
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.detection import DetectionConfig
 from mpa import MPAConstants
@@ -22,6 +25,7 @@ from ote_sdk.configuration import cfg_helper
 from ote_sdk.configuration.helper.utils import ids_to_strings
 from ote_sdk.entities.annotation import Annotation
 from ote_sdk.entities.datasets import DatasetEntity
+from ote_sdk.entities.id import ID
 from ote_sdk.entities.inference_parameters import InferenceParameters
 from ote_sdk.entities.label import Domain
 from ote_sdk.entities.metrics import (BarChartInfo, BarMetricsGroup,
@@ -29,9 +33,12 @@ from ote_sdk.entities.metrics import (BarChartInfo, BarMetricsGroup,
                                       LineMetricsGroup, MetricsGroup,
                                       ScoreMetric, VisualizationType)
 from ote_sdk.entities.model import (ModelEntity, ModelFormat,
-                                    ModelOptimizationType, ModelPrecision)
+                                    ModelOptimizationType)
+from ote_sdk.entities.model_template import TaskType
 from ote_sdk.entities.resultset import ResultSetEntity
+from ote_sdk.entities.result_media import ResultMediaEntity
 from ote_sdk.entities.scored_label import ScoredLabel
+from ote_sdk.entities.shapes.polygon import Point, Polygon
 from ote_sdk.entities.shapes.rectangle import Rectangle
 from ote_sdk.entities.subset import Subset
 from ote_sdk.entities.task_environment import TaskEnvironment
@@ -48,7 +55,9 @@ from ote_sdk.usecases.tasks.interfaces.inference_interface import \
 from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
 from ote_sdk.usecases.tasks.interfaces.unload_interface import IUnload
 
-# from mmdet.apis import export_model
+from detection_tasks.apis.detection import OTEDetectionNNCFTask
+from ote_sdk.utils.argument_checks import check_input_parameters_type
+from ote_sdk.entities.model_template import parse_model_template
 
 
 logger = get_logger()
@@ -63,8 +72,8 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
 
     def infer(self,
               dataset: DatasetEntity,
-              inference_parameters: Optional[InferenceParameters] = None
-              ) -> DatasetEntity:
+              inference_parameters: Optional[InferenceParameters] = None,
+              **kwargs) -> DatasetEntity:
         logger.info('infer()')
 
         update_progress_callback = default_progress_callback
@@ -78,19 +87,50 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
             self.confidence_threshold = self._hyperparams.postprocessing.confidence_threshold
         logger.info(f'Confidence threshold {self.confidence_threshold}')
 
-        stage_module = 'DetectionInferrer'
-        self._data_cfg = self._init_test_data_cfg(dataset)
-        results = self._run_task(stage_module, mode='train', dataset=dataset, parameters=inference_parameters)
-        # TODO: InferenceProgressCallback register
-        logger.debug(f'result of run_task {stage_module} module = {results}')
-        output = results['outputs']
-        predictions = output['detections']
-        # TODO: feature maps should be came from the inference results
-        featuremaps = [None for _ in range(len(predictions))]
-        prediction_results = zip(predictions, featuremaps)
+        prediction_results, _ = self._infer_detector(dataset, inference_parameters, **kwargs)
         self._add_predictions_to_dataset(prediction_results, dataset, self.confidence_threshold)
         logger.info('Inference completed')
         return dataset
+
+    def _infer_detector(self, dataset: DatasetEntity,
+                        inference_parameters: Optional[InferenceParameters] = None,
+                        **kwargs) -> Tuple[Iterable, float]:
+        """ Inference wrapper
+
+        This method triggers the inference and returns `prediction_results` zipped with prediction results,
+        feature vectors, and saliency maps. `metric` is returned as a float value if InferenceParameters.is_evaluation
+        is set to true, otherwise, `None` is returned.
+
+        Args:
+            dataset (DatasetEntity): the validation or test dataset to be inferred with
+            inference_parameters (Optional[InferenceParameters], optional): Option to run evaluation or not.
+                If `InferenceParameters.is_evaluation=True` then metric is returned, otherwise, both metric and
+                saliency maps are empty. Defaults to None.
+
+        Returns:
+            Tuple[Iterable, float]: Iterable prediction results for each sample and metric for on the given dataset
+        """
+        stage_module = 'DetectionInferrer'
+        self._data_cfg = self._init_test_data_cfg(dataset)
+        dump_features = True
+        dump_saliency_map = not inference_parameters.is_evaluation if inference_parameters else True
+        results = self._run_task(stage_module,
+                                 mode='train',
+                                 dataset=dataset,
+                                 eval=inference_parameters.is_evaluation if inference_parameters else False,
+                                 dump_features=dump_features,
+                                 dump_saliency_map=dump_saliency_map,
+                                 **kwargs)
+        # TODO: InferenceProgressCallback register
+        logger.debug(f'result of run_task {stage_module} module = {results}')
+        output = results['outputs']
+        metric = output['metric']
+        predictions = output['detections']
+        assert len(output['detections']) == len(output['feature_vectors']) == len(output['saliency_maps']), \
+               'Number of elements should be the same, however, number of outputs are ' \
+               f"{len(output['detections'])}, {len(output['feature_vectors'])}, and {len(output['saliency_maps'])}"
+        prediction_results = zip(predictions, output['feature_vectors'], output['saliency_maps'])
+        return prediction_results, metric
 
     def evaluate(self,
                  output_result_set: ResultSetEntity,
@@ -121,12 +161,12 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         output_model.optimization_type = ModelOptimizationType.MO
 
         stage_module = 'DetectionExporter'
-        results = self._run_task(stage_module, mode='train')
+        self._model_cfg = self._initialize()
+        results = self._run_task(stage_module, mode='train', precision=self._precision[0].name)
         results = results.get('outputs')
         logger.debug(f'results of run_task = {results}')
         if results is None:
             logger.error(f"error while exporting model {results.get('msg')}")
-            # output_model.model_status = ModelStatus.FAILED
         else:
             bin_file = results.get('bin')
             xml_file = results.get('xml')
@@ -141,26 +181,41 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
                 np.array([self.confidence_threshold], dtype=np.float32).tobytes())
             output_model.precision = self._precision
             output_model.optimization_methods = self._optimization_methods
-            # output_model.model_status = ModelStatus.SUCCESS
             output_model.set_data("label_schema.json", label_schema_to_bytes(self._task_environment.label_schema))
         logger.info('Exporting completed')
 
-    def _init_recipe_hparam(self) -> dict:
-        return ConfigDict(
-            optimizer=ConfigDict(lr=self._hyperparams.learning_parameters.learning_rate),
-            lr_config=ConfigDict(warmup_iters=int(self._hyperparams.learning_parameters.learning_rate_warmup_iters)),
-            data=ConfigDict(
-                samples_per_gpu=int(self._hyperparams.learning_parameters.batch_size),
-                workers_per_gpu=int(self._hyperparams.learning_parameters.num_workers),
-            ),
-            runner=ConfigDict(max_epochs=int(self._hyperparams.learning_parameters.num_iters)),
-        )
+    def _overwrite_parameters(self):
+        """ Overwrite config parameters with TaskEnvironment hyperparameters and config tiling parameters. """
+        super()._overwrite_parameters()
+        if bool(self._hyperparams.tiling_parameters.enable_tiling):
+            tile_params = ConfigDict(
+                data=ConfigDict(
+                    train=ConfigDict(
+                        tile_size=int(self._hyperparams.tiling_parameters.tile_size),
+                        overlap_ratio=float(self._hyperparams.tiling_parameters.tile_overlap),
+                        max_per_img=int(self._hyperparams.tiling_parameters.tile_max_number)
+                    ),
+                    val=ConfigDict(
+                        tile_size=int(self._hyperparams.tiling_parameters.tile_size),
+                        overlap_ratio=float(self._hyperparams.tiling_parameters.tile_overlap),
+                        max_per_img=int(self._hyperparams.tiling_parameters.tile_max_number)
+                    ),
+                    test=ConfigDict(
+                        tile_size=int(self._hyperparams.tiling_parameters.tile_size),
+                        overlap_ratio=float(self._hyperparams.tiling_parameters.tile_overlap),
+                        max_per_img=int(self._hyperparams.tiling_parameters.tile_max_number)
+                    )
+                )
+            )
+            self._recipe_cfg.merge_from_dict(tile_params)
 
     def _init_recipe(self):
         logger.info('called _init_recipe()')
 
-        # recipe_root = 'recipes/stages/detection'
         recipe_root = os.path.join(MPAConstants.RECIPES_PATH, 'stages/detection')
+        if self._task_type.domain in {Domain.INSTANCE_SEGMENTATION, Domain.ROTATED_DETECTION}:
+            recipe_root = os.path.join(MPAConstants.RECIPES_PATH, 'stages/instance-segmentation')
+
         train_type = self._hyperparams.algo_backend.train_type
         logger.info(f'train type = {train_type}')
 
@@ -172,18 +227,21 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
             raise NotImplementedError(f'train type {train_type} is not implemented yet.')
         elif train_type == TrainType.Incremental:
             recipe = os.path.join(recipe_root, 'imbalance.py')
-            # raise NotImplementedError(f'train type {train_type} is not implemented yet.')
         else:
             raise NotImplementedError(f'train type {train_type} is not implemented yet.')
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
-        self._patch_datasets(self._recipe_cfg)  # for OTE compatibility
+        self._patch_data_pipeline()
+        self._patch_datasets(self._recipe_cfg, self._task_type.domain)  # for OTE compatibility
         self._patch_evaluation(self._recipe_cfg)  # for OTE compatibility
         logger.info(f'initialized recipe = {recipe}')
 
     def _init_model_cfg(self):
         base_dir = os.path.abspath(os.path.dirname(self.template_file_path))
-        return MPAConfig.fromfile(os.path.join(base_dir, 'model.py'))
+        model_cfg = MPAConfig.fromfile(os.path.join(base_dir, 'model.py'))
+        if len(self._anchors) != 0:
+            self._update_anchors(model_cfg.model.bbox_head.anchor_generator, self._anchors)
+        return model_cfg
 
     def _init_test_data_cfg(self, dataset: DatasetEntity):
         data_cfg = ConfigDict(
@@ -202,35 +260,42 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
 
     def _add_predictions_to_dataset(self, prediction_results, dataset, confidence_threshold=0.0):
         """ Loop over dataset again to assign predictions. Convert from MMDetection format to OTE format. """
-        for dataset_item, (all_bboxes, fmap) in zip(dataset, prediction_results):
+        for dataset_item, (all_results, feature_vector, saliency_map) in zip(dataset, prediction_results):
             width = dataset_item.width
             height = dataset_item.height
 
             shapes = []
-            for label_idx, detections in enumerate(all_bboxes):
-                for i in range(detections.shape[0]):
-                    probability = float(detections[i, 4])
-                    coords = detections[i, :4].astype(float).copy()
-                    coords /= np.array([width, height, width, height], dtype=float)
-                    coords = np.clip(coords, 0, 1)
-
-                    if probability < confidence_threshold:
-                        continue
-
-                    assigned_label = [ScoredLabel(self._labels[label_idx],
-                                                  probability=probability)]
-                    if coords[3] - coords[1] <= 0 or coords[2] - coords[0] <= 0:
-                        continue
-
-                    shapes.append(Annotation(
-                        Rectangle(x1=coords[0], y1=coords[1], x2=coords[2], y2=coords[3]),
-                        labels=assigned_label))
+            if self._task_type == TaskType.DETECTION:
+                shapes = self._det_add_predictions_to_dataset(all_results, width, height, confidence_threshold)
+            elif self._task_type in {TaskType.INSTANCE_SEGMENTATION, TaskType.ROTATED_DETECTION}:
+                shapes = self._ins_seg_add_predictions_to_dataset(all_results, width, height, confidence_threshold)
+            else:
+                raise RuntimeError(
+                    f"MPA results assignment not implemented for task: {self._task_type}")
 
             dataset_item.append_annotations(shapes)
 
-            if fmap is not None:
-                active_score = TensorEntity(name="representation_vector", numpy=fmap)
-                dataset_item.append_metadata_item(active_score)
+            if feature_vector is not None:
+                active_score = TensorEntity(name="representation_vector", numpy=feature_vector.reshape(-1))
+                dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
+
+            if saliency_map is not None:
+                width, height = dataset_item.width, dataset_item.height
+                saliency_map = cv2.resize(saliency_map, (width, height), interpolation=cv2.INTER_NEAREST)
+                saliency_map_media = ResultMediaEntity(name="saliency_map", type="Saliency map",
+                                                       annotation_scene=dataset_item.annotation_scene,
+                                                       numpy=saliency_map, roi=dataset_item.roi)
+                dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
+
+    def _patch_data_pipeline(self):
+        base_dir = os.path.abspath(os.path.dirname(self.template_file_path))
+        if bool(self._hyperparams.tiling_parameters.enable_tiling):
+            data_pipeline_path = os.path.join(base_dir, "tile_pipeline.py")
+        else:
+            data_pipeline_path = os.path.join(base_dir, 'data_pipeline.py')
+        if os.path.exists(data_pipeline_path):
+            data_pipeline_cfg = MPAConfig.fromfile(data_pipeline_path)
+            self._recipe_cfg.merge_from_dict(data_pipeline_cfg)
 
     @staticmethod
     def _patch_datasets(config: MPAConfig, domain=Domain.DETECTION):
@@ -248,13 +313,18 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
                     pipeline_step.to_rgb = to_rgb
                 elif pipeline_step.type == 'MultiScaleFlipAug':
                     patch_color_conversion(pipeline_step.transforms)
-
+        # remove redundant parameters introduced in self._recipe_cfg.merge_from_dict
+        remove_from_config(config, 'ann_file')
+        remove_from_config(config, 'img_prefix')
         assert 'data' in config
         for subset in ('train', 'val', 'test', 'unlabeled'):
             cfg = config.data.get(subset, None)
             if not cfg:
                 continue
-            if cfg.type == 'RepeatDataset' or cfg.type == 'MultiImageMixDataset':
+            # remove redundant parameters introduced in self._recipe_cfg.merge_from_dict
+            remove_from_config(cfg, 'ann_file')
+            remove_from_config(cfg, 'img_prefix')
+            if cfg.type in ["RepeatDataset", "MultiImageMixDataset", "ImageTilingDataset"]:
                 cfg = cfg.dataset
             cfg.type = 'MPADetDataset'
             cfg.domain = domain
@@ -279,18 +349,74 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         cfg = config.evaluation
         # CocoDataset.evaluate -> CustomDataset.evaluate
         cfg.pop('classwise', None)
-        cfg.metric = 'mAP'
+        # cfg.metric = 'mAP'
         cfg.save_best = 'mAP'
         # EarlyStoppingHook
         for cfg in config.get('custom_hooks', []):
             if 'EarlyStoppingHook' in cfg.type:
                 cfg.metric = 'mAP'
 
+    def _det_add_predictions_to_dataset(self, all_results, width, height, confidence_threshold):
+        shapes = []
+        for label_idx, detections in enumerate(all_results):
+            for i in range(detections.shape[0]):
+                probability = float(detections[i, 4])
+                coords = detections[i, :4].astype(float).copy()
+                coords /= np.array([width, height, width, height], dtype=float)
+                coords = np.clip(coords, 0, 1)
+
+                if probability < confidence_threshold:
+                    continue
+
+                assigned_label = [ScoredLabel(self._labels[label_idx],
+                                              probability=probability)]
+                if coords[3] - coords[1] <= 0 or coords[2] - coords[0] <= 0:
+                    continue
+
+                shapes.append(Annotation(
+                    Rectangle(x1=coords[0], y1=coords[1], x2=coords[2], y2=coords[3]),
+                    labels=assigned_label))
+        return shapes
+
+    def _ins_seg_add_predictions_to_dataset(self, all_results, width, height, confidence_threshold):
+        shapes = []
+        for label_idx, (boxes, masks) in enumerate(zip(*all_results)):
+            for mask, probability in zip(masks, boxes[:, 4]):
+                if isinstance(mask, dict):
+                    mask = mask_util.decode(mask)
+                mask = mask.astype(np.uint8)
+                probability = float(probability)
+                contours, hierarchies = cv2.findContours(mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+                if hierarchies is None:
+                    continue
+                for contour, hierarchy in zip(contours, hierarchies[0]):
+                    if hierarchy[3] != -1:
+                        continue
+                    if len(contour) <= 2 or probability < confidence_threshold:
+                        continue
+                    if self._task_type == TaskType.INSTANCE_SEGMENTATION:
+                        points = [Point(x=point[0][0] / width, y=point[0][1] / height) for point in contour]
+                    else:
+                        box_points = cv2.boxPoints(cv2.minAreaRect(contour))
+                        points = [Point(x=point[0] / width, y=point[1] / height) for point in box_points]
+                    labels = [ScoredLabel(self._labels[label_idx], probability=probability)]
+                    polygon = Polygon(points=points)
+                    if cv2.contourArea(contour) > 0 and polygon.get_area() > 1e-12:
+                        shapes.append(Annotation(polygon, labels=labels, id=ID(f"{label_idx:08}")))
+        return shapes
+
+    @staticmethod
+    def _update_anchors(origin, new):
+        logger.info("Updating anchors")
+        origin['heights'] = new['heights']
+        origin['widths'] = new['widths']
+
 
 class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
     def save_model(self, output_model: ModelEntity):
         logger.info('called save_model')
         buffer = io.BytesIO()
+        # TODO[EUGENE]: WHY NESTED PARAMETER ARE NOT PROPERLY SAVED?
         hyperparams_str = ids_to_strings(cfg_helper.convert(self._hyperparams, dict, enum_to_str=True))
         labels = {label.name: label.color.rgb_tuple for label in self._labels}
         model_ckpt = torch.load(self._model_ckpt)
@@ -298,16 +424,25 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
             'model': model_ckpt['state_dict'], 'config': hyperparams_str, 'labels': labels,
             'confidence_threshold': self.confidence_threshold, 'VERSION': 1
         }
+        if bool(self._hyperparams.tiling_parameters.enable_tiling):
+            modelinfo.update(
+                dict(tiling_parameters=dict(
+                        enable_tiling=bool(self._hyperparams.tiling_parameters.enable_tiling),
+                        tile_size=int(self._hyperparams.tiling_parameters.tile_size),
+                        tile_overlap=float(self._hyperparams.tiling_parameters.tile_overlap),
+                        tile_max_number=int(self._hyperparams.tiling_parameters.tile_max_number),
+                ))
+            )
 
-        # if hasattr(self._config.model, 'bbox_head') and hasattr(self._config.model.bbox_head, 'anchor_generator'):
-        #     if getattr(self._config.model.bbox_head.anchor_generator, 'reclustering_anchors', False):
-        #         generator = self._model.bbox_head.anchor_generator
-        #         modelinfo['anchors'] = {'heights': generator.heights, 'widths': generator.widths}
+        if hasattr(self._model_cfg.model, 'bbox_head') and hasattr(self._model_cfg.model.bbox_head, 'anchor_generator'):
+            if getattr(self._model_cfg.model.bbox_head.anchor_generator, 'reclustering_anchors', False):
+                modelinfo['anchors'] = {}
+                self._update_anchors(modelinfo['anchors'], self._model_cfg.model.bbox_head.anchor_generator)
 
         torch.save(modelinfo, buffer)
         output_model.set_data("weights.pth", buffer.getvalue())
         output_model.set_data("label_schema.json", label_schema_to_bytes(self._task_environment.label_schema))
-        output_model.precision = [ModelPrecision.FP32]
+        output_model.precision = self._precision
 
     def cancel_training(self):
         """
@@ -318,8 +453,6 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
         """
         logger.info("Cancel training requested.")
         self._should_stop = True
-        # stop_training_filepath = os.path.join(self._training_work_dir, '.stop_training')
-        # open(stop_training_filepath, 'a').close()
         if self.cancel_interface is not None:
             self.cancel_interface.cancel()
         else:
@@ -349,6 +482,7 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
         stage_module = 'DetectionTrainer'
         self._data_cfg = self._init_train_data_cfg(dataset)
         self._is_training = True
+        self._config_tiling_parameters(dataset)
         results = self._run_task(stage_module, mode='train', dataset=dataset, parameters=train_parameters)
 
         # Check for stop signal when training has stopped. If should_stop is true, training was cancelled and no new
@@ -368,21 +502,16 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
             # update checkpoint to the newly trained model
             self._model_ckpt = model_ckpt
 
+        # Update anchors
+        if hasattr(self._model_cfg.model, 'bbox_head') and hasattr(self._model_cfg.model.bbox_head, 'anchor_generator'):
+            if getattr(self._model_cfg.model.bbox_head.anchor_generator, 'reclustering_anchors', False):
+                self._update_anchors(self._anchors, self._model_cfg.model.bbox_head.anchor_generator)
+
         # get prediction on validation set
         val_dataset = dataset.get_subset(Subset.VALIDATION)
-        self._data_cfg = self._init_test_data_cfg(val_dataset)
-        results = self._run_task(
-            'DetectionInferrer',
-            mode='train',
-            dataset=val_dataset,
-        )
+        val_preds, val_map = self._infer_detector(val_dataset, InferenceParameters(is_evaluation=True))
+
         preds_val_dataset = val_dataset.with_empty_annotations()
-        logger.debug(f'result of run_task {stage_module} module = {results}')
-        output = results['outputs']
-        val_preds = output['detections']
-        val_map = output['metric']
-        featuremaps = [None for _ in range(len(val_preds))]
-        val_preds = zip(val_preds, featuremaps)
         self._add_predictions_to_dataset(val_preds, preds_val_dataset, 0.0)
 
         result_set = ResultSetEntity(
@@ -468,3 +597,39 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
         )
 
         return output
+
+    def _config_tiling_parameters(self, dataset):
+        # TODO[EUGENE]
+        """_summary_
+
+        Args:
+            dataset (_type_): _description_
+        """
+        if bool(self._hyperparams.tiling_parameters.enable_adaptive_params):
+            adaptive_object_tile_ratio = float(self._hyperparams.tiling_parameters.adaptive_object_tile_ratio)
+            tile_cfg = adaptive_tile_params(dataset, adaptive_object_tile_ratio)
+            if tile_cfg.get('tile_size'):
+                self._hyperparams.tiling_parameters.tile_size = tile_cfg.get('tile_size')
+            if tile_cfg.get('tile_overlap'):
+                self._hyperparams.tiling_parameters.tile_overlap = tile_cfg.get('tile_overlap')
+            if tile_cfg.get('tile_max_number'):
+                self._hyperparams.tiling_parameters.tile_max_number = tile_cfg.get('tile_max_number')
+
+
+class DetectionNNCFTask(OTEDetectionNNCFTask):
+
+    @check_input_parameters_type()
+    def __init__(self, task_environment: TaskEnvironment):
+        """"
+        Task for compressing detection models using NNCF.
+        """
+        curr_model_path = task_environment.model_template.model_template_path
+        base_model_path = os.path.join(
+            os.path.dirname(os.path.abspath(curr_model_path)),
+            task_environment.model_template.base_model_path
+        )
+        if os.path.isfile(base_model_path):
+            logger.info(f'Base model for NNCF: {base_model_path}')
+            # Redirect to base model
+            task_environment.model_template = parse_model_template(base_model_path)
+        super().__init__(task_environment)

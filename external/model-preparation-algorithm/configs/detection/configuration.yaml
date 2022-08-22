@@ -23,6 +23,7 @@ learning_parameters:
     warning:
       Increasing this value may cause the system to use more memory than available,
       potentially causing out of memory errors, please update with caution.
+    auto_hpo_state: NOT_POSSIBLE
   description: Learning Parameters
   header: Learning Parameters
   learning_rate:
@@ -44,6 +45,7 @@ learning_parameters:
     value: 0.01
     visible_in_ui: true
     warning: null
+    auto_hpo_state: NOT_POSSIBLE
   learning_rate_warmup_iters:
     affects_outcome_of: TRAINING
     default_value: 100
@@ -170,8 +172,6 @@ algo_backend:
     enum_name: TrainType
     header: train type
     options:
-      SemiSupervised: "SemiSupervised"
-      SelfSupervised: "SelfSupervised"
       Incremental: "Incremental"
     type: SELECTABLE
     ui_rules:
@@ -179,7 +179,7 @@ algo_backend:
       operator: AND
       rules: []
       type: UI_RULES
-    value: SelfSupervised
+    value: Incremental
     visible_in_ui: True
     warning: null
   type: PARAMETER_GROUP
@@ -279,3 +279,114 @@ nncf_optimization:
     warning: null
   type: PARAMETER_GROUP
   visible_in_ui: True
+
+tiling_parameters:
+  header: Tiling
+  description: Crop dataset to tiles
+
+  enable_tiling:
+    header: Enable tiling on training dataset
+    description: Enable tiling on training dataset
+    default_value: false
+    editable: true
+    affects_outcome_of: TRAINING
+    type: BOOLEAN
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: true
+    visible_in_ui: true
+    warning: null
+
+  tile_size:
+    header: Tile Dimension
+    description: Tile Dimension
+    affects_outcome_of: TRAINING
+    default_value: 400
+    min_value: 100
+    max_value: 9223372036854775807
+    type: INTEGER
+    editable: true
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: 400
+    visible_in_ui: true
+    warning: null
+
+  tile_overlap:
+    header: Tile Overlap
+    description: Tile Overlap
+    affects_outcome_of: TRAINING
+    default_value: 0.2
+    min_value: 0.0
+    max_value: 1.0
+    type: FLOAT
+    editable: true
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: 0.2
+    visible_in_ui: true
+    warning: null
+
+  tile_max_number:
+    header: Max object per image
+    description: Max object per image
+    affects_outcome_of: TRAINING
+    default_value: 1500
+    min_value: 0
+    max_value: 9223372036854775807
+    type: INTEGER
+    editable: true
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: 1500
+    visible_in_ui: true
+    warning: null
+
+  enable_adaptive_params:
+    header: Enable adaptive tiling parameters
+    description: Config tiling parameters adaptively based on annotated dataset statistic
+    default_value: false
+    editable: true
+    affects_outcome_of: TRAINING
+    type: BOOLEAN
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: true
+    visible_in_ui: true
+    warning: null
+
+  adaptive_object_tile_ratio:
+    header: Object Tile Ratio
+    description: Filter empty tile in training
+    affects_outcome_of: TRAINING
+    default_value: 0.01
+    min_value: 0.0
+    max_value: 1.0
+    type: FLOAT
+    editable: true
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: 0.01
+    visible_in_ui: true
+    warning: null
+
+  type: PARAMETER_GROUP
+  visible_in_ui: true

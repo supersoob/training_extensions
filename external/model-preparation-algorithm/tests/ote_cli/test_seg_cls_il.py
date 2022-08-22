@@ -54,10 +54,10 @@ args = {
     ]
 }
 
-root = '/tmp/ote_cli/'
+root = '/tmp/ote_cli_seg/'
 ote_dir = os.getcwd()
 
-templates = Registry('external/model-preparation-algorithm').filter(task_type='SEGMENTATION').templates
+templates = Registry('external/model-preparation-algorithm', experimental=True).filter(task_type='SEGMENTATION').templates
 templates_ids = [template.model_template_id for template in templates]
 
 
@@ -141,7 +141,6 @@ class TestToolsSegClsIncr:
 
     @e2e_pytest_component
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.skip("Issue with model loading 76853")
     def test_nncf_eval(self, template):
         if template.entrypoints.nncf is None:
             pytest.skip("nncf entrypoint is none")
@@ -150,7 +149,6 @@ class TestToolsSegClsIncr:
 
     @e2e_pytest_component
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.skip("Issue with model loading 76853")
     def test_nncf_eval_openvino(self, template):
         if template.entrypoints.nncf is None:
             pytest.skip("nncf entrypoint is none")
