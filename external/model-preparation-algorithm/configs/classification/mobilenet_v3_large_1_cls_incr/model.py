@@ -11,7 +11,7 @@ custom_hooks = [
         start=0,
         patience=10,
         iteration_patience=0,
-        metric='mAP',
+        metric='accuracy',
         interval=1,
         priority=75,
     ),
