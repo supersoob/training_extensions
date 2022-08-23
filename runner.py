@@ -49,7 +49,7 @@ def ote_eval(model_template_path, test_ann_file, test_data_roots, save_performan
     envs = collect_env_vars(env_root)
     envs.update(dict(CUDA_VISIBLE_DEVICES=cuda))
     assert run(command_line, env=envs).returncode == 0
-    assert os.path.exists(save_performance)
+    # assert os.path.exists(save_performance)
 
 
 def prepare_train(config, dataset_name, seed, num_sample) -> dict:
@@ -108,15 +108,15 @@ def main(args):
                         ote_train(kwargs, config.env_root, cuda=args.cuda)
                     # eval validation
                     if os.path.exists(os.path.join(kwargs['save_model_dir'], 'weights.pth')):
-                        ote_eval(
-                            model_template_path=config.template,
-                            test_ann_file=os.path.join(dataset_cfg.anno_root, dataset_cfg.annotations_val),
-                            test_data_roots=os.path.join(dataset_cfg.img_root, dataset_cfg.images_val_dir),
-                            save_performance=os.path.join(kwargs['save_model_dir'], 'val_performance.json'),
-                            weight_path=os.path.join(kwargs['save_model_dir'], 'weights.pth'),
-                            env_root=config.env_root,
-                            cuda=args.cuda
-                        )
+                        # ote_eval(
+                        #     model_template_path=config.template,
+                        #     test_ann_file=os.path.join(dataset_cfg.anno_root, dataset_cfg.annotations_val),
+                        #     test_data_roots=os.path.join(dataset_cfg.img_root, dataset_cfg.images_val_dir),
+                        #     save_performance=os.path.join(kwargs['save_model_dir'], 'val_performance.json'),
+                        #     weight_path=os.path.join(kwargs['save_model_dir'], 'weights.pth'),
+                        #     env_root=config.env_root,
+                        #     cuda=args.cuda
+                        # )
                         # eval test
                         ote_eval(
                             model_template_path=config.template,

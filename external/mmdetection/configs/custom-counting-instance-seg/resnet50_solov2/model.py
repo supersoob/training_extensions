@@ -53,9 +53,9 @@ model = dict(
 
 
 cudnn_benchmark = True
-evaluation = dict(interval=1, metric='mAP', save_best='mAP', iou_thr=[0.5 , 0.55, 0.6 , 0.65, 0.7 , 0.75, 0.8 , 0.85, 0.9, 0.95])
+evaluation = dict(interval=1, metric='mAP', save_best='mAP', iou_thr=[0.5])
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
-optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+optimizer_config = dict(grad_clip=None)
 
 lr_config = dict(
     policy='ReduceLROnPlateau',
@@ -68,9 +68,10 @@ lr_config = dict(
     warmup_iters=200,
     warmup_ratio=1.0 / 3)
 
-checkpoint_config = dict(interval=5)
-log_config = dict(interval=1, hooks=[dict(type='TextLoggerHook')])
 runner = dict(type='EpochRunnerWithCancel', max_epochs=300)
+checkpoint_config = dict(interval=5)
+optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+log_config = dict(interval=1, hooks=[dict(type='TextLoggerHook')])
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = 'output'
