@@ -143,33 +143,33 @@ def main():
 
     validation_dataset = dataset.get_subset(Subset.TESTING)
     
-    # predicted_validation_dataset = task.infer(
-    #     validation_dataset,
-    #     InferenceParameters(is_evaluation=True),
-    #     performance_path=args.save_performance,
-    # )
-
     predicted_validation_dataset = task.infer(
-        validation_dataset.with_empty_annotations(),
+        validation_dataset,
         InferenceParameters(is_evaluation=True),
         performance_path=args.save_performance,
     )
 
-    resultset = ResultSetEntity(
-        model=environment.model,
-        ground_truth_dataset=validation_dataset,
-        prediction_dataset=predicted_validation_dataset,
-    )
-    task.evaluate(resultset)
-    assert resultset.performance is not None
-    print(resultset.performance)
+    # predicted_validation_dataset = task.infer(
+    #     validation_dataset.with_empty_annotations(),
+    #     InferenceParameters(is_evaluation=True),
+    #     performance_path=args.save_performance,
+    # )
 
-    if args.save_performance:
-        with open(args.save_performance + '.f1.json', "w", encoding="UTF-8") as write_file:
-            json.dump(
-                {resultset.performance.score.name: resultset.performance.score.value},
-                write_file,
-            )
+    # resultset = ResultSetEntity(
+    #     model=environment.model,
+    #     ground_truth_dataset=validation_dataset,
+    #     prediction_dataset=predicted_validation_dataset,
+    # )
+    # task.evaluate(resultset)
+    # assert resultset.performance is not None
+    # print(resultset.performance)
+
+    # if args.save_performance:
+    #     with open(args.save_performance + '.f1.json', "w", encoding="UTF-8") as write_file:
+    #         json.dump(
+    #             {resultset.performance.score.name: resultset.performance.score.value},
+    #             write_file,
+    #         )
 
 
 if __name__ == "__main__":
