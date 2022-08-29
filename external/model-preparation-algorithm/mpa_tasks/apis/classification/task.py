@@ -171,7 +171,7 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
         output_model.optimization_type = ModelOptimizationType.MO
 
         stage_module = 'ClsExporter'
-        results = self._run_task(stage_module, mode='train', precision='FP32', export=True)
+        results = self._run_task(stage_module, mode='train', precision='FP32')
         logger.debug(f'results of run_task = {results}')
         results = results.get('outputs')
         logger.debug(f'results of run_task = {results}')
