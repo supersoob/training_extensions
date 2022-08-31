@@ -1,15 +1,49 @@
-_base_: classification/ote_mobilenet_v3_small.yaml
+_base_:
+  [
+    "./stages/classification/train.yaml",
+    "./stages/_base_/data/cls_data.py",
+    "./stages/_base_/models/classifiers/classifier.py",
+  ]
 
-model:
-  adapter: ote.backends.torch.mmcv.MMModelAdapter
-  registry: mmcls.models.builder.CLASSIFIERS
+runner:
+  max_epochs: 20
+
+optimizer_config:
+  type: SAMOptimizerHook
+
+optimizer:
+  type: SGD
+  lr: 0.01
+  momentum: 0.9
+  weight_decay: 0.0005
+
+evaluation:
+  metric: ["accuracy", "class_accuracy"]
+
+task_adapt:
+  type: "mpa"
+  op: "REPLACE"
+
+custom_hooks:
+  - type: NoBiasDecayHook
+  - type: ModelEmaV2Hook
+
+adapters:
+  model: ote.backends.torch.mmcv.model.MMClassifier
+  data: ote.backends.torch.mmcv.dataset.MMClsDataset
+
+model_override: "recipes/classification/ote_mobilenet_v3_small.yaml"
+data_override: "recipes/stages/_base_/data/cifar10.py"
 
 task_cfg:
   tasks:
-    - type: MMTrainer
+    - type: MMClsTrainer
       spec: trainer
     - type: MMEvaluator
       spec: evaluator
       metric: top-1
     - type: MMInferrer
       spec: inferrer
+    - type: TorchOptimizer
+      spec: model_optimizer
+      option: openvino

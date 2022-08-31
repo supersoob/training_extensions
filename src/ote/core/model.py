@@ -1,11 +1,21 @@
 from abc import abstractmethod
+from enum import IntEnum
 
-from ote.core.config import OTEConfig
+from ote.core.config import Config
+from ote.logger import get_logger
+
+logger = get_logger()
+
+class ModelStatus(IntEnum):
+    CONFIGURED = 0
+    BUILT = 1
+    CONFIG_UPDATED = 2
+    OPTIMIZED = 3
 
 
-class OTEModel:
-    def __init__(self, model):
-        self._model = model
+class IModel:
+    def __init__(self, model_config: dict):
+        self.config = Config(model_config)
 
     @abstractmethod
     def save(self):
@@ -17,13 +27,10 @@ class OTEModel:
         """"""
         raise NotImplementedError()
 
-
-class ModelAdapter:
-    @property
     @abstractmethod
-    def model(self) -> OTEModel:
+    def build(self):
         raise NotImplementedError
 
     @abstractmethod
-    def update_model(config: OTEConfig):
+    def update_model(self, config: dict):
         raise NotImplementedError()

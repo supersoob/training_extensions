@@ -1,23 +1,19 @@
 import torch
 import timm
-from ote.core.model import OTEModel, ModelAdapter
-from ote.core.config import OTEConfig
+from ote.core.model import IModel
+from ote.core.config import Config
 from ote.logger import get_logger
-from torch import nn
+# from torch import nn
 
 logger = get_logger()
 
 
-class TorchModelAdapter(ModelAdapter):
-    def __init__(self, model_config: OTEConfig):
-        if not hasattr(model_config, "hub") or not hasattr(model_config, "model"):
-            raise ValueError("cannot find 'hub' or 'model' attribute in the model config")
-        model = TorchModelAdapter.load_from_hub(model_config.hub, model_config.model)
-        self._model = TorchModel(model)
+class TorchModel(IModel):
+    def __init__(self, model_config: dict):
+        super().__init__(model_config)
 
-    @property
-    def model(self):
-        return self._model
+    def build(self):
+        return TorchModel.load_from_hub(self.config.hub, self.config.model)
 
     @staticmethod
     def load_from_hub(hub, model, pretrained=True, **kwargs):
@@ -29,13 +25,8 @@ class TorchModelAdapter(ModelAdapter):
             raise ValueError(f"not supported model hub repo {hub_path}")
         return model
 
-    def update_model(config):
+    def update_model(self, config):
         pass
-
-
-class TorchModel(OTEModel):
-    def __init__(self, model):
-        super().__init__(model)
 
     def save(self):
         pass

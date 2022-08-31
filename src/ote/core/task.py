@@ -1,16 +1,17 @@
 from abc import abstractmethod
 
 from mmcv.utils import Registry, build_from_cfg
-from ote.core.config import OTEConfig
+
+from ote.core.config import Config
 
 TASK_REGISTRY = Registry("ote-task")
 
-class OTETask():
+class ITask():
     """"""
     def __init__(self, spec):
         """"""
         self.spec = spec
 
     @abstractmethod
-    def run(self, **kwargs):
+    def run(self, *args, **kwargs):
         raise NotImplementedError()

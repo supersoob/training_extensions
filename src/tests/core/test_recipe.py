@@ -1,6 +1,7 @@
 import os
+
 from ote import OTEConstants
-from ote.core.config import OTEConfig
+from ote.core.config import Config
 from ote.core.recipe import Recipe
 
 
@@ -9,6 +10,6 @@ def test_recipe():
     recipe = Recipe(yaml_file_path)
     assert isinstance(recipe, Recipe)
 
-    recipe.run(dataset="dataset")
+    # recipe.run(dataset="dataset")
 
-    recipe.train(dataset="dataset")
+    recipe.train(mode="train")

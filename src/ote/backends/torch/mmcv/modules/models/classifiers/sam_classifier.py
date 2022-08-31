@@ -33,8 +33,10 @@ class SAMImageClassifier(ImageClassifier):
     """SAM-enabled ImageClassifier"""
 
     def __init__(self, task_adapt=None, **kwargs):
+        self.multilabel = False
         if 'multilabel' in kwargs:
             self.multilabel = kwargs.pop('multilabel')
+        self.hierarchical = False
         if 'hierarchical' in kwargs:
             self.hierarchical = kwargs.pop('hierarchical')
         super().__init__(**kwargs)
@@ -87,7 +89,7 @@ class SAMImageClassifier(ImageClassifier):
         if self.multilabel or self.hierarchical:
             loss = self.head.forward_train(x, gt_label, **kwargs)
         else:
-            gt_label = gt_label.squeeze(dim=1)
+            # gt_label = gt_label.squeeze(dim=1)
             loss = self.head.forward_train(x, gt_label)
 
         losses.update(loss)
