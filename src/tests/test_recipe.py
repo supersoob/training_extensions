@@ -2,7 +2,7 @@ import os
 
 from ote import OTEConstants
 from ote.core.config import Config
-from ote.core.recipe import Recipe
+from ote.recipe import Recipe
 
 
 def test_recipe():
@@ -12,4 +12,6 @@ def test_recipe():
 
     # recipe.run(dataset="dataset")
 
-    recipe.train(mode="train")
+    result = recipe.train(mode="train")
+    assert isinstance(result, dict)
+    assert result.get("final_ckpt") is not None

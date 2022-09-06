@@ -11,17 +11,17 @@ from ote.logger import get_logger
 logger = get_logger()
 
 class MMDataset(TorchDataset):
-    def __init__(self, data_config: Config):
+    def __init__(self, data_config: Config, **kwargs):
         super().__init__(data_config)
 
     def build(self):
         if self.datasets is None:
             self.datasets = dict()
-        self.configure()
+        # self.configure()
         for subset in ["train", "val", "test"]:
-            logger.info(f"data config for building = {self.config._cfg_dict}")
-            if hasattr(self.config._cfg_dict, subset):
-                self.datasets[subset] = self.builder(self.config._cfg_dict.get(subset))
+            logger.info(f"data config for building = {self._config._cfg_dict}")
+            if hasattr(self._config._cfg_dict, subset):
+                self.datasets[subset] = self.builder(self._config._cfg_dict.get(subset))
             else:
                 logger.warning(f"no attribute {subset} in the config")
         logger.info(f"datasets = {self.datasets}")
@@ -32,67 +32,13 @@ class MMDataset(TorchDataset):
     def builder(self):
         raise NotImplementedError()
 
-    def update_data(self, options: dict):
-        self.config.merge_from_dict(options)
-        logger.info(f"updated data cfg = {self.config}")
+    def update_config(self, options: dict, overwrite=False, **kwargs):
+        logger.info(f"options = {options}, overwrite = {overwrite}")
+        if overwrite:
+            self._config = Config(options)
+        else:
+            self._config.merge_from_dict(options)
 
-    def configure(self, **kwargs):
-        # update data configuration using image options
-        def configure_split(target):
-
-            def update_transform(opt, pipeline, idx, transform):
-                if isinstance(opt, dict):
-                    if '_delete_' in opt.keys() and opt.get('_delete_', False):
-                        # if option include _delete_=True, remove this transform from pipeline
-                        logger.info(f"configure_data: {transform['type']} is deleted")
-                        del pipeline[idx]
-                        return
-                    logger.info(f"configure_data: {transform['type']} is updated with {opt}")
-                    transform.update(**opt)
-
-            def update_config(src, pipeline_options):
-                logger.info(f'update_config() {pipeline_options}')
-                if src.get('pipeline') is not None or \
-                        (src.get('dataset') is not None and src.get('dataset').get('pipeline') is not None):
-                    if src.get('pipeline') is not None:
-                        pipeline = src.get('pipeline', None)
-                    else:
-                        pipeline = src.get('dataset').get('pipeline')
-                    if isinstance(pipeline, list):
-                        for idx, transform in enumerate(pipeline):
-                            for opt_key, opt in pipeline_options.items():
-                                if transform['type'] == opt_key:
-                                    update_transform(opt, pipeline, idx, transform)
-                    elif isinstance(pipeline, dict):
-                        for _, pipe in pipeline.items():
-                            for idx, transform in enumerate(pipe):
-                                for opt_key, opt in pipeline_options.items():
-                                    if transform['type'] == opt_key:
-                                        update_transform(opt, pipe, idx, transform)
-                    else:
-                        raise NotImplementedError(f'pipeline type of {type(pipeline)} is not supported')
-                else:
-                    logger.info('no pipeline in the data split')
-
-            split = cfg.get(target)
-            if split is not None:
-                if isinstance(split, list):
-                    for sub_item in split:
-                        update_config(sub_item, pipeline_options)
-                elif isinstance(split, dict):
-                    update_config(split, pipeline_options)
-                else:
-                    logger.warning(f"type of split '{target}'' should be list or dict but {type(split)}")
-
-        cfg = self.config
-        logger.info('configure_data()')
-        logger.debug(f'[args] {cfg}')
-        pipeline_options = cfg.pop('pipeline_options', None)
-        if pipeline_options is not None and isinstance(pipeline_options, dict):
-            configure_split('train')
-            configure_split('val')
-            configure_split('test')
-            configure_split('unlabeled')
 
 class MMClsDataset(MMDataset):
     """mmcls dataset dataset adapter"""

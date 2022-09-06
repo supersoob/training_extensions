@@ -1,4 +1,5 @@
 import random
+
 import numpy as np
 import torch
 
@@ -38,16 +39,3 @@ class TorchTask(ITask):
     @staticmethod
     def get_current_device():
         return torch.cuda.current_device()
-
-    @staticmethod
-    def scatter_kwargs(inputs, kwargs):
-        """Scatter with support for kwargs dictionary"""
-        inputs = scatter_cpu(inputs) if inputs else []
-        kwargs = scatter_cpu(kwargs) if kwargs else []
-        if len(inputs) < len(kwargs):
-            inputs.extend([() for _ in range(len(kwargs) - len(inputs))])
-        elif len(kwargs) < len(inputs):
-            kwargs.extend([{} for _ in range(len(inputs) - len(kwargs))])
-        inputs = tuple(inputs)
-        kwargs = tuple(kwargs)
-        return inputs, kwargs

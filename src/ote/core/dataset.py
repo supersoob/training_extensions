@@ -7,7 +7,7 @@ logger = get_logger()
 
 class IDataset:
     def __init__(self, data_config: Config):
-        self.config = Config(data_config)
+        self._config = Config(data_config)
         self.datasets = None
 
     def get_subset(self, subset):
@@ -25,5 +25,9 @@ class IDataset:
         raise NotImplementedError()
 
     @abstractmethod
-    def update_data(self, config: dict):
+    def update_config(self, config: dict):
         raise NotImplementedError()
+
+    @property
+    def config(self):
+        return self._config

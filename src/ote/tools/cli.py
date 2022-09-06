@@ -13,7 +13,27 @@ def get_recipe(name):
     return get_recipe(name)
 
 
-def train(recipe: Recipe):
+
+def build():
+    pass
+
+def build_recipe():
+    pass
+
+def build_model():
+    pass
+
+
+def train(recipe_file):
+    recipe = Recipe(recipe_file)
     if isinstance(recipe, Recipe):
         recipe.train()
 
+def eval():
+    pass
+
+def infer():
+    pass
+
+def export():
+    pass

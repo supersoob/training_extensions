@@ -13,7 +13,7 @@ from mmcv.runner.dist_utils import master_only
 # __all__ = ['config_logger', 'get_log_dir', 'get_logger']
 __all__ = ['config_logger', 'get_log_dir']
 
-_LOGGING_FORMAT = '%(asctime)s | %(levelname)s : %(message)s'
+_LOGGING_FORMAT = '%(asctime)s | %(funcName)s | %(levelname)s : %(message)s'
 _LOG_DIR = None
 _FILE_HANDLER = None
 _CUSTOM_LOG_LEVEL = 31

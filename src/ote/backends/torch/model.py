@@ -25,11 +25,12 @@ class TorchModel(IModel):
             raise ValueError(f"not supported model hub repo {hub_path}")
         return model
 
-    def update_model(self, config):
-        pass
-
     def save(self):
         pass
 
     def export(self):
         pass
+
+    @staticmethod
+    def rand(size):
+        return torch.rand(size)

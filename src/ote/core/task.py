@@ -15,3 +15,7 @@ class ITask():
     @abstractmethod
     def run(self, *args, **kwargs):
         raise NotImplementedError()
+
+    @abstractmethod
+    def configure(self, recipe: Config, **kwargs):
+        raise NotImplementedError()

@@ -1,207 +1,288 @@
-import numpy as np
+import numbers
+import os
+import time
 
-from mmcv import ConfigDict
-from ote.backends.torch.mmcv.trainer import MMTrainer
-from ote.backends.torch.mmcv.config import update_or_add_custom_hook
-from ote.core.config import Config
+from mmcls.core import DistOptimizerHook, Fp16OptimizerHook
+from mmcls.datasets import build_dataloader
+from mmcls.utils import collect_env
+from mmcls.version import __version__
+from mmcv import build_from_cfg
+from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
+from mmcv.runner import HOOKS, DistSamplerSeedHook, build_optimizer, build_runner
+from mmcv.utils.config import Config
+
+from ote.backends.torch.mmcv.modules.datasets.composed_dataloader import ComposedDL
+from ote.backends.torch.mmcv.modules.hooks.eval_hook import (
+    CustomEvalHook,
+    DistCustomEvalHook,
+)
+from ote.backends.torch.mmcv.extentions import MMDataCPU
+from ote.backends.torch.mmcv.classification.task import MMClsTask
 from ote.core.task import TASK_REGISTRY
 from ote.logger import get_logger
 
 logger = get_logger()
 
-CLASS_INC_DATASET = ['MPAClsDataset', 'MPAMultilabelClsDataset', 'MPAHierarchicalClsDataset',
-                     'ClsDirDataset', 'ClsTVDataset']
-PSEUDO_LABEL_ENABLE_DATASET = ['ClassIncDataset', 'LwfTaskIncDataset', 'ClsTVDataset']
-WEIGHT_MIX_CLASSIFIER = ['SAMImageClassifier']
-
 @TASK_REGISTRY.register_module()
-class MMClsTrainer(MMTrainer):
-    def configure(self, cfg: Config, **kwargs):
-        training = kwargs.get("training", True)
-        model_ckpt = kwargs.get("model_ckpt")
-        if model_ckpt is not None:
-            cfg.load_from = MMClsTrainer.get_model_ckpt(model_ckpt)
+class MMClsTrainer(MMClsTask):
+    def __init__(self, spec, **kwargs):
+        super().__init__(spec, **kwargs)
+        logger.info(f"{__name__} __init__({kwargs})")
 
-        pretrained = kwargs.get('pretrained', None)
-        if pretrained and isinstance(pretrained, str):
-            logger.info(f'Overriding cfg.load_from -> {pretrained}')
-            cfg.load_from = pretrained
+    def run(self, model, data, recipe, **kwargs):
+        logger.info(f"{__name__} run(model = {model}, datasets = {data}, recipe = {recipe}, others = {kwargs})")
 
-         # Task
-        if 'task_adapt' in cfg:
-            model_meta = self.get_model_meta(cfg)
-            model_tasks, dst_classes = MMClsTrainer.configure_task(cfg, training, model_meta, **kwargs)
-            if model_tasks is not None:
-                self.model_tasks = model_tasks
-            if dst_classes is not None:
-                self.model_classes = dst_classes
+        cfg = Config(dict(**recipe))
+
+        # self.configure(cfg, **kwargs)
+        # cfg = self.configure(model_cfg, model_ckpt, data_cfg, training=True, **kwargs)
+
+        if hasattr(cfg, 'seed'):
+            self._set_random_seed(cfg.seed, deterministic=cfg.get('deterministic', False))
         else:
-            if 'num_classes' not in cfg.data:
-                cfg.data.num_classes = len(cfg.data.train.get('classes', []))
-            cfg.model.head.num_classes = cfg.data.num_classes
+            cfg.seed = None
 
-        if cfg.model.head.get('topk', False) and isinstance(cfg.model.head.topk, tuple):
-            cfg.model.head.topk = (1,) if cfg.model.head.num_classes < 5 else (1, 5)
-            if cfg.model.get('multilabel', False) or cfg.model.get('hierarchical', False):
-                cfg.model.head.pop('topk', None)
+        timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+
+        # Environment
+        distributed = False
+        if cfg.gpu_ids is not None:
+            if isinstance(cfg.get('gpu_ids'), numbers.Number):
+                cfg.gpu_ids = [cfg.get('gpu_ids')]
+            if len(cfg.gpu_ids) > 1:
+                distributed = True
+
+        env_info_dict = collect_env()
+        env_info = '\n'.join([(f'{k}: {v}') for k, v in env_info_dict.items()])
+        dash_line = '-' * 60 + '\n'
+        logger.info('Environment info:\n' + dash_line + env_info + '\n' +
+                    dash_line)
+
+        # Data
+        datasets = data.get("train")
+        # val_datasets = data.get("val")
+        if "unlabeled" in data.keys():
+            datasets = [[datasets, data.get("unlabeled")]]
+        else:
+            datasets = [datasets]
+
+        # # Dataset for HPO
+        # hp_config = kwargs.get('hp_config', None)
+        # if hp_config is not None:
+        #     import hpopt
+
+        #     if isinstance(datasets[0], list):
+        #         for idx, ds in enumerate(datasets[0]):
+        #             datasets[0][idx] = hpopt.createHpoDataset(ds, hp_config)
+        #     else:
+        #         datasets[0] = hpopt.createHpoDataset(datasets[0], hp_config)
+
+        # Metadata
+        meta = dict()
+        meta['env_info'] = env_info
+        # meta['config'] = cfg.pretty_text
+        meta['seed'] = cfg.seed
+
+
+        if cfg.checkpoint_config is not None:
+            cfg.checkpoint_config.meta = dict(
+                mmcls_version=__version__)
+
+            if isinstance(datasets[0], list):
+                repr_ds = datasets[0][0]
+            else:
+                repr_ds = datasets[0]
+
+            if hasattr(repr_ds, 'tasks'):
+                cfg.checkpoint_config.meta['tasks'] = repr_ds.tasks
+            else:
+                cfg.checkpoint_config.meta['CLASSES'] = repr_ds.CLASSES
+            if 'task_adapt' in cfg:
+                if hasattr(self, 'model_tasks'):  # for incremnetal learning
+                    cfg.checkpoint_config.meta.update({'tasks': self.model_tasks})
+                    # instead of update(self.old_tasks), update using "self.model_tasks"
+                else:
+                    cfg.checkpoint_config.meta.update({'CLASSES': self.model_classes})
+
+        if distributed:
+            if cfg.dist_params.get('linear_scale_lr', False):
+                new_lr = len(cfg.gpu_ids) * cfg.optimizer.lr
+                logger.info(f'enabled linear scaling rule to the learning rate. \
+                    changed LR from {cfg.optimizer.lr} to {new_lr}')
+                cfg.optimizer.lr = new_lr
+
+        # Save config
+        # cfg.dump(osp.join(cfg.work_dir, 'config.yaml')) # FIXME bug to save
+        # logger.info(f'Config:\n{cfg.pretty_text}')
+
+        if distributed:
+            os.environ['MASTER_ADDR'] = cfg.dist_params.get('master_addr', 'localhost')
+            os.environ['MASTER_PORT'] = cfg.dist_params.get('master_port', '29500')
+
+            mp.spawn(self.train_worker, nprocs=len(cfg.gpu_ids),
+                     args=(model, datasets, data.get("val"), cfg, distributed, True, timestamp, meta))
+        else:
+            self.train_worker(None, model, datasets, data.get("val"),
+                                   cfg,
+                                   distributed,
+                                   True,
+                                   timestamp,
+                                   meta)
+
+        # Save outputs
+        output_ckpt_path = os.path.join(cfg.work_dir, 'best_model.pth'
+                                    if os.path.exists(os.path.join(cfg.work_dir, 'best_model.pth'))
+                                    else 'latest.pth')
+        return dict(final_ckpt=output_ckpt_path)
 
     @staticmethod
-    def configure_task(cfg, training, model_meta=None, **kwargs):
-        """Configure for Task Adaptation Task
-        """
-        task_adapt_type = cfg['task_adapt'].get('type', None)
-        adapt_type = cfg['task_adapt'].get('op', 'REPLACE')
+    def train_worker(gpu, model, dataset, val_dataset, cfg, distributed, validate, timestamp, meta):
+        logger.info(f'called train_worker() gpu={gpu}, dataset={dataset}, val_dataset={val_dataset} distributed={distributed}, validate={validate}')
+        if distributed:
+            torch.cuda.set_device(gpu)
+            dist.init_process_group(backend=cfg.dist_params.get('backend', 'nccl'),
+                                    world_size=len(cfg.gpu_ids), rank=gpu)
+            logger.info(f'dist info world_size = {dist.get_world_size()}, rank = {dist.get_rank()}')
 
-        model_tasks, dst_classes = None, None
-        model_classes, data_classes = [], []
+        # # model
+        # model = build_classifier(cfg.model)
+
+        # prepare data loaders
+        dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
         train_data_cfg = MMClsTrainer.get_train_data_cfg(cfg)
-        if isinstance(train_data_cfg, list):
-            train_data_cfg = train_data_cfg[0]
+        drop_last = train_data_cfg.drop_last if train_data_cfg.get('drop_last', False) else False
 
-        model_classes = MMClsTrainer.get_model_classes(cfg)
-        data_classes = MMClsTrainer.get_data_classes(cfg)
-        if model_classes:
-            cfg.model.head.num_classes = len(model_classes)
-        elif data_classes:
-            cfg.model.head.num_classes = len(data_classes)
-        model_meta['CLASSES'] = model_classes
-
-        if not train_data_cfg.get('new_classes', False):  # when train_data_cfg doesn't have 'new_classes' key
-            new_classes = np.setdiff1d(data_classes, model_classes).tolist()
-            train_data_cfg['new_classes'] = new_classes
-
-        if training:
-            # if Trainer to Stage configure, training = True
-            if train_data_cfg.get('tasks'):
-                # Task Adaptation
-                if model_meta.get('tasks', False):
-                    model_tasks, old_tasks = refine_tasks(train_data_cfg, model_meta, adapt_type)
-                else:
-                    raise KeyError(f'can not find task meta data from {cfg.load_from}.')
-                cfg.model.head.update({'old_tasks': old_tasks})
-                # update model.head.tasks with training dataset's tasks if it's configured as None
-                if cfg.model.head.get('tasks') is None:
-                    logger.info("'tasks' in model.head is None. updated with configuration on train data "
-                                f"{train_data_cfg.get('tasks')}")
-                    cfg.model.head.update({'tasks': train_data_cfg.get('tasks')})
-            elif 'new_classes' in train_data_cfg:
-                # Class-Incremental
-                dst_classes, old_classes = refine_cls(train_data_cfg, data_classes, model_meta, adapt_type)
+        # updated to adapt list of dataset for the 'train'
+        data_loaders = []
+        for ds in dataset:
+            if isinstance(ds, list):
+                sub_loaders = [
+                    build_dataloader(
+                        sub_ds,
+                        sub_ds.samples_per_gpu if hasattr(sub_ds, 'samples_per_gpu') else cfg.data.samples_per_gpu,
+                        sub_ds.workers_per_gpu if hasattr(sub_ds, 'workers_per_gpu') else cfg.data.workers_per_gpu,
+                        num_gpus=len(cfg.gpu_ids),
+                        dist=distributed,
+                        round_up=True,
+                        seed=cfg.seed,
+                        drop_last=drop_last
+                    ) for sub_ds in ds
+                ]
+                data_loaders.append(ComposedDL(sub_loaders))
             else:
-                raise KeyError(
-                    '"new_classes" or "tasks" should be defined for incremental learning w/ current model.'
-                )
+                data_loaders.append(
+                    build_dataloader(
+                        ds,
+                        cfg.data.samples_per_gpu,
+                        cfg.data.workers_per_gpu,
+                        # cfg.gpus will be ignored if distributed
+                        num_gpus=len(cfg.gpu_ids),
+                        dist=distributed,
+                        round_up=True,
+                        seed=cfg.seed,
+                        drop_last=drop_last
+                    ))
+        # put model on gpus
+        if MMClsTrainer.is_gpu_available():
+            model = model.cuda()
 
-            if task_adapt_type == 'mpa':
-                if train_data_cfg.type not in CLASS_INC_DATASET:  # task incremental is not supported yet
-                    raise NotImplementedError(
-                        f'Class Incremental Learning for {train_data_cfg.type} is not yet supported!')
-
-                if cfg.model.type in WEIGHT_MIX_CLASSIFIER:
-                    cfg.model.task_adapt = ConfigDict(
-                        src_classes=model_classes,
-                        dst_classes=data_classes,
-                    )
-
-                # Train dataset config update
-                train_data_cfg.classes = dst_classes
-
-                # model configuration update
-                cfg.model.head.num_classes = len(dst_classes)
-
-                if not cfg.model.get('multilabel', False) and not cfg.model.get('hierarchical', False):
-                    efficient_mode = cfg['task_adapt'].get('efficient_mode', True)
-                    gamma = 2 if efficient_mode else 3
-                    sampler_type = 'balanced'
-
-                    if len(set(model_classes) & set(dst_classes)) == 0 or set(model_classes) == set(dst_classes):
-                        cfg.model.head.loss = dict(type='CrossEntropyLoss', loss_weight=1.0)
-                    else:
-                        cfg.model.head.loss = ConfigDict(
-                            type='SoftmaxFocalLoss',
-                            loss_weight=1.0,
-                            gamma=gamma,
-                            reduction='none',
-                        )
-                else:
-                    efficient_mode = cfg['task_adapt'].get('efficient_mode', False)
-                    sampler_type = 'cls_incr'
-
-                if len(set(model_classes) & set(dst_classes)) == 0 or set(model_classes) == set(dst_classes):
-                    sampler_flag = False
-                else:
-                    sampler_flag = True
-
-                # Update Task Adapt Hook
-                task_adapt_hook = ConfigDict(
-                    type='TaskAdaptHook',
-                    src_classes=old_classes,
-                    dst_classes=dst_classes,
-                    model_type=cfg.model.type,
-                    sampler_flag=sampler_flag,
-                    sampler_type=sampler_type,
-                    efficient_mode=efficient_mode
-                )
-                update_or_add_custom_hook(cfg, task_adapt_hook)
-
-        else:  # if not training phase (eval)
-            if train_data_cfg.get('tasks'):
-                if model_meta.get('tasks', False):
-                    cfg.model.head['tasks'] = model_meta['tasks']
-                else:
-                    raise KeyError(f'can not find task meta data from {cfg.load_from}.')
-            elif train_data_cfg.get('new_classes'):
-                dst_classes, _ = refine_cls(train_data_cfg, data_classes, model_meta, adapt_type)
-                cfg.model.head.num_classes = len(dst_classes)
-
-        # Pseudo label augmentation
-        pre_stage_res = kwargs.get('pre_stage_res', None)
-        if pre_stage_res:
-            logger.info(f'pre-stage dataset: {pre_stage_res}')
-            if train_data_cfg.type not in PSEUDO_LABEL_ENABLE_DATASET:
-                raise NotImplementedError(
-                    f'Pseudo label loading for {train_data_cfg.type} is not yet supported!')
-            train_data_cfg.pre_stage_res = pre_stage_res
-            if train_data_cfg.get('tasks'):
-                train_data_cfg.model_tasks = model_tasks
-                cfg.model.head.old_tasks = old_tasks
-            elif train_data_cfg.get('CLASSES'):
-                train_data_cfg.dst_classes = dst_classes
-                cfg.data.val.dst_classes = dst_classes
-                cfg.data.test.dst_classes = dst_classes
-                cfg.model.head.num_classes = len(train_data_cfg.dst_classes)
-                cfg.model.head.num_old_classes = len(old_classes)
-        return model_tasks, dst_classes
-
-def refine_tasks(train_cfg, meta, adapt_type):
-    new_tasks = train_cfg['tasks']
-    if adapt_type == 'REPLACE':
-        old_tasks = {}
-        model_tasks = new_tasks
-    elif adapt_type == 'MERGE':
-        old_tasks = meta['tasks']
-        model_tasks = copy.deepcopy(old_tasks)
-        for task, cls in new_tasks.items():
-            if model_tasks.get(task):
-                model_tasks[task] = model_tasks[task] \
-                                            + [c for c in cls if c not in model_tasks[task]]
+        # put model on gpus
+        if MMClsTrainer.is_gpu_available():
+            if distributed:
+                # put model on gpus
+                find_unused_parameters = cfg.get('find_unused_parameters', False)
+                # Sets the `find_unused_parameters` parameter in
+                # torch.nn.parallel.DistributedDataParallel
+                model = MMDistributedDataParallel(
+                    model,
+                    device_ids=[MMClsTrainer.get_current_device()],
+                    broadcast_buffers=False,
+                    find_unused_parameters=find_unused_parameters)
             else:
-                model_tasks.update({task: cls})
-    else:
-        raise KeyError(f'{adapt_type} is not supported for task_adapt options!')
-    return model_tasks, old_tasks
+                model = MMDataParallel(
+                    model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+        else:
+            model = MMDataCPU(model)
 
+        # build runner
+        optimizer = build_optimizer(model, cfg.optimizer)
 
-def refine_cls(train_cfg, data_classes, meta, adapt_type):
-    # Get 'new_classes' in data.train_cfg & get 'old_classes' pretreained model meta data CLASSES
-    new_classes = train_cfg['new_classes']
-    old_classes = meta['CLASSES']
-    if adapt_type == 'REPLACE':
-        # if 'REPLACE' operation, then dst_classes -> data_classes
-        dst_classes = data_classes.copy()
-    elif adapt_type == 'MERGE':
-        # if 'MERGE' operation, then dst_classes -> old_classes + new_classes (merge)
-        dst_classes = old_classes + [cls for cls in new_classes if cls not in old_classes]
-    else:
-        raise KeyError(f'{adapt_type} is not supported for task_adapt options!')
-    return dst_classes, old_classes
+        if cfg.get('runner') is None:
+            cfg.runner = {
+                'type': 'EpochBasedRunner',
+                'max_epochs': cfg.total_epochs
+            }
+            warnings.warn(
+                'config is now expected to have a `runner` section, '
+                'please set `runner` in your config.', UserWarning)
+
+        runner = build_runner(
+            cfg.runner,
+            default_args=dict(
+                model=model,
+                batch_processor=None,
+                optimizer=optimizer,
+                work_dir=cfg.work_dir,
+                logger=logger,
+                meta=meta))
+
+        # an ugly walkaround to make the .log and .log.json filenames the same
+        runner.timestamp = f'{timestamp}'
+
+        # fp16 setting
+        fp16_cfg = cfg.get('fp16', None)
+        if fp16_cfg is not None:
+            optimizer_config = Fp16OptimizerHook(
+                **cfg.optimizer_config, **fp16_cfg, distributed=distributed)
+        elif distributed and 'type' not in cfg.optimizer_config:
+            optimizer_config = DistOptimizerHook(**cfg.optimizer_config)
+        else:
+            optimizer_config = cfg.optimizer_config
+
+        # register hooks
+        runner.register_training_hooks(cfg.lr_config, optimizer_config,
+                                       None, cfg.log_config,
+                                       cfg.get('momentum_config', None))
+        if cfg.get('checkpoint_config', False):
+            runner.register_hook(MMClsTrainer.register_checkpoint_hook(cfg.checkpoint_config))
+
+        if distributed:
+            runner.register_hook(DistSamplerSeedHook())
+
+        for hook in cfg.get('custom_hooks', ()):
+            runner.register_hook_from_cfg(hook)
+
+        # register eval hooks
+        if validate:
+            # val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
+            logger.info(f"val_dataset = {val_dataset}")
+            val_dataloader = build_dataloader(
+                val_dataset,
+                samples_per_gpu=cfg.data.samples_per_gpu,
+                workers_per_gpu=cfg.data.workers_per_gpu,
+                dist=distributed,
+                shuffle=False,
+                round_up=True)
+            logger.info(f"val_dataloader = {val_dataloader}")
+            eval_cfg = cfg.get('evaluation', {})
+            eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
+            eval_hook = DistCustomEvalHook if distributed else CustomEvalHook
+            runner.register_hook(eval_hook(val_dataloader, **eval_cfg), priority='HIGHEST')
+
+        if cfg.get('resume_from', False):
+            runner.resume(cfg.resume_from)
+        elif cfg.get('load_from', False):
+            if gpu is None:
+                runner.load_checkpoint(cfg.load_from)
+            else:
+                runner.load_checkpoint(cfg.load_from, map_location=f'cuda:{gpu}')
+        runner.run(data_loaders, cfg.workflow)
+
+    @staticmethod
+    def register_checkpoint_hook(checkpoint_config):
+        if checkpoint_config.get('type', False):
+            hook = build_from_cfg(checkpoint_config, HOOKS)
+        else:
+            checkpoint_config.setdefault('type', 'CheckpointHook')
+            hook = build_from_cfg(checkpoint_config, HOOKS)
+        return hook

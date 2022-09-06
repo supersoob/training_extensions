@@ -33,16 +33,16 @@ adapters:
   data: ote.backends.torch.mmcv.dataset.MMClsDataset
 
 model_override: "recipes/classification/ote_mobilenet_v3_small.yaml"
-data_override: "recipes/stages/_base_/data/cifar10.py"
+data_override: "recipes/stages/_base_/data/cifar10_224_5cls.py"
 
 task_cfg:
   tasks:
     - type: MMClsTrainer
       spec: trainer
-    - type: MMEvaluator
+    - type: MMClsEvaluator
       spec: evaluator
       metric: top-1
-    - type: MMInferrer
+    - type: MMClsInferrer
       spec: inferrer
     - type: TorchOptimizer
       spec: model_optimizer
