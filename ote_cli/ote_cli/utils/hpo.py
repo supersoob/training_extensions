@@ -6,14 +6,17 @@ Utils for HPO with hpopt
 # SPDX-License-Identifier: Apache-2.0
 #
 
+import glob
 import os
+import re
+import shutil
 import time
-from math import ceil
-from functools import partial
 from enum import Enum
+from functools import partial
 from inspect import isclass
+from math import ceil
 from os import path as osp
-from typing import Union, Optional, Callable, Dict, Any
+from typing import Any, Callable, Dict, Optional, Union
 
 import torch
 import yaml
@@ -30,8 +33,8 @@ from ote_cli.utils.io import generate_label_schema, read_model, save_model_data
 
 try:
     import hpopt
-    from hpopt.hyperband import HyperBand
     from hpopt.hpo_runner import run_hpo_loop
+    from hpopt.hyperband import HyperBand
 except ImportError:
     print("cannot import hpopt module")
     hpopt = None
@@ -108,6 +111,26 @@ class TaskManager:
 
         return epoch_name
 
+    def move_weight(self, src: str, det: str):
+        if self._task_type == TaskType.DETECTION:
+            for weight_candidate in glob.iglob(osp.join(src, "**/*.pth"), recursive=True):
+                if not osp.islink(weight_candidate):
+                    shutil.move(weight_candidate, det)
+
+    def get_latest_weight(self, workdir: str):
+        if self._task_type == TaskType.DETECTION:
+            pattern = re.compile(r"epoch_([0-9]+)\.pth")
+            current_latest_epoch = -1
+            latest_weight = None
+
+            for weight_name in  glob.iglob(osp.join(workdir, "**/epoch_*.pth"), recursive=True):
+                ret = pattern.match(weight_name)
+                epoch = int(ret.group(1))
+                if current_latest_epoch < epoch:
+                    latest_weight = weight_name
+
+        return latest_weight
+
 class TaskEnvironmentManager:
     def __init__(self, environment: TaskEnvironment):
         self._environment = environment
@@ -134,8 +157,10 @@ class TaskEnvironmentManager:
             setattr(target, param_key[-1], param_val)
 
     def get_dict_type_hyper_parameter(self):
-        learning_parameter = self._environment.get_hyper_parameters().learning_parameters
-        return self._convert_parameter_group_to_dict(learning_parameter)
+        learning_parameters = self._environment.get_hyper_parameters().learning_parameters
+        learning_parameters = self._convert_parameter_group_to_dict(learning_parameters)
+        hyper_parameter = {f"learning_parameters.{key}" : val for key, val in learning_parameters.items()}
+        return hyper_parameter
 
     @staticmethod
     def _convert_parameter_group_to_dict(parameter_group):
@@ -272,7 +297,8 @@ class HpoRunner:
                 task_type=self._environment.get_task(),
                 hpo_workdir=self._hpo_workdir,
                 initial_weight_name=self._initial_weight_name,
-                metric=self._hpo_config["metric"]
+                metric=self._hpo_config["metric"],
+                max_epoch=32
             ),
             resource_type,
         )
@@ -309,9 +335,10 @@ class HpoRunner:
             "full_dataset_size" : train_dataset_size,
             "non_pure_train_ratio" : val_dataset_size / (train_dataset_size + val_dataset_size),
             "metric" : self._hpo_config.get("metric", "mAP"),
+            "expected_time_ratio" : self._hpo_config.get("expected_time_ratio"),
             "prior_hyper_parameters" : self._get_default_hyper_parameters(),
-            "maximum_resource" : 100,
-            "minimum_resource" : 40,
+            "maximum_resource" : 32,
+            "minimum_resource" : 4,
             "asynchronous_bracket" : True
         }
 
@@ -330,6 +357,8 @@ class HpoRunner:
             if key in self._hpo_config["hp_space"]:
                 default_hyper_parameters[key] = val
 
+        if not default_hyper_parameters:
+            return None
         return default_hyper_parameters
 
     def _get_initial_model_weight_path(self):
@@ -360,7 +389,7 @@ def run_hpo(args, environment, dataset, task_type):
     print(
         f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} [HPO] started hyper-parameter optimization"
     )
-    best_config = hpo_runner.run_hpo(run_trial, dataset_paths)
+    best_config = hpo_runner.run_hpo(mocking_run_trial, dataset_paths)
     print(
         f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} [HPO] completed hyper-parameter optimization"
     )
@@ -377,7 +406,8 @@ class Trainer:
         task_type: TaskType,
         hpo_workdir: str,
         initial_weight_name: str,
-        metric: str
+        metric: str,
+        max_epoch: int
     ):
         self._hp_config = hp_config
         self._report_func = report_func
@@ -387,6 +417,7 @@ class Trainer:
         self._hpo_workdir = hpo_workdir
         self._initial_weight_name = initial_weight_name
         self._metric = metric
+        self._max_epoch = max_epoch
 
     def run(self):
         """Run each training of each trial with given hyper parameters"""
@@ -401,9 +432,11 @@ class Trainer:
         if not initial_weight_exists:
             self._add_initial_weight_saving_hook(task)
 
+        self._resume_if_available(task)
         output_model = environment.get_output_model(dataset)
         score_report_callback = self._prepare_score_report_callback(task)
         task.train(dataset=dataset, output_model=output_model, train_parameters=score_report_callback)
+        self._finalize_trial(task)
 
     def _prepare_hyper_parameter(self):
         return create(self._model_template.hyper_parameters.data)
@@ -425,7 +458,8 @@ class Trainer:
         return dataset
 
     def _set_hyper_parameter(self, environment: TaskEnvironmentManager):
-        epoch = ceil(self._hp_config["configuration"]["iterations"])
+        epoch_ratio = self._hp_config["configuration"]["iterations"]
+        epoch = ceil(self._max_epoch * epoch_ratio / 100)
         del self._hp_config["configuration"]["iterations"]
         environment.set_hyper_parameter_from_flatten_format_dict(self._hp_config)
         environment.set_epoch(epoch)
@@ -468,6 +502,16 @@ class Trainer:
             }
         )
 
+    def _resume_if_available(self, task):
+        trial_work_dir = self._get_trial_work_dir()
+        if not osp.exists(trial_work_dir):
+            return
+        
+        latest_weight = self._task.get_latest_weight(trial_work_dir)
+        if latest_weight is None:
+            return
+        task.update_override_configurations({"resume_from" : latest_weight})
+
     def _change_model_weight_to_otx_format(self):
         initial_weight_path = self._get_initial_weight_path()
         initial_weight = torch.load(initial_weight_path, map_location="cpu")
@@ -475,10 +519,19 @@ class Trainer:
         torch.save(initial_weight, initial_weight_path)
 
     def _prepare_score_report_callback(self, task):
-        return TrainParameters(False, HpoCallback(self._report_func, self._metric, task))
+        return TrainParameters(False, HpoCallback(self._report_func, self._metric, self._max_epoch, task))
 
     def _get_initial_weight_path(self):
         return osp.join(self._hpo_workdir, self._initial_weight_name)
+
+    def _finalize_trial(self, task):
+        trial_work_dir = self._get_initial_weight_path()
+        os.makedirs(trial_work_dir, exist_ok=True)
+        self._task.move_weight(task.output_path, trial_work_dir)
+        self._report_func(0, 0, done=True)
+
+    def _get_trial_work_dir(self):
+        return osp.join(self._hpo_workdir, self._hp_config["id"])
 
 def run_trial(
     hp_config:  Dict,
@@ -488,7 +541,8 @@ def run_trial(
     task_type: TaskType,
     hpo_workdir: str,
     initial_weight_name: str,
-    metric: str
+    metric: str,
+    max_epoch: int
 ):
     trainer = Trainer(
         hp_config,
@@ -498,24 +552,48 @@ def run_trial(
         task_type,
         hpo_workdir,
         initial_weight_name,
-        metric
+        metric,
+        max_epoch
     )
     trainer.run()
+
+def mocking_run_trial(
+    hp_config:  Dict,
+    report_func: Callable,
+    model_template,
+    dataset_paths: Dict[str, str],
+    task_type: TaskType,
+    hpo_workdir: str,
+    initial_weight_name: str,
+    metric: str,
+    max_epoch: int
+):
+    lr = hp_config["configuration"]["learning_parameters.learning_rate"]
+    bs = hp_config["configuration"]["learning_parameters.batch_size"]
+    obj_func = 100 - (0.001 - lr) ** 2 - ((16 - bs) ** 2) / 100
+    iteration = ceil(hp_config["configuration"]["iterations"])
+    if iteration >= 2:
+        iteration -= 2
+    for i in range(iteration):
+        report_func(obj_func + i / 100, i+1)
+    report_func(0, 0, done=True)
 
 class HpoCallback(UpdateProgressCallback):
     """Callback class to report score to hpopt"""
 
-    def __init__(self, report_func: Callable, metric: str, task):
+    def __init__(self, report_func: Callable, metric: str, max_epoch: int, task):
         super().__init__()
         self._report_func = report_func
         self.metric = metric
+        self._max_epoch = max_epoch
         self._task = task
 
     def __call__(self, progress: Union[int, float], score: Optional[float] = None):
         if score is not None:
-            if self._report_func(score=score, progress=progress) == hpopt.Status.STOP:
+            epoch = ceil(self._max_epoch * progress / 100)
+            print("*"*100, f"In hpo callback : {score} / {progress} / {epoch}")
+            if self._report_func(score=score, progress=epoch) == hpopt.Status.STOP:
                 self._task.cancel_training()
-
 
 class HpoDataset:
     """

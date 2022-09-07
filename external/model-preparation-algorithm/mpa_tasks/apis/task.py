@@ -82,6 +82,10 @@ class BaseTask:
         # to override configuration at runtime
         self.override_configs = {}
 
+    @property
+    def output_path(self):
+        return self._output_path
+
     def _run_task(self, stage_module, mode=None, dataset=None, parameters=None, resume=False, **kwargs):
         # FIXME: Temporary remedy for CVS-88098
         export = kwargs.get("export", False)
