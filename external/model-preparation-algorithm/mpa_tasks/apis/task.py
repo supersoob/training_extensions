@@ -285,7 +285,7 @@ class BaseTask:
             if model_data.get("anchors"):
                 self._anchors = model_data["anchors"]
 
-            return model_data.get("model", model_data.get("state_dict", None))
+            return model_data
         else:
             return None
 
