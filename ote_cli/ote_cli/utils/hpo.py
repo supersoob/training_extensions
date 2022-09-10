@@ -113,20 +113,21 @@ class TaskManager:
 
     def move_weight(self, src: str, det: str):
         if self._task_type == TaskType.DETECTION:
-            for weight_candidate in glob.iglob(osp.join(src, "**/*.pth"), recursive=True):
-                if not osp.islink(weight_candidate):
+            for weight_candidate in glob.iglob(osp.join(src, "**/epoch_*.pth"), recursive=True):
+                if not (osp.islink(weight_candidate) or osp.exists(osp.join(det, weight_candidate))):
                     shutil.move(weight_candidate, det)
 
     def get_latest_weight(self, workdir: str):
         if self._task_type == TaskType.DETECTION:
-            pattern = re.compile(r"epoch_([0-9]+)\.pth")
+            pattern = re.compile(r"(\d+)\.pth")
             current_latest_epoch = -1
             latest_weight = None
 
             for weight_name in  glob.iglob(osp.join(workdir, "**/epoch_*.pth"), recursive=True):
-                ret = pattern.match(weight_name)
+                ret = pattern.search(weight_name)
                 epoch = int(ret.group(1))
                 if current_latest_epoch < epoch:
+                    current_latest_epoch = epoch
                     latest_weight = weight_name
 
         return latest_weight
@@ -208,6 +209,10 @@ class TaskEnvironmentManager:
 
     def load_model_weight(self, model_weight_path: str):
         self._environment.model = read_model(self._environment.get_model_configuration(), model_weight_path, None)
+
+    def resume_model_weight(self, model_weight_path: str):
+        self.load_model_weight(model_weight_path)
+        self._environment.model.model_adapters["resume"] = True
 
     def get_output_model(self, dataset = None):
         return ModelEntity(
@@ -297,8 +302,7 @@ class HpoRunner:
                 task_type=self._environment.get_task(),
                 hpo_workdir=self._hpo_workdir,
                 initial_weight_name=self._initial_weight_name,
-                metric=self._hpo_config["metric"],
-                max_epoch=32
+                metric=self._hpo_config["metric"]
             ),
             resource_type,
         )
@@ -389,7 +393,7 @@ def run_hpo(args, environment, dataset, task_type):
     print(
         f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} [HPO] started hyper-parameter optimization"
     )
-    best_config = hpo_runner.run_hpo(mocking_run_trial, dataset_paths)
+    best_config = hpo_runner.run_hpo(run_trial, dataset_paths)
     print(
         f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} [HPO] completed hyper-parameter optimization"
     )
@@ -406,8 +410,7 @@ class Trainer:
         task_type: TaskType,
         hpo_workdir: str,
         initial_weight_name: str,
-        metric: str,
-        max_epoch: int
+        metric: str
     ):
         self._hp_config = hp_config
         self._report_func = report_func
@@ -417,7 +420,8 @@ class Trainer:
         self._hpo_workdir = hpo_workdir
         self._initial_weight_name = initial_weight_name
         self._metric = metric
-        self._max_epoch = max_epoch
+        self._epoch = ceil(self._hp_config["configuration"]["iterations"])
+        del self._hp_config["configuration"]["iterations"]
 
     def run(self):
         """Run each training of each trial with given hyper parameters"""
@@ -426,13 +430,22 @@ class Trainer:
 
         environment = self._prepare_environment(hyper_parameters, dataset)
         self._set_hyper_parameter(environment)
-        initial_weight_exists = self._load_fixed_initial_weight(environment)
+
+        need_to_save_initial_weight = False
+        resume_weight_path = self._get_resume_weight_path()
+        if resume_weight_path is not None:
+            environment.resume_model_weight(resume_weight_path)
+        else:
+            initial_weight = self._load_fixed_initial_weight()
+            if initial_weight is not None:
+                environment.load_model_weight(initial_weight)
+            else:
+                need_to_save_initial_weight = True
 
         task = environment.get_train_task()
-        if not initial_weight_exists:
+        if not need_to_save_initial_weight:
             self._add_initial_weight_saving_hook(task)
 
-        self._resume_if_available(task)
         output_model = environment.get_output_model(dataset)
         score_report_callback = self._prepare_score_report_callback(task)
         task.train(dataset=dataset, output_model=output_model, train_parameters=score_report_callback)
@@ -458,11 +471,8 @@ class Trainer:
         return dataset
 
     def _set_hyper_parameter(self, environment: TaskEnvironmentManager):
-        epoch_ratio = self._hp_config["configuration"]["iterations"]
-        epoch = ceil(self._max_epoch * epoch_ratio / 100)
-        del self._hp_config["configuration"]["iterations"]
         environment.set_hyper_parameter_from_flatten_format_dict(self._hp_config)
-        environment.set_epoch(epoch)
+        environment.set_epoch(self._epoch)
 
     def _prepare_environment(self, hyper_parameters, dataset):
         enviroment = TaskEnvironment(
@@ -474,14 +484,17 @@ class Trainer:
 
         return TaskEnvironmentManager(enviroment)
 
-    def _load_fixed_initial_weight(self, environment: TaskEnvironmentManager):
-        initial_weight_path = self._get_initial_weight_path()
+    def _get_resume_weight_path(self):
+        trial_work_dir = self._get_trial_work_dir()
+        if not osp.exists(trial_work_dir):
+            return None
+        return self._task.get_latest_weight(trial_work_dir)
 
+    def _load_fixed_initial_weight(self):
+        initial_weight_path = self._get_initial_weight_path()
         if osp.exists(initial_weight_path):
-            environment.load_model_weight(initial_weight_path)
-            return True
-        else:
-            return False
+            return initial_weight_path
+        return None
 
     def _prepare_task(self, environment: TaskEnvironment):
         task_class = get_impl_class(environment.model_template.entrypoints.base)
@@ -502,16 +515,6 @@ class Trainer:
             }
         )
 
-    def _resume_if_available(self, task):
-        trial_work_dir = self._get_trial_work_dir()
-        if not osp.exists(trial_work_dir):
-            return
-        
-        latest_weight = self._task.get_latest_weight(trial_work_dir)
-        if latest_weight is None:
-            return
-        task.update_override_configurations({"resume_from" : latest_weight})
-
     def _change_model_weight_to_otx_format(self):
         initial_weight_path = self._get_initial_weight_path()
         initial_weight = torch.load(initial_weight_path, map_location="cpu")
@@ -519,13 +522,13 @@ class Trainer:
         torch.save(initial_weight, initial_weight_path)
 
     def _prepare_score_report_callback(self, task):
-        return TrainParameters(False, HpoCallback(self._report_func, self._metric, self._max_epoch, task))
+        return TrainParameters(False, HpoCallback(self._report_func, self._metric, self._epoch, task))
 
     def _get_initial_weight_path(self):
         return osp.join(self._hpo_workdir, self._initial_weight_name)
 
     def _finalize_trial(self, task):
-        trial_work_dir = self._get_initial_weight_path()
+        trial_work_dir = self._get_trial_work_dir()
         os.makedirs(trial_work_dir, exist_ok=True)
         self._task.move_weight(task.output_path, trial_work_dir)
         self._report_func(0, 0, done=True)
@@ -541,8 +544,7 @@ def run_trial(
     task_type: TaskType,
     hpo_workdir: str,
     initial_weight_name: str,
-    metric: str,
-    max_epoch: int
+    metric: str
 ):
     trainer = Trainer(
         hp_config,
@@ -552,8 +554,7 @@ def run_trial(
         task_type,
         hpo_workdir,
         initial_weight_name,
-        metric,
-        max_epoch
+        metric
     )
     trainer.run()
 
@@ -590,7 +591,7 @@ class HpoCallback(UpdateProgressCallback):
 
     def __call__(self, progress: Union[int, float], score: Optional[float] = None):
         if score is not None:
-            epoch = ceil(self._max_epoch * progress / 100)
+            epoch = round(self._max_epoch * progress / 100)
             print("*"*100, f"In hpo callback : {score} / {progress} / {epoch}")
             if self._report_func(score=score, progress=epoch) == hpopt.Status.STOP:
                 self._task.cancel_training()
