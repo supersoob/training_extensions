@@ -339,7 +339,7 @@ class HpoRunner:
             "full_dataset_size" : train_dataset_size,
             "non_pure_train_ratio" : val_dataset_size / (train_dataset_size + val_dataset_size),
             "metric" : self._hpo_config.get("metric", "mAP"),
-            "expected_time_ratio" : self._hpo_config.get("expected_time_ratio"),
+            "expected_time_ratio" : self._hpo_time_ratio,
             "prior_hyper_parameters" : self._get_default_hyper_parameters(),
             "maximum_resource" : 32,
             "minimum_resource" : 4,
@@ -382,7 +382,7 @@ def run_hpo(args, environment, dataset, task_type):
         return None
 
     hpo_save_path = os.path.abspath(os.path.join(os.path.dirname(args.save_model_to), "hpo"))
-    hpo_runner = HpoRunner(environment, dataset, hpo_save_path)
+    hpo_runner = HpoRunner(environment, dataset, hpo_save_path, args.hpo_time_ratio)
     dataset_paths = {
         "train_ann_file": args.train_ann_files,
         "train_data_root": args.train_data_roots,
