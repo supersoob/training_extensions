@@ -14,7 +14,7 @@ import time
 from enum import Enum
 from functools import partial
 from inspect import isclass
-from math import ceil
+from math import floor
 from os import path as osp
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -114,7 +114,7 @@ class TaskManager:
     def move_weight(self, src: str, det: str):
         if self._task_type == TaskType.DETECTION:
             for weight_candidate in glob.iglob(osp.join(src, "**/epoch_*.pth"), recursive=True):
-                if not (osp.islink(weight_candidate) or osp.exists(osp.join(det, weight_candidate))):
+                if not (osp.islink(weight_candidate) or osp.exists(osp.join(det, osp.basename(weight_candidate)))):
                     shutil.move(weight_candidate, det)
 
     def get_latest_weight(self, workdir: str):
@@ -307,6 +307,7 @@ class HpoRunner:
             resource_type,
         )
         self._restore_fixed_hp(best_config)
+        hpo_algo.print_result()
 
         return best_config
 
@@ -341,8 +342,8 @@ class HpoRunner:
             "metric" : self._hpo_config.get("metric", "mAP"),
             "expected_time_ratio" : self._hpo_time_ratio,
             "prior_hyper_parameters" : self._get_default_hyper_parameters(),
-            "maximum_resource" : 32,
-            "minimum_resource" : 4,
+            "maximum_resource" : 21,
+            "minimum_resource" : 2,
             "asynchronous_bracket" : True
         }
 
@@ -420,7 +421,7 @@ class Trainer:
         self._hpo_workdir = hpo_workdir
         self._initial_weight_name = initial_weight_name
         self._metric = metric
-        self._epoch = ceil(self._hp_config["configuration"]["iterations"])
+        self._epoch = floor(self._hp_config["configuration"]["iterations"])
         del self._hp_config["configuration"]["iterations"]
 
     def run(self):
@@ -485,7 +486,7 @@ class Trainer:
         return TaskEnvironmentManager(enviroment)
 
     def _get_resume_weight_path(self):
-        trial_work_dir = self._get_trial_work_dir()
+        trial_work_dir = self._get_weight_dir_path()
         if not osp.exists(trial_work_dir):
             return None
         return self._task.get_latest_weight(trial_work_dir)
@@ -528,13 +529,13 @@ class Trainer:
         return osp.join(self._hpo_workdir, self._initial_weight_name)
 
     def _finalize_trial(self, task):
-        trial_work_dir = self._get_trial_work_dir()
-        os.makedirs(trial_work_dir, exist_ok=True)
-        self._task.move_weight(task.output_path, trial_work_dir)
+        weight_dir_path = self._get_weight_dir_path()
+        os.makedirs(weight_dir_path, exist_ok=True)
+        self._task.move_weight(task.output_path, weight_dir_path)
         self._report_func(0, 0, done=True)
 
-    def _get_trial_work_dir(self):
-        return osp.join(self._hpo_workdir, self._hp_config["id"])
+    def _get_weight_dir_path(self):
+        return osp.join(self._hpo_workdir, "weight", self._hp_config["id"])
 
 def run_trial(
     hp_config:  Dict,
@@ -572,7 +573,7 @@ def mocking_run_trial(
     lr = hp_config["configuration"]["learning_parameters.learning_rate"]
     bs = hp_config["configuration"]["learning_parameters.batch_size"]
     obj_func = 100 - (0.001 - lr) ** 2 - ((16 - bs) ** 2) / 100
-    iteration = ceil(hp_config["configuration"]["iterations"])
+    iteration = floor(hp_config["configuration"]["iterations"])
     if iteration >= 2:
         iteration -= 2
     for i in range(iteration):
