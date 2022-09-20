@@ -444,7 +444,7 @@ class Trainer:
                 need_to_save_initial_weight = True
 
         task = environment.get_train_task()
-        if not need_to_save_initial_weight:
+        if need_to_save_initial_weight:
             self._add_initial_weight_saving_hook(task)
 
         output_model = environment.get_output_model(dataset)
