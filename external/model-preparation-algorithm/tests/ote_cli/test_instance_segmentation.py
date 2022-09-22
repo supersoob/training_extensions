@@ -57,7 +57,7 @@ args = {
 root = "/tmp/ote_cli/"
 ote_dir = os.getcwd()
 
-TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", False)
+TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", True)
 if TT_STABILITY_TESTS:
     default_template = parse_model_template(
         os.path.join(

@@ -58,7 +58,7 @@ ote_dir = os.getcwd()
 
 templates = Registry("external").filter(task_type="ANOMALY_SEGMENTATION").templates
 templates_ids = [template.model_template_id for template in templates]
-TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", False)
+TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", True)
 if TT_STABILITY_TESTS:
     default_template = parse_model_template(
         os.path.join("external/anomaly/configs", "segmentation", "padim", "template.yaml")
