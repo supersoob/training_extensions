@@ -35,9 +35,14 @@ try:
     import hpopt
     from hpopt.hpo_runner import run_hpo_loop
     from hpopt.hyperband import HyperBand
+    from hpopt.hpo_base import TrialStatus
 except ImportError:
     print("cannot import hpopt module")
     hpopt = None
+
+import logging
+hpopt_logger = logging.getLogger("hpopt")
+hpopt_logger.setLevel(logging.DEBUG)
 
 def _check_hpo_enabled_task(task_type):
     return task_type in [
@@ -342,8 +347,6 @@ class HpoRunner:
             "metric" : self._hpo_config.get("metric", "mAP"),
             "expected_time_ratio" : self._hpo_time_ratio,
             "prior_hyper_parameters" : self._get_default_hyper_parameters(),
-            "maximum_resource" : 21,
-            "minimum_resource" : 2,
             "asynchronous_bracket" : True
         }
 
@@ -568,16 +571,30 @@ def mocking_run_trial(
     hpo_workdir: str,
     initial_weight_name: str,
     metric: str,
-    max_epoch: int
 ):
+    print("mocking_run_trial start!")
+
+    import logging
+    hpopt_logger = logging.getLogger("hpopt")
+    hpopt_logger.setLevel(logging.DEBUG)
+
     lr = hp_config["configuration"]["learning_parameters.learning_rate"]
     bs = hp_config["configuration"]["learning_parameters.batch_size"]
     obj_func = 100 - (0.001 - lr) ** 2 - ((16 - bs) ** 2) / 100
     iteration = floor(hp_config["configuration"]["iterations"])
-    if iteration >= 2:
-        iteration -= 2
-    for i in range(iteration):
-        report_func(obj_func + i / 100, i+1)
+    validation_interval = 2
+    print(f"iteratoin : {iteration}")
+    if iteration > 50:
+        iteration = 50
+        print("iteration is modified to 50.")
+
+    for i in range(validation_interval, iteration+1, validation_interval):
+        score = obj_func + i / 100
+        progress = i
+        stop_train = report_func(score, progress)
+        if stop_train == TrialStatus.STOP:
+            break
+
     report_func(0, 0, done=True)
 
 class HpoCallback(UpdateProgressCallback):
@@ -594,7 +611,7 @@ class HpoCallback(UpdateProgressCallback):
         if score is not None:
             epoch = round(self._max_epoch * progress / 100)
             print("*"*100, f"In hpo callback : {score} / {progress} / {epoch}")
-            if self._report_func(score=score, progress=epoch) == hpopt.Status.STOP:
+            if self._report_func(score=score, progress=epoch) == TrialStatus.STOP:
                 self._task.cancel_training()
 
 class HpoDataset:
