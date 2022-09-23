@@ -116,11 +116,11 @@ class TaskManager:
 
         return epoch_name
 
-    def move_weight(self, src: str, det: str):
+    def copy_weight(self, src: str, det: str):
         if self.is_mpa_framework_task():
             for weight_candidate in glob.iglob(osp.join(src, "**/epoch_*.pth"), recursive=True):
                 if not (osp.islink(weight_candidate) or osp.exists(osp.join(det, osp.basename(weight_candidate)))):
-                    shutil.move(weight_candidate, det)
+                    shutil.copy(weight_candidate, det)
 
     def get_latest_weight(self, workdir: str):
         latest_weight = None
@@ -535,7 +535,7 @@ class Trainer:
     def _finalize_trial(self, task):
         weight_dir_path = self._get_weight_dir_path()
         os.makedirs(weight_dir_path, exist_ok=True)
-        self._task.move_weight(task.output_path, weight_dir_path)
+        self._task.copy_weight(task.output_path, weight_dir_path)
         self._report_func(0, 0, done=True)
 
     def _get_weight_dir_path(self):
