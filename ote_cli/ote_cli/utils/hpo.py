@@ -117,13 +117,14 @@ class TaskManager:
         return epoch_name
 
     def move_weight(self, src: str, det: str):
-        if self._task_type == TaskType.DETECTION:
+        if self.is_mpa_framework_task():
             for weight_candidate in glob.iglob(osp.join(src, "**/epoch_*.pth"), recursive=True):
                 if not (osp.islink(weight_candidate) or osp.exists(osp.join(det, osp.basename(weight_candidate)))):
                     shutil.move(weight_candidate, det)
 
     def get_latest_weight(self, workdir: str):
-        if self._task_type == TaskType.DETECTION:
+        latest_weight = None
+        if self.is_mpa_framework_task():
             pattern = re.compile(r"(\d+)\.pth")
             current_latest_epoch = -1
             latest_weight = None
