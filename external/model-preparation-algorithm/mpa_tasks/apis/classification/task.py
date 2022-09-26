@@ -81,23 +81,14 @@ class TrainingProgressCallback(TimeMonitorCallback):
 
     def on_epoch_end(self, epoch, logs=None):
         self.past_epoch_duration.append(time.time() - self.start_epoch_time)
+        progress = ((epoch + 1) / self.total_epochs) * 100
+        print("*"*100, f"epoch : {epoch} / total_epoch : {self.total_epochs}")
         self._calculate_average_epoch()
         score = None
         if hasattr(self.update_progress_callback, "metric") and isinstance(logs, dict):
             score = logs.get(self.update_progress_callback.metric, None)
             logger.info(f"logged score for metric {self.update_progress_callback.metric} = {score}")
-            score = 0.01 * float(score) if score is not None else None
-            if score is not None:
-                iter_num = logs.get("current_iters", None)
-                if iter_num is not None:
-                    logger.info(f"score = {score} at epoch {epoch} / {int(iter_num)}")
-                    # as a trick, score (at least if it's accuracy not the loss) and iteration number
-                    # could be assembled just using summation and then disassembeled.
-                    if 1.0 > score:
-                        score = score + int(iter_num)
-                    else:
-                        score = -(score + int(iter_num))
-        self.update_progress_callback(self.get_progress(), score=score)
+        self.update_progress_callback(progress, score=score)
 
 
 class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask, IUnload):
