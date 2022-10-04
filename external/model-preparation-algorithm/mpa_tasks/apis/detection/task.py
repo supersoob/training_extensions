@@ -228,6 +228,13 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         model_cfg = MPAConfig.fromfile(os.path.join(base_dir, 'model.py'))
         if len(self._anchors) != 0:
             self._update_anchors(model_cfg.model.bbox_head.anchor_generator, self._anchors)
+        if self._calib_scale is not None:
+            if model_cfg.model.get('roi_head', None):
+                model_cfg.model.roi_head.bbox_head.calib_scale = torch.Tensor(self._calib_scale)
+            elif model_cfg.model.get('bbox_head', None):
+                model_cfg.model.bbox_head.calib_scale = torch.Tensor(self._calib_scale)
+            else:
+                raise NotImplementedError(f'{model_cfg.model.type} do not support NorCal')
         return model_cfg
 
     def _init_test_data_cfg(self, dataset: DatasetEntity):
@@ -403,6 +410,8 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
             if getattr(self._model_cfg.model.bbox_head.anchor_generator, 'reclustering_anchors', False):
                 modelinfo['anchors'] = {}
                 self._update_anchors(modelinfo['anchors'], self._model_cfg.model.bbox_head.anchor_generator)
+        if 'calib_scale' in model_ckpt['meta']:
+            modelinfo['calib_scale'] = model_ckpt['meta']['calib_scale']
 
         torch.save(modelinfo, buffer)
         output_model.set_data("weights.pth", buffer.getvalue())
