@@ -1,21 +1,77 @@
-_base_:
-  [
-    "./stages/classification/train.yaml",
-    "./stages/_base_/data/cls_data.py",
-    "./stages/_base_/models/classifiers/classifier.py",
-  ]
+# jobs:
+#   - type: MMClsTrainer
+#     spec: trainer
+#   - type: MMClsEvaluator
+#     spec: evaluator
+#     metric: top-1
+#   - type: MMClsInferrer
+#     spec: inferrer
+#   - type: TorchOptimizer
+#     spec: model_optimizer
+#     option: openvino
+
+_base_: ["./pipelines/radnom_hflip_resize_pipeline.py"]
+
+jobs:
+  - type: MMClsTrainJob
+    spec: [train, optimize]
+  - type: MMClsNonTrainJob
+    spec: [eval, infer]
+  - type: OVExporter
+    spec: [export]
+
+model:
+  override: recipes/models/backbones/ote_mobilenet_v3_small.yaml
+  adapter: ote.backends.torch.mmcv.model.MMClassifier
+  spec:
+    backend: mmcv
+    type: classifier
+  type: ImageClassifier
+  task: classification
+  pretrained: None
+  backbone:
+    spec: classifier
+    type: MobileNetV2
+    widen_factor: 1.0
+  neck: None
+  head:
+    in_channels: -1
+    loss:
+      type: CrossEntropyLoss
+      loss_weight: 1.0
+    topk: !!python/tuple [1, 5]
+
+data:
+  spec:
+    backend: mmcv
+  override: data/cifar10_224_5cls.yaml
+  train:
+    type: MMClsDataset
+    pipeline: { { _base_.train_pipeline } }
+  val:
+    type: MMClsDataset
+    pipeline: { { _base_.test_pipeline } }
+  test:
+    type: MMClsDataset
+    pipeline: { { _base_.test_pipeline } }
+  unlabeled: None
 
 runner:
   max_epochs: 20
 
-optimizer_config:
-  type: SAMOptimizerHook
+workflow: [!!python/tuple ["train", 1]]
 
 optimizer:
   type: SGD
   lr: 0.01
   momentum: 0.9
   weight_decay: 0.0005
+
+optimizer_config:
+  type: SAMOptimizerHook
+
+lr_config:
+  policy: fixed
 
 evaluation:
   metric: ["accuracy", "class_accuracy"]
@@ -28,22 +84,6 @@ custom_hooks:
   - type: NoBiasDecayHook
   - type: ModelEmaV2Hook
 
-adapters:
-  model: ote.backends.torch.mmcv.model.MMClassifier
-  data: ote.backends.torch.mmcv.dataset.MMClsDataset
-
-model_override: "recipes/classification/ote_mobilenet_v3_small.yaml"
-data_override: "recipes/stages/_base_/data/cifar10_224_5cls.py"
-
-task_cfg:
-  tasks:
-    - type: MMClsTrainer
-      spec: trainer
-    - type: MMClsEvaluator
-      spec: evaluator
-      metric: top-1
-    - type: MMClsInferrer
-      spec: inferrer
-    - type: TorchOptimizer
-      spec: model_optimizer
-      option: openvino
+dist_params:
+  backend: nccl
+  linear_scale_lr: True

@@ -1,0 +1,44 @@
+# any algorithm specific general configurations
+algo:
+  task: classification
+  train_type: class-incr
+
+# mapping to the specific job implementation in the backends
+jobs:
+  - adapter: otx.backends.torch.mmcv.MMClsTrainJob
+    spec: [train, optimize]
+  - adapter: otx.backends.torch.mmcv.MMClsNonTrainJob
+    spec: [eval, infer]
+  - adapter: otx.backends.ov.OVExporter
+    spec: [export]
+
+# configurations for each job spec
+train:
+  # configurations for 'train' job
+  hyper_parameters:
+    attr0: value0
+
+optimize:
+  # configurations for 'opimize' job
+  attr0: value0
+  attr1: value1
+
+eval:
+  # configurations for 'eval' job
+  metric:
+    attr0: value0
+    attr1: value1
+
+export:
+  # configurations for 'export' job
+  attr0: value0
+
+# default model configurations
+model:
+  default: configs/models/backbones/ote_mobilenet_v3_small.yaml
+  adapter: otx.backends.torch.mmcv.model.MMClassifier
+
+# default dataset configurations
+data:
+  default: configs/data/cifar10_224_5cls.yaml
+  adapter: otx.backends.torch.mmcv.classification.MMClsDataset

@@ -12,6 +12,6 @@ def test_recipe():
 
     # recipe.run(dataset="dataset")
 
-    result = recipe.train(mode="train")
+    result = recipe.train()
     assert isinstance(result, dict)
     assert result.get("final_ckpt") is not None
