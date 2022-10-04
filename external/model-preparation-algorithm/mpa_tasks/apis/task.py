@@ -52,6 +52,7 @@ class BaseTask:
         self._optimization_methods = []
         self._model_ckpt = None
         self._anchors = {}
+        self._calib_scale = None
         if task_environment.model is not None:
             logger.info("loading the model from the task env.")
             state_dict = self._load_model_state_dict(self._task_environment.model)
@@ -275,9 +276,11 @@ class BaseTask:
             model_data = torch.load(buffer, map_location=torch.device("cpu"))
 
             # set confidence_threshold as well
-            self.confidence_threshold = model_data.get("confidence_threshold", self.confidence_threshold)
-            if model_data.get("anchors"):
-                self._anchors = model_data["anchors"]
+            self.confidence_threshold = model_data.get('confidence_threshold', self.confidence_threshold)
+            if model_data.get('anchors'):
+                self._anchors = model_data['anchors']
+            if model_data.get('calib_scale'):
+                self._calib_scale = model_data['calib_scale']
 
             return model_data.get("model", model_data.get("state_dict", None))
         else:
