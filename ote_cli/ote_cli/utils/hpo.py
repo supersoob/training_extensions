@@ -476,7 +476,7 @@ class Trainer:
         return dataset
 
     def _set_hyper_parameter(self, environment: TaskEnvironmentManager):
-        environment.set_hyper_parameter_from_flatten_format_dict(self._hp_config)
+        environment.set_hyper_parameter_from_flatten_format_dict(self._hp_config["configuration"])
         environment.set_epoch(self._epoch)
 
     def _prepare_environment(self, hyper_parameters, dataset):
