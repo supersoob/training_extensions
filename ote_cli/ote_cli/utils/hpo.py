@@ -348,7 +348,8 @@ class HpoRunner:
             "metric" : self._hpo_config.get("metric", "mAP"),
             "expected_time_ratio" : self._hpo_time_ratio,
             "prior_hyper_parameters" : self._get_default_hyper_parameters(),
-            "asynchronous_bracket" : True
+            "asynchronous_bracket" : True,
+            "asynchronous_sha" : False if torch.cuda.device_count() == 1 else True
         }
 
         print(f"[OTE_CLI] [DEBUG-HPO] ASHA args for create hpopt = {args}")
