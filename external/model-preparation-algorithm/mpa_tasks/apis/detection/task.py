@@ -465,7 +465,6 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
                 )
             if 'calib_scale' in model_ckpt['meta']:
                 modelinfo['calib_scale'] = model_ckpt['meta']['calib_scale']
-
         torch.save(modelinfo, buffer)
         output_model.set_data("weights.pth", buffer.getvalue())
         output_model.set_data(
