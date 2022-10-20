@@ -9,6 +9,7 @@ from typing import Iterable, List, Optional, Tuple
 
 import cv2
 import numpy as np
+import pycocotools.mask as mask_util
 import torch
 from detection_tasks.apis.detection import OTEDetectionNNCFTask
 from detection_tasks.apis.detection.config_utils import remove_from_config
@@ -410,6 +411,8 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         shapes = []
         for label_idx, (boxes, masks) in enumerate(zip(*all_results)):
             for mask, probability in zip(masks, boxes[:, 4]):
+                if isinstance(mask, dict):
+                    mask = mask_util.decode(mask)
                 mask = mask.astype(np.uint8)
                 probability = float(probability)
                 contours, hierarchies = cv2.findContours(mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
