@@ -91,7 +91,7 @@ def patch_config(config: Config, work_dir: str, labels: List[LabelEntity], domai
     # Patch data pipeline, making it OTE-compatible.
     patch_datasets(config, domain)
 
-    # Remove FP16 config if running on CPU device and revert to FP32 
+    # Remove FP16 config if running on CPU device and revert to FP32
     # https://github.com/pytorch/pytorch/issues/23377
     if not torch.cuda.is_available() and 'fp16' in config:
         logger.info(f'Revert FP16 to FP32 on CPU device')
