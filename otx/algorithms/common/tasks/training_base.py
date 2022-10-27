@@ -241,6 +241,15 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
             )
         self._recipe_cfg.log_config.hooks.append({"type": "OTXLoggerHook", "curves": self._learning_curves})
 
+        if 'custom_hooks' in self._model_cfg:
+            # Sungchul: I want to use L195-198 to update custom_hooks,
+            # but I don't know how to use L393-397, so I create this part.
+            # If I know the way to use L393-397, I'll delete this.
+            for hook in self._model_cfg['custom_hooks']:
+                update_or_add_custom_hook(
+                    self._recipe_cfg, ConfigDict(**hook)
+                )
+
         logger.info("initialized.")
 
     @abc.abstractmethod
