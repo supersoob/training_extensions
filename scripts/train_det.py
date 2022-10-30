@@ -2,17 +2,22 @@ import importlib
 import os
 import shutil
 import subprocess
+from typing import Dict, List
 
 from mmcv.utils.config import Config
-from mpa.utils.config_utils import MPAConfig
 
-if __name__ == '__main__':
-    GPUS = 0
-    EXP = 'subset_geti1'
-    DATASETS = ['bccd', 'fish', 'pothole', 'vitens']
-    MODELS = ['mobilenetv2_atss', 'mobilenetv2_ssd', 'cspdarknet_yolox']
-    MODES = ['sup', 'sup_detcon', 'detcon_supcon']
-    NUM_DATAS = [16, 32, 48]
+
+def main(
+    GPUS: int = 0,
+    EXP: str = 'subset_geti1',
+    DATASETS: List[str] = ['bccd', 'fish', 'pothole', 'vitens'],
+    MODELS: List[str] = ['mobilenetv2_atss', 'mobilenetv2_ssd', 'cspdarknet_yolox'],
+    MODES: List[str] = ['sup', 'sup_detcon', 'detcon_supcon'],
+    NUM_DATAS: List[int] = [16, 32, 48],
+    # hparams for the model
+    INTERVALS: List[int] = [1],
+    LAMBDAS: List[int] = [1],
+):
 
     # hparams for training
     BATCHSIZES = {16: [8], 32: [8, 16], 48: [8, 24]}
@@ -22,24 +27,20 @@ if __name__ == '__main__':
         'cspdarknet_yolox': [0.0002]
     }
 
-    # hparams for the model
-    INTERVALS = [1]
-    LAMBDAS = [1]
-
     cfg = None
     for DATASET in DATASETS:
-        DATAROOT = f'data/{DATASET}'
+        # DATAROOT = f'data/{DATASET}'
         if DATASET == 'fish':
-            REAL_CLASSES = '"["fish"]"'
+            # REAL_CLASSES = '"["fish"]"'
             NUM_CLASSES = 2
         elif DATASET == 'bccd':
-            REAL_CLASSES = '"["Platelets", "RBC", "WBC"]"'
+            # REAL_CLASSES = '"["Platelets", "RBC", "WBC"]"'
             NUM_CLASSES = 4
         elif DATASET == 'pothole':
-            REAL_CLASSES = '"["pothole"]"'
+            # REAL_CLASSES = '"["pothole"]"'
             NUM_CLASSES = 2
         elif DATASET == 'vitens':
-            REAL_CLASSES = '"["object"]"'
+            # REAL_CLASSES = '"["object"]"'
             NUM_CLASSES = 2
         else:
             raise ValueError()
@@ -79,7 +80,8 @@ if __name__ == '__main__':
 
                                         os.makedirs(RECIPE, exist_ok=True)
 
-                                        # update template.yaml
+
+                                        ################## update template.yaml ##################
                                         shutil.copy(os.path.join(BASELINE_ROOT, 'template.yaml'), os.path.join(RECIPE, 'template.yaml'))
                                         template = Config.fromfile(os.path.join(RECIPE, 'template.yaml'))
 
@@ -90,7 +92,8 @@ if __name__ == '__main__':
 
                                         template.dump(os.path.join(RECIPE, 'template.yaml'))
 
-                                        # update model.py & copy data_pipeline.py
+
+                                        ######## update model.py & copy data_pipeline.py ########
                                         if 'supcon' in MODE:
                                             shutil.copy(f'{SELFSL_ROOT}/data_pipeline_detcon_supcon.py', os.path.join(RECIPE, 'data_pipeline.py'))
 
@@ -112,7 +115,7 @@ if __name__ == '__main__':
                                                     hook['interval'] = INTERVAL
 
                                             new_cfg = Config(
-                                                cfg_dict={k: eval(f'cfg.{k}') for k in ['_base_', 'model', 'custom_hooks', 'load_from']}, 
+                                                cfg_dict={k: getattr(cfg, k) for k in ['_base_', 'model', 'custom_hooks', 'load_from']}, 
                                                 filename=os.path.join(SELFSL_ROOT, 'model_detcon_supcon.py')
                                             )
 
@@ -132,8 +135,10 @@ if __name__ == '__main__':
                                                 '../' * (len(RECIPE.split('/')) - len(BASELINE_ROOT.split('/'))) + b for b in cfg._base_
                                             ] # 4
 
+                                            model_cfg_for_update = [k for k in ['_base_', 'model', 'fp16', 'load_from', '__width_mult', 'ignore'] if hasattr(cfg, k)]
+
                                             new_cfg = Config(
-                                                cfg_dict={k: eval(f'cfg.{k}') for k in ['_base_', 'model', 'fp16', 'load_from'] }, 
+                                                cfg_dict={k: getattr(cfg, k) for k in model_cfg_for_update}, 
                                                 filename=os.path.join(BASELINE_ROOT, 'model.py')
                                             )
 
@@ -166,3 +171,15 @@ if __name__ == '__main__':
                                                 shutil.copy(os.path.join(work_dir, file), os.path.join(WORKDIR, file))
                                             except:
                                                 pass
+
+if __name__ == '__main__':
+    main(
+        GPUS=0,
+        EXP='test',
+        DATASETS=['bccd', 'fish', 'pothole', 'vitens'],
+        MODELS=['mobilenetv2_ssd'],
+        MODES=['sup'],
+        NUM_DATAS=[16, 32, 48],
+        INTERVALS=[1],
+        LAMBDAS=[1],
+    )
