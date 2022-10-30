@@ -8,14 +8,19 @@ from mpa.utils.config_utils import MPAConfig
 
 if __name__ == '__main__':
     GPUS = 0
+    EXP = 'subset_geti1'
     DATASETS = ['bccd', 'fish', 'pothole', 'vitens']
     MODELS = ['mobilenetv2_atss', 'mobilenetv2_ssd', 'cspdarknet_yolox']
     MODES = ['sup', 'sup_detcon', 'detcon_supcon']
-    NUM_DATAS = [16]
+    NUM_DATAS = [16, 32, 48]
 
     # hparams for training
     BATCHSIZES = {16: [8], 32: [8, 16], 48: [8, 24]}
-    LRS = [0.004]
+    LRS = {
+        'mobilenetv2_atss': [0.004],
+        'mobilenetv2_ssd': [0.01],
+        'cspdarknet_yolox': [0.0002]
+    }
 
     # hparams for the model
     INTERVALS = [1]
@@ -44,7 +49,7 @@ if __name__ == '__main__':
                 assert MODE in ['sup', 'sup_detcon', 'detcon_supcon']
                 for NUM_DATA in NUM_DATAS:
                     for BATCHSIZE in BATCHSIZES[NUM_DATA]:
-                        for LR in LRS:
+                        for LR in LRS[MODEL]:
                             for INTERVAL in INTERVALS:
                                 for LAMBDA in LAMBDAS:
                                     for seed in [1, 2, 3, 4, 5]:
@@ -55,7 +60,7 @@ if __name__ == '__main__':
                                         if 'supcon' in MODE:
                                             # supcon
                                             OPTIONS = f'batch{BATCHSIZE}_lr{LR}_lambda{LAMBDA}_interval{INTERVAL}'
-                                            WORKDIR = f'work_dirs/supcon/detection/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODE}_{MODEL}/seed{seed}'
+                                            WORKDIR = f'work_dirs/supcon/detection/{EXP}/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODE}_{MODEL}/seed{seed}'
                                             RECIPE = f'{RECIPE_ROOT}/{OPTIONS}/{MODE}_{MODEL}'
                                         else:
                                             # supervised
@@ -63,13 +68,13 @@ if __name__ == '__main__':
                                                 # supervised with self-sl pipeline
                                                 assert len(LAMBDAS) == 1 and len(INTERVALS) == 1
                                                 OPTIONS = f'batch{BATCHSIZE}_lr{LR}'
-                                                WORKDIR = f'work_dirs/supcon/detection/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODEL}_{MODE}/seed{seed}'
+                                                WORKDIR = f'work_dirs/supcon/detection/{EXP}/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODEL}_{MODE}/seed{seed}'
                                                 RECIPE = f'{RECIPE_ROOT}/{OPTIONS}/{MODEL}_{MODE}'
                                             else:
                                                 # supervised baseline
                                                 assert len(LAMBDAS) == 1 and len(INTERVALS) == 1
                                                 OPTIONS = f'batch{BATCHSIZE}_lr{LR}'
-                                                WORKDIR = f'work_dirs/supcon/detection/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODEL}/seed{seed}'
+                                                WORKDIR = f'work_dirs/supcon/detection/{EXP}/{DATASET}/{NUM_DATA}/{OPTIONS}/{MODEL}/seed{seed}'
                                                 RECIPE = f'{RECIPE_ROOT}/{OPTIONS}/{MODEL}'
 
                                         os.makedirs(RECIPE, exist_ok=True)
