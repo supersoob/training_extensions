@@ -161,8 +161,8 @@ class DetConB(SAMDetectorMixin, L2SPDetectorMixin, SingleStageDetector):
     def __init__(
         self,
         backbone,
-        neck,
-        bbox_head,
+        neck=None,
+        bbox_head=None,
         train_cfg=None,
         test_cfg=None,
         projector=None,
@@ -259,7 +259,7 @@ class DetConB(SAMDetectorMixin, L2SPDetectorMixin, SingleStageDetector):
             raise ValueError()
 
     def _forward_train(self, imgs, masks, net, projector):
-        embds = [net(img) for img in imgs]
+        embds = [self.extract_feat(img) for img in imgs]
         
         embds_for_detcon = [self.get_transformed_features(emb) for emb in embds]
 
@@ -269,7 +269,7 @@ class DetConB(SAMDetectorMixin, L2SPDetectorMixin, SingleStageDetector):
         embds_for_detcon = [
             embd.reshape((bs, emb_d, emb_h*emb_w)).transpose(1, 2) for embd in embds_for_detcon
         ]
-
+        
         sampled_embds = [
             sampled_mask @ embd_for_detcon 
             for sampled_mask, embd_for_detcon in zip(sampled_masks, embds_for_detcon)
@@ -447,11 +447,11 @@ class DetConBSupCon(DetConB):
 
         if not isinstance(img, (list, tuple)):
             # supervised learning with interval
-            e1 = self.online_net(img)
+            e1 = self.extract_feat(img)
 
             # bbox head
             loss_bbox = self.bbox_head.forward_train(
-                self.neck(e1), img_metas, gt_bboxes, gt_labels, gt_bboxes_ignore=None, **kwargs)
+                e1, img_metas, gt_bboxes, gt_labels, gt_bboxes_ignore=None, **kwargs)
 
             losses.update(loss_bbox)
 
@@ -468,7 +468,7 @@ class DetConBSupCon(DetConB):
             
             # bbox head
             e1, _ = embds
-            loss_bbox = self.bbox_head.forward_train(self.neck(e1), img_metas1, gt_bboxes1, gt_labels1, gt_bboxes_ignore=None, **kwargs)
+            loss_bbox = self.bbox_head.forward_train(e1, img_metas1, gt_bboxes1, gt_labels1, gt_bboxes_ignore=None, **kwargs)
             losses.update(loss_bbox)
 
             with torch.no_grad():

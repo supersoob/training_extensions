@@ -22,22 +22,22 @@ _base_ = [
 
 model = dict(
     type='DetConBSupCon',
-    pretrained='https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-atss.pth',
+    pretrained='https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth',
     num_classes=None, # to be set based on dataset
     num_samples=16,
-    downsample=8,
+    downsample=16,
     input_transform='resize_concat',
-    in_index=[0,1,2,3,4],
+    in_index=[0,1],
     projector=dict(
-        in_channels=320,
-        hid_channels=640,
+        in_channels=416,
+        hid_channels=832,
         out_channels=256,
         norm_cfg=dict(type='BN1d', requires_grad=True),
         with_avg_pool=False
     ),
     predictor=dict(
         in_channels=256,
-        hid_channels=640,
+        hid_channels=832,
         out_channels=256,
         norm_cfg=dict(type='BN1d', requires_grad=True),
         with_avg_pool=False

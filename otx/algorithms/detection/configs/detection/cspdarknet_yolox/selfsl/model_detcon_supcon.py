@@ -1,4 +1,4 @@
-"""Model configuration of Self-SL with ATSS model for Detection Task."""
+"""Model configuration of Self-SL with YOLOX model for Detection Task."""
 
 # Copyright (C) 2022 Intel Corporation
 #
@@ -22,22 +22,22 @@ _base_ = [
 
 model = dict(
     type='DetConBSupCon',
-    pretrained='https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-atss.pth',
+    pretrained='https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/yolox_tiny_8x8.pth',
     num_classes=None, # to be set based on dataset
     num_samples=16,
     downsample=8,
     input_transform='resize_concat',
-    in_index=[0,1,2,3,4],
+    in_index=[0,1,2],
     projector=dict(
-        in_channels=320,
-        hid_channels=640,
+        in_channels=288,
+        hid_channels=576,
         out_channels=256,
         norm_cfg=dict(type='BN1d', requires_grad=True),
         with_avg_pool=False
     ),
     predictor=dict(
         in_channels=256,
-        hid_channels=640,
+        hid_channels=576,
         out_channels=256,
         norm_cfg=dict(type='BN1d', requires_grad=True),
         with_avg_pool=False
