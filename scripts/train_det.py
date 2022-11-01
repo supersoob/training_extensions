@@ -2,7 +2,7 @@ import importlib
 import os
 import shutil
 import subprocess
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from mmcv.utils.config import Config
 
@@ -14,6 +14,9 @@ def main(
     MODELS: List[str] = ['mobilenetv2_atss', 'mobilenetv2_ssd', 'cspdarknet_yolox'],
     MODES: List[str] = ['sup', 'sup_detcon', 'detcon_supcon'],
     NUM_DATAS: List[int] = [16, 32, 48],
+    # hparams for training
+    BATCHSIZES: Optional[Dict] = None,
+    LRS: Optional[Dict] = None,
     # hparams for the model
     INTERVALS: List[int] = [1],
     LAMBDAS: List[int] = [1],
@@ -21,8 +24,8 @@ def main(
 ):
 
     # hparams for training
-    BATCHSIZES = {16: [8], 32: [8, 16], 48: [8, 24]}
-    LRS = {
+    BATCHSIZES = BATCHSIZES if BATCHSIZES else {16: [8], 32: [8, 16], 48: [8, 24]}
+    LRS = LRS if LRS else {
         'mobilenetv2_atss': [0.004],
         'mobilenetv2_ssd': [0.01],
         'cspdarknet_yolox': [0.0002]
