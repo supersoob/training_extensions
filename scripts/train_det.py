@@ -105,46 +105,44 @@ def main(
                                                 cfg = importlib.import_module(os.path.join(SELFSL_ROOT, 'model_detcon_supcon').replace('/', '.'))
                                             else:
                                                 cfg = importlib.reload(cfg)
+
+                                            model_cfg_for_update = [k for k in ['_base_', 'model', 'custom_hooks', 'load_from'] if hasattr(cfg, k)]
+                                            new_cfg = {k: getattr(cfg, k) for k in model_cfg_for_update}
                                             
                                             ## update _base_
-                                            cfg._base_ = [
-                                                '../' * (len(RECIPE.split('/')) - len(SELFSL_ROOT.split('/'))) + b for b in cfg._base_
+                                            new_cfg['_base_'] = [
+                                                '../' * (len(RECIPE.split('/')) - len(SELFSL_ROOT.split('/'))) + b for b in new_cfg['_base_']
                                             ] # 3
 
                                             ## update hparams
-                                            cfg.model['num_classes'] = NUM_CLASSES
-                                            cfg.model['loss_weights'] = {'detcon': LAMBDA}
-                                            for hook in cfg.custom_hooks:
+                                            new_cfg['model']['num_classes'] = NUM_CLASSES
+                                            new_cfg['model']['loss_weights'] = {'detcon': LAMBDA}
+                                            for hook in new_cfg['custom_hooks']:
                                                 if hook['type'] == 'SwitchPipelineHook':
                                                     hook['interval'] = INTERVAL
 
-                                            new_cfg = Config(
-                                                cfg_dict={k: getattr(cfg, k) for k in ['_base_', 'model', 'custom_hooks', 'load_from']}, 
-                                                filename=os.path.join(SELFSL_ROOT, 'model_detcon_supcon.py')
-                                            )
+                                            new_cfg = Config(cfg_dict=new_cfg, filename=os.path.join(SELFSL_ROOT, 'model_detcon_supcon.py'))
 
                                         else:
                                             if 'detcon' in MODE:
                                                 shutil.copy(f'{SELFSL_ROOT}/data_pipeline_detcon.py', os.path.join(RECIPE, 'data_pipeline.py'))
                                             else:
                                                 shutil.copy(f'{BASELINE_ROOT}/data_pipeline.py', os.path.join(RECIPE, 'data_pipeline.py'))
-
+                                            
                                             if (cfg is None) or (cfg.__name__ != os.path.join(BASELINE_ROOT, 'model').replace('/', '.')):
                                                 cfg = importlib.import_module(os.path.join(BASELINE_ROOT, 'model').replace('/', '.'))
                                             else:
                                                 cfg = importlib.reload(cfg)
+                                            
+                                            model_cfg_for_update = [k for k in ['_base_', 'model', 'fp16', 'load_from', '__width_mult', 'ignore'] if hasattr(cfg, k)]
+                                            new_cfg = {k: getattr(cfg, k) for k in model_cfg_for_update}
 
                                             ## update _base_
-                                            cfg._base_ = [
-                                                '../' * (len(RECIPE.split('/')) - len(BASELINE_ROOT.split('/'))) + b for b in cfg._base_
+                                            new_cfg['_base_'] = [
+                                                '../' * (len(RECIPE.split('/')) - len(BASELINE_ROOT.split('/'))) + b for b in new_cfg['_base_']
                                             ] # 4
 
-                                            model_cfg_for_update = [k for k in ['_base_', 'model', 'fp16', 'load_from', '__width_mult', 'ignore'] if hasattr(cfg, k)]
-
-                                            new_cfg = Config(
-                                                cfg_dict={k: getattr(cfg, k) for k in model_cfg_for_update}, 
-                                                filename=os.path.join(BASELINE_ROOT, 'model.py')
-                                            )
+                                            new_cfg = Config(cfg_dict=new_cfg, filename=os.path.join(BASELINE_ROOT, 'model.py'))
 
                                         new_cfg.dump(os.path.join(RECIPE, 'model.py'))
 
