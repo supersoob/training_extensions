@@ -1,0 +1,2 @@
+{"exp_name": "train_round_0", "hook_msgs": {}}
+{"mode": "train", "epoch": 1, "iter": 1, "lr": 0.00267, "current_iters": 0, "data_time": 0.37481, "loss_cls": 1.09995, "loss_bbox": 0.72261, "loss_centerness": 0.60857, "loss": 2.43113, "time": 117.70866}

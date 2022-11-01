@@ -1,0 +1,1 @@
+--train-ann-files ~/datasets/BBCD/train/_annotations.coco.json --train-data-roots ~/datasets/BBCD/train --val-ann-files ~/datasets/BBCD/valid/_annotations.coco.json --val-data-roots ~/datasets/BBCD/valid
