@@ -103,8 +103,7 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
         self._is_training = False
         self._should_stop = False
         self.cancel_interface = None
-        self.reserved_cancel = False
-        self.on_hook_initialized = self.OnHookInitialized(self)
+        self.stop_flag = torch.Tensor([False]).share_memory_()
 
         # to override configuration at runtime
         self.override_configs = {}  # type: Dict[str, str]
@@ -149,6 +148,7 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
 
     def _delete_scratch_space(self):
         """Remove model checkpoints and mpa logs."""
+        return
         if os.path.exists(self._output_path):
             shutil.rmtree(self._output_path, ignore_errors=False)
 
@@ -228,7 +228,7 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
         # add Cancel tranining hook
         update_or_add_custom_hook(
             self._recipe_cfg,
-            ConfigDict(type="CancelInterfaceHook", init_callback=self.on_hook_initialized),
+            ConfigDict(type="CancelInterfaceHook", stop_flag=self.stop_flag),
         )
         if self._time_monitor is not None:
             update_or_add_custom_hook(
@@ -343,13 +343,6 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
         is_in_docker = is_in_docker or os.path.exists("/.dockerenv")
         return is_in_docker
 
-    def cancel_hook_initialized(self, cancel_interface: CancelInterfaceHook):
-        """Initialization of cancel_interface hook."""
-        logger.info("cancel hook is initialized")
-        self.cancel_interface = cancel_interface
-        if self.reserved_cancel and self.cancel_interface:
-            self.cancel_interface.cancel()
-
     def unload(self):
         """Unload the task."""
         self._delete_scratch_space()
@@ -364,24 +357,6 @@ class BaseTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
             logger.warning(
                 f"Done unloading. " f"Torch is still occupying {torch.cuda.memory_allocated()} bytes of GPU memory"
             )
-
-    class OnHookInitialized:
-        """OnHookInitialized class."""
-
-        def __init__(self, task_instance):
-            self.task_instance = task_instance
-
-        def __call__(self, cancel_interface):
-            """Function call in OnHookInitialized."""
-            self.task_instance.cancel_hook_initialized(cancel_interface)
-
-        def __repr__(self):
-            """Function repr in OnHookInitialized."""
-            return f"'{__name__}.OnHookInitialized'"
-
-        def __reduce__(self):
-            """Function reduce in OnHookInitialized."""
-            return (self.__class__, (id(self.task_instance),))
 
     def update_override_configurations(self, config):
         """Update override_configs."""

@@ -99,11 +99,7 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
         """
         logger.info("Cancel training requested.")
         self._should_stop = True
-        if self.cancel_interface is not None:
-            self.cancel_interface.cancel()
-        else:
-            logger.info("but training was not started yet. reserved it to cancel")
-            self.reserved_cancel = True
+        self.stop_flag[0] = True
 
     def train(
         self,
