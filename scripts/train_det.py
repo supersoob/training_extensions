@@ -17,6 +17,7 @@ def main(
     # hparams for the model
     INTERVALS: List[int] = [1],
     LAMBDAS: List[int] = [1],
+    SEEDS: List[int] = [1, 2, 3, 4, 5]
 ):
 
     # hparams for training
@@ -53,7 +54,7 @@ def main(
                         for LR in LRS[MODEL]:
                             for INTERVAL in INTERVALS:
                                 for LAMBDA in LAMBDAS:
-                                    for seed in [1, 2, 3, 4, 5]:
+                                    for seed in SEEDS:
                                         # set command
                                         BASELINE_ROOT = f'otx/algorithms/detection/configs/detection/{MODEL}'
                                         SELFSL_ROOT = f'{BASELINE_ROOT}/selfsl'
