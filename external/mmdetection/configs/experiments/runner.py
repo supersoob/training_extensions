@@ -5,7 +5,7 @@ import json
 import os
 import os.path as osp
 from datetime import datetime
-from mmcv import Config
+# from mmcv import Config
 from subprocess import run
 
 
@@ -64,28 +64,34 @@ def collect_f1_thres(path):
                 return float(line.replace(beginning, ''))
 
 
-def calculate_train_time(work_dir):
-    if not osp.exists(work_dir):
+def collect_training_time_stats(dataset_log):
+    
+    if not os.path.isfile(dataset_log):
+        print(f"{dataset_log} wasn't found")
+
         return None
 
-    log = [file for file in os.listdir(work_dir) if file.endswith('.log')]
-    if not log:
-        raise KeyError(f'{work_dir} has not log file')
-    log_path = osp.join(work_dir, sorted(log)[-1])
     first_line, last_line = '', ''
-    with open(log_path, 'r') as log_file:
+    last_epoch, max_epoch = 0, 0
+    with open(dataset_log, 'r') as log_file:
         for line in log_file:
-            if line.startswith('2021-'):
-                line = line[:19]
+            if line.startswith('2022-'):
+                # line = line[:19]
                 if first_line == '':
                     first_line = line
                 else:
                     last_line = line
+            if line.startswith("[ INFO ] workflow: [('train', 1)], max: "):
+                max_epoch = int(line.replace("[ INFO ] workflow: [('train', 1)], max: ", "").replace(" epochs", ""))
+            if line.startswith('[ INFO ] Epoch ['):
+                last_epoch = line.replace('[ INFO ] Epoch [', '')
 
+
+    last_epoch = int(last_epoch.split(']')[0])
     FMT = '%Y-%m-%d %H:%M:%S'
     tdelta = (datetime.strptime(last_line, FMT) -
               datetime.strptime(first_line, FMT)).total_seconds() / 60
-    return tdelta
+    return tdelta, last_epoch, max_epoch
 
 
 def get_command_eval_line(subset, dataset, work_dir, data_root, metric='bbox', update_nms=False):
@@ -182,16 +188,17 @@ def print_summarized_statistics(datasets, work_dir, cur_metric):
 
     for dataset in datasets:
         names.append(dataset['name'])
-        dataset_work_dir = f'{work_dir}/{dataset["name"]}'
-        for subset in ('train', 'val'):
-            metrics.append('')
-        try:
-            epoch = collect_epoch(f'{dataset_work_dir}/checkpoints_round_0')
-            metrics.append(epoch)
-            training_time = calculate_train_time(dataset_work_dir)
-            metrics.append(f'{training_time:.0f}')
-        except Exception as e:
-            metrics.append('')
+        dataset_log = f'{work_dir}/{dataset["name"]}.log'
+        metrics.append('')
+        # try:
+            # trained_epoch, max_epoch = vb(f'{dataset_work_dir}')
+            # metrics.append(epoch)
+        training_time, trained_epoch, max_epoch = collect_training_time_stats(dataset_log)
+        metrics.append(f'{training_time:.0f}')
+        metrics.append(f'{trained_epoch:.0f}')
+        metrics.append(f'{max_epoch:.0f}')
+        # except Exception as e:
+            # metrics.append('')
 
     print(work_dir)
     print(','.join(names))
@@ -237,17 +244,23 @@ def train_datasets(args, datasets, skip=None):
         copy_cmd = f' cd {args.work_dir} && cp {template_path} {dataset_template_path}'
 
         # activate_cmd = f' . det_env/bin/activate ' 
+        FMT = "%Y-%m-%d %H:%M:%S"
+        start_time = f'echo "Start time" ; date +"{FMT}"'
 
-        # train_cmd = f' ote train {template_path} --train-ann-files {dataset["train-ann-files"]} --train-data-roots {dataset["train-data-roots"]} '\
-        #     f'--val-ann-files {dataset["val-ann-files"]} --val-data-roots {dataset["val-data-roots"]} '\
-        #     f'--save-model-to {log_dir} >> {dataset["name"]}.log  '
+        end_time = f'echo "End time" ; date +"{FMT}"'
 
-        train_cmd = f' ote eval {template_path} '\
-            f'--test-ann-files {dataset["val-ann-files"]} --test-data-roots {dataset["val-data-roots"]} '\
-            f'--load-weights /home/gzalessk/code/training_extensions/models/ATSS/weights.pth >> {dataset["name"]}.log  '
+        train_cmd = f' ote train {template_path} --train-ann-files {dataset["train-ann-files"]} --train-data-roots {dataset["train-data-roots"]} '\
+            f'--val-ann-files {dataset["val-ann-files"]} --val-data-roots {dataset["val-data-roots"]} '\
+            f'--save-model-to {log_dir}  '
 
-        print(f'{train_cmd}')
-        run(f' {train_cmd}', shell=True, check=True)
+        to_log_file = f' >> {log_dir}.log '
+
+        # train_cmd = f' ote eval {template_path} '\
+        #     f'--test-ann-files {dataset["val-ann-files"]} --test-data-roots {dataset["val-data-roots"]} '\
+        #     f'--load-weights /home/gzalessk/code/openvino_training_extensions/models/ATSS/weights.pth >> {dataset["name"]}.log  '
+
+        print(f'{start_time} && {train_cmd} && {end_time} && {to_log_file}')
+        run(f' {start_time} && {train_cmd} && {end_time} && {to_log_file} ', shell=True, check=True)
 
     print_summarized_statistics(datasets, args.work_dir, metric)
 
@@ -288,7 +301,8 @@ if __name__ == '__main__':
     args = parse_args()
     sc_datasets = load_sc_dataset_cfg(args.data_cfg)
     if args.task == 'train':
-        train_datasets(args, sc_datasets, skip=('weed', 'diopsis'))
+        train_datasets(args, sc_datasets, skip=('weed', 'diopsis',  'pklot'))
+        # 'bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5',
     else:
         print_summarized_statistics(sc_datasets, args.work_dir, '')
 

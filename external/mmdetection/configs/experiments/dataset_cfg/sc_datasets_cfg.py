@@ -36,10 +36,10 @@
     },
     {
         "name": "minneapple",
-        "train-ann-files": "~/datasets/MinneApple/train_coco.json",
-        "train-data-roots": "~/datasets/MinneApple/images",
-        "val-ann-files": "~/datasets/MinneApple/val_coco.json",
-        "val-data-roots": "~/datasets/MinneApple/images"
+        "train-ann-files": "~/datasets/MinneApple/detection/train/train_coco.json",
+        "train-data-roots": "~/datasets/MinneApple/detection/train/images",
+        "val-ann-files": "~/datasets/MinneApple/detection/train/val_coco.json",
+        "val-data-roots": "~/datasets/MinneApple/detection/train/images"
     },
     {
         "name": "wgisd1",
@@ -57,9 +57,9 @@
     },
     {
         "name": "pklot",
-        "train-ann-files": "~/datasets/pklot-coco/instances_train.json",
+        "train-ann-files": "~/datasets/pklot-coco/annotations/instances_train.json",
         "train-data-roots": "~/datasets/pklot-coco/images",
-        "val-ann-files": "~/datasets/pklot-coco/instances_val.json",
+        "val-ann-files": "~/datasets/pklot-coco/annotations/instances_val.json",
         "val-data-roots": "~/datasets/pklot-coco/images"
     },
     {
