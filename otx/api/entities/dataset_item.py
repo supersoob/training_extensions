@@ -11,6 +11,9 @@ import itertools
 import logging
 from threading import Lock
 from typing import List, Optional, Sequence, Set, Tuple, Union
+import traceback
+import sys
+import os
 
 import numpy as np
 
@@ -488,11 +491,12 @@ class DatasetItemEntity(metaclass=abc.ABCMeta):
         return [meta for meta in self.get_metadata() if meta.data.name == name and meta.model == model]
 
     def __getstate__(self):
-        for name in vars(self).keys():
-            if "__roi_lock" in name:
-                setattr(self, name, None)
+        lock = self.__roi_lock
+        self.__roi_lock = None
+        ret = copy.deepcopy(self.__dict__)
+        self.__roi_lock = lock
 
-        return self.__dict__
+        return ret
 
     def __setstate__(self, state):
         self.__dict__ = state
