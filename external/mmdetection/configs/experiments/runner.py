@@ -94,7 +94,7 @@ def collect_training_time_stats(dataset_log):
     return tdelta, last_epoch, max_epoch
 
 
-def get_command_eval_line(subset, dataset, work_dir, data_root, metric='bbox', update_nms=False):
+# def get_command_eval_line(subset, dataset, work_dir, data_root, metric='bbox', update_nms=False):
     """Returns a command line for evaluation.
     Args:
         subset: train/val/test
@@ -123,7 +123,7 @@ def get_command_eval_line(subset, dataset, work_dir, data_root, metric='bbox', u
         cfg_path = osp.join(dataset_folder, 'model_tiling.py')
     else:
         cfg_path = osp.join(dataset_folder, 'model.py')
-    cfg = Config.fromfile(cfg_path)
+    # cfg = Config.fromfile(cfg_path)
 
     if len(glob.glob(osp.join(dataset_folder, 'best_*.pth'))):
         ckpt_path = glob.glob(osp.join(dataset_folder, 'best_*.pth'))[0]
@@ -188,7 +188,7 @@ def print_summarized_statistics(datasets, work_dir, cur_metric):
 
     for dataset in datasets:
         names.append(dataset['name'])
-        dataset_log = f'{work_dir}/{dataset["name"]}.log'
+        dataset_log = f'{work_dir}/results/{dataset["name"]}.log'
         metrics.append('')
         # try:
             # trained_epoch, max_epoch = vb(f'{dataset_work_dir}')
@@ -230,37 +230,30 @@ def print_summarized_statistics(datasets, work_dir, cur_metric):
 def train_datasets(args, datasets, skip=None):
     metric = args.metric
     config_path = 'model.py'
-    template_path = osp.join(args.work_dir, 'template_experimental.yaml')
+    template_path = osp.join(args.work_dir, [file for file in os.listdir(args.work_dir) if file.endswith('.yaml')][0])
     for dataset in datasets:
         if dataset['name'] in skip:
             continue
 
+        log_dir = osp.join(args.work_dir, 'results', dataset['name'])
 
-        # cfg = Config.fromfile(config_path)
-        # update_cfg = gen_update_cmd(cfg, dataset)
-        log_dir = osp.join(args.work_dir, dataset['name'])
-
-        dataset_template_path = osp.join(log_dir, 'template.yaml')
-        copy_cmd = f' cd {args.work_dir} && cp {template_path} {dataset_template_path}'
 
         # activate_cmd = f' . det_env/bin/activate ' 
         FMT = "%Y-%m-%d %H:%M:%S"
-        start_time = f'echo "Start time" ; date +"{FMT}"'
+        start_time = f' echo "Start time" ; date +"{FMT}"'
 
         end_time = f'echo "End time" ; date +"{FMT}"'
 
         train_cmd = f' ote train {template_path} --train-ann-files {dataset["train-ann-files"]} --train-data-roots {dataset["train-data-roots"]} '\
             f'--val-ann-files {dataset["val-ann-files"]} --val-data-roots {dataset["val-data-roots"]} '\
-            f'--save-model-to {log_dir}  '
+            f'--save-model-to {log_dir} '
 
         to_log_file = f' >> {log_dir}.log '
 
-        # train_cmd = f' ote eval {template_path} '\
-        #     f'--test-ann-files {dataset["val-ann-files"]} --test-data-roots {dataset["val-data-roots"]} '\
-        #     f'--load-weights /home/gzalessk/code/openvino_training_extensions/models/ATSS/weights.pth >> {dataset["name"]}.log  '
 
-        print(f'{start_time} && {train_cmd} && {end_time} && {to_log_file}')
-        run(f' {start_time} && {train_cmd} && {end_time} && {to_log_file} ', shell=True, check=True)
+        print(f'{start_time}  {to_log_file} && {train_cmd}  {to_log_file} && {end_time} {to_log_file} ')
+        create_dir = f'mkdir -p {osp.join(args.work_dir, "results")}'
+        run(f'{create_dir} && {start_time}  {to_log_file} && {train_cmd}  {to_log_file} && {end_time} {to_log_file} ', shell=True, check=True)
 
     print_summarized_statistics(datasets, args.work_dir, metric)
 
@@ -301,7 +294,8 @@ if __name__ == '__main__':
     args = parse_args()
     sc_datasets = load_sc_dataset_cfg(args.data_cfg)
     if args.task == 'train':
-        train_datasets(args, sc_datasets, skip=('weed', 'diopsis',  'pklot'))
+        train_datasets(args, sc_datasets, skip=('weed', 'diopsis', )) 
+        # 'bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5', 'uno'))
         # 'bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5',
     else:
         print_summarized_statistics(sc_datasets, args.work_dir, '')
