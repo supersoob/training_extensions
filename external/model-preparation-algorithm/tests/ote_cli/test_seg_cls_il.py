@@ -58,18 +58,13 @@ args = {
 root = '/tmp/ote_cli_seg/'
 ote_dir = os.getcwd()
 
-TT_STABILITY_TEST = os.environ.get('TT_STABILITY_TEST', True)
-if TT_STABILITY_TEST:
-    default_template = parse_model_template(
-        os.path.join(
-            'external/model-preparation-algorithm/configs', 'segmentation', 'ocr-lite-hrnet-18-mod2', 'template.yaml'
-        )
+default_template = parse_model_template(
+    os.path.join(
+        'external/model-preparation-algorithm/configs', 'segmentation', 'ocr-lite-hrnet-18-mod2', 'template.yaml'
     )
-    templates = [default_template] * 100
-    templates_ids = [template.model_template_id + f'-{i+1}' for i, template in enumerate(templates)]
-else:
-    templates = Registry('external/model-preparation-algorithm', experimental=True).filter(task_type='SEGMENTATION').templates
-    templates_ids = [template.model_template_id for template in templates]
+)
+templates = [default_template] * 100
+templates_ids = [template.model_template_id + f'-{i+1}' for i, template in enumerate(templates)]
 
 
 class TestToolsSegClsIncr:
@@ -88,109 +83,3 @@ class TestToolsSegClsIncr:
         args1 = args.copy()
         args1['--load-weights'] = f'{template_work_dir}/trained_{template.model_template_id}/weights.pth'
         ote_train_testing(template, root, ote_dir, args1)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_export(self, template):
-        ote_export_testing(template, root)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_eval(self, template):
-        ote_eval_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_eval_openvino(self, template):
-        ote_eval_openvino_testing(template, root, ote_dir, args, threshold=0.1)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_demo(self, template):
-        ote_demo_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_demo_openvino(self, template):
-        ote_demo_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_deploy_openvino(self, template):
-        ote_deploy_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_eval_deployment(self, template):
-        ote_eval_deployment_testing(template, root, ote_dir, args, threshold=0.0)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_demo_deployment(self, template):
-        ote_demo_deployment_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_ote_hpo(self, template):
-        ote_hpo_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_nncf_optimize(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_optimize_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_nncf_export(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_export_testing(template, root)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_nncf_eval(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_eval_testing(template, root, ote_dir, args, threshold=0.001)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_nncf_eval_openvino(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_eval_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_pot_optimize(self, template):
-        if template.model_template_id.startswith('ClassIncremental_Semantic_Segmentation_Lite-HRNet-'):
-            pytest.skip('CVS-82482')
-        pot_optimize_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TEST, reason='This is TT_STABILITY_TEST')
-    @pytest.mark.parametrize('template', templates, ids=templates_ids)
-    def test_pot_eval(self, template):
-        if template.model_template_id.startswith('ClassIncremental_Semantic_Segmentation_Lite-HRNet-'):
-            pytest.skip('CVS-82482')
-        pot_eval_testing(template, root, ote_dir, args)
