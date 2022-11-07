@@ -209,8 +209,10 @@ class DetConB(SAMDetectorMixin, L2SPDetectorMixin, SingleStageDetector):
 
         if pretrained is not None:
             self.logger.info('Load model from: {} in DetCon'.format(pretrained))
-            load_checkpoint(self.backbone, pretrained, strict=False, map_location='cpu',
-                            logger=self.logger, revise_keys=[(r'^backbone\.', '')])
+            load_checkpoint(model=self,
+                            filename=pretrained,
+                            map_location='cuda' if torch.cuda.is_available() else 'cpu',
+                            logger=self.logger)
         else:
             self.logger.warn((
                 '`pretrained` is None. If `load_from` is set, '
