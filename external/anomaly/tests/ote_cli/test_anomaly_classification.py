@@ -58,7 +58,7 @@ ote_dir = os.getcwd()
 
 default_template = parse_model_template(
     os.path.join(
-        "external/anomaly/configs", "classification", "draem", "template_experimental.yaml"
+        "external/anomaly/configs", "classification", "padim", "template.yaml"
     )
 )
 templates = [default_template] * 100
