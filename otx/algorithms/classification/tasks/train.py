@@ -78,12 +78,8 @@ class ClassificationTrainTask(ClassificationInferenceTask):
         Stopping will therefore take some time.
         """
         self._should_stop = True
-        logger.info("Cancel training requested.")
-        if self.cancel_interface is not None:
-            self.cancel_interface.cancel()
-        else:
-            logger.info("but training was not started yet. reserved it to cancel")
-            self.reserved_cancel = True
+        self.stop_flag[0] = True
+
 
     def train(
         self,
