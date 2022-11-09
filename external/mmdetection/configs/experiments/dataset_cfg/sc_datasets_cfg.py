@@ -56,11 +56,18 @@
         "val-data-roots": "~/datasets/wgisd/data"
     },
     {
+        "name": "pcb",
+        "train-ann-files": "~/datasets/PCB_ORiGINAL-coco/annotations/instances_train.json",
+        "train-data-roots": "~/datasets/PCB_ORiGINAL-coco/images",
+        "val-ann-files": "~/datasets/PCB_ORiGINAL-coco/annotations/instances_val.json",
+        "val-data-roots": "~/datasets/PCB_ORiGINAL-coco/images"
+    },
+    {
         "name": "pklot",
         "train-ann-files": "~/datasets/pklot-coco/annotations/instances_train.json",
-        "train-data-roots": "~/datasets/pklot-coco/images",
+        "train-data-roots": "~/datasets/pklot-coco/images/train",
         "val-ann-files": "~/datasets/pklot-coco/annotations/instances_val.json",
-        "val-data-roots": "~/datasets/pklot-coco/images"
+        "val-data-roots": "~/datasets/pklot-coco/images/val"
     },
     {
         "name": "uno",

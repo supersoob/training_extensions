@@ -65,12 +65,11 @@ def collect_f1_thres(path):
 
 
 def collect_training_time_stats(dataset_log):
-    
     if not os.path.isfile(dataset_log):
         print(f"{dataset_log} wasn't found")
 
-        return None
-
+        return '','',''
+    print(dataset_log)
     first_line, last_line = '', ''
     last_epoch, max_epoch = 0, 0
     with open(dataset_log, 'r') as log_file:
@@ -78,19 +77,25 @@ def collect_training_time_stats(dataset_log):
             if line.startswith('2022-'):
                 # line = line[:19]
                 if first_line == '':
-                    first_line = line
+                    first_line = line[:-1]
                 else:
-                    last_line = line
+                    last_line = line[:-1]
             if line.startswith("[ INFO ] workflow: [('train', 1)], max: "):
                 max_epoch = int(line.replace("[ INFO ] workflow: [('train', 1)], max: ", "").replace(" epochs", ""))
             if line.startswith('[ INFO ] Epoch ['):
                 last_epoch = line.replace('[ INFO ] Epoch [', '')
 
-
-    last_epoch = int(last_epoch.split(']')[0])
+    if isinstance(last_epoch, str):
+        last_epoch = int(last_epoch.split(']')[0])
+    else:
+        last_epoch = ''
     FMT = '%Y-%m-%d %H:%M:%S'
-    tdelta = (datetime.strptime(last_line, FMT) -
-              datetime.strptime(first_line, FMT)).total_seconds() / 60
+    # print(last_line, first_line)
+    try:
+        tdelta = int((datetime.strptime(last_line, FMT) -
+                datetime.strptime(first_line, FMT)).total_seconds() / 60)
+    except ValueError:
+        return '','',''
     return tdelta, last_epoch, max_epoch
 
 
@@ -194,9 +199,9 @@ def print_summarized_statistics(datasets, work_dir, cur_metric):
             # trained_epoch, max_epoch = vb(f'{dataset_work_dir}')
             # metrics.append(epoch)
         training_time, trained_epoch, max_epoch = collect_training_time_stats(dataset_log)
-        metrics.append(f'{training_time:.0f}')
-        metrics.append(f'{trained_epoch:.0f}')
-        metrics.append(f'{max_epoch:.0f}')
+        metrics.append(f'{training_time}')
+        metrics.append(f'{trained_epoch}')
+        metrics.append(f'{max_epoch}')
         # except Exception as e:
             # metrics.append('')
 
@@ -227,12 +232,12 @@ def print_summarized_statistics(datasets, work_dir, cur_metric):
 #     return update_config
 
 
-def train_datasets(args, datasets, skip=None):
+def train_datasets(args, datasets, data_to_train):
     metric = args.metric
     config_path = 'model.py'
     template_path = osp.join(args.work_dir, [file for file in os.listdir(args.work_dir) if file.endswith('.yaml')][0])
     for dataset in datasets:
-        if dataset['name'] in skip:
+        if dataset['name'] not in data_to_train:
             continue
 
         log_dir = osp.join(args.work_dir, 'results', dataset['name'])
@@ -270,6 +275,8 @@ def parse_args():
 
     subparsers = parser.add_subparsers(dest='task', help='task parser')
     parser_plt = subparsers.add_parser('train', help='parser for training')
+    parser_plt.add_argument('--datasets', nargs='+', default=['bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5', 'pcb', 'uno', 'pklot'])
+    parser_plt.add_argument('--datasets_skip', nargs='+', default=[])
     parser_plt.add_argument('--val-only')
     parser_plt.add_argument('--update-nms', action='store_true')
     parser_plt.add_argument('--gpus', type=int, default=1)
@@ -293,9 +300,10 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     sc_datasets = load_sc_dataset_cfg(args.data_cfg)
+    data_to_train = [dataset for dataset in args.datasets if dataset not in args.datasets_skip]
+    print(data_to_train)
     if args.task == 'train':
-        train_datasets(args, sc_datasets, skip=('weed', 'diopsis', )) 
-        # 'bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5', 'uno'))
+        train_datasets(args, sc_datasets, data_to_train=data_to_train)
         # 'bbcd', 'pothole', 'wildfire', 'aerial', 'dice', 'minneapple', 'wgisd1', 'wgisd5',
     else:
         print_summarized_statistics(sc_datasets, args.work_dir, '')
