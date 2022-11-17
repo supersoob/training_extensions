@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument("template")
     parser.add_argument(
         "--train-ann-files",
-        required=True,
+        required=False,
         help="Comma-separated paths to training annotation files.",
     )
     parser.add_argument(
@@ -72,7 +72,7 @@ def parse_args():
     )
     parser.add_argument(
         "--val-ann-files",
-        required=True,
+        required=False,
         help="Comma-separated paths to validation annotation files.",
     )
     parser.add_argument(
