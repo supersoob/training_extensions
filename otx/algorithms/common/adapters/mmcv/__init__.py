@@ -22,8 +22,10 @@ from .hooks import (
     OTXProgressHook,
     ReduceLROnPlateauLrUpdaterHook,
     StopLossNanTrainingHook,
+    SelfSLHook,
 )
 from .runner import EpochRunnerWithCancel, IterBasedRunnerWithCancel
+from .optimizers import LARS
 
 __all__ = [
     "EpochRunnerWithCancel",
@@ -35,4 +37,6 @@ __all__ = [
     "ReduceLROnPlateauLrUpdaterHook",
     "EnsureCorrectBestCheckpointHook",
     "StopLossNanTrainingHook",
+    "SelfSLHook",
+    "LARS"
 ]

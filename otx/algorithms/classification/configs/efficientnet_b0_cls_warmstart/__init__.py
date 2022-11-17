@@ -1,4 +1,4 @@
-"""Adapters of classification - mmcls."""
+"""Initialization of EfficinetNet-B0 model for Warmstart Classification Task."""
 
 # Copyright (C) 2022 Intel Corporation
 #
@@ -13,9 +13,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions
 # and limitations under the License.
-
-from .data import MPAClsDataset, SelfSLDataset
-
-__all__ = [
-    "MPAClsDataset", "SelfSLDataset"
-]

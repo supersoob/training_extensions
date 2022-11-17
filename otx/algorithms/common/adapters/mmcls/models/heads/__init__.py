@@ -1,4 +1,4 @@
-"""Adapters of classification - mmcls."""
+"""Classification heads."""
 
 # Copyright (C) 2022 Intel Corporation
 #
@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-from .data import MPAClsDataset, SelfSLDataset
+from .contrastive_head import ConstrastiveHead
 
-__all__ = [
-    "MPAClsDataset", "SelfSLDataset"
-]
+__all__ = ["ConstrastiveHead"]

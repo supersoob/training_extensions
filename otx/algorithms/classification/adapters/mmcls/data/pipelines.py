@@ -8,8 +8,15 @@ from typing import Any, Dict
 
 import numpy as np
 from mmcls.datasets import PIPELINES
-
 from otx.api.utils.argument_checks import check_input_parameters_type
+
+import torch
+from PIL import Image, ImageFilter
+import mmcv
+from mmcv.utils.registry import build_from_cfg
+from torchvision.transforms import functional as F
+from torchvision import transforms as T
+
 
 
 # Temporary copy from detection_tasks
@@ -62,3 +69,121 @@ class LoadImageFromOTXDataset:
             results["img"] = results["img"].astype(np.float32)
 
         return results
+
+
+@PIPELINES.register_module()
+class RandomHorizontalFlip(T.RandomHorizontalFlip):
+    def __call__(self, results):
+        results['img'] = np.array(self.forward(Image.fromarray(results['img'])))
+        return results
+
+
+@PIPELINES.register_module()
+class RandomResizedCrop(T.RandomResizedCrop):
+    def __call__(self, results):
+        results['img'] = np.array(self.forward(Image.fromarray(results['img'])))
+        return results
+
+
+@PIPELINES.register_module()
+class RandomAppliedTrans(object):
+    """Randomly applied transformations.
+
+    Args:
+        transforms (list[dict]): List of transformations in dictionaries.
+        p (float): Probability.
+    """
+
+    def __init__(self, transforms, p=0.5):
+        t = [build_from_cfg(t, PIPELINES) for t in transforms]
+        self.trans = T.RandomApply(t, p=p)
+
+    def __call__(self, results):
+        return self.trans(results)
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        return repr_str
+
+
+@PIPELINES.register_module
+class ColorJitter(T.ColorJitter):
+    def __call__(self, results):
+        results['img'] = np.array(self.forward(Image.fromarray(results['img'])))
+        return results
+
+
+@PIPELINES.register_module
+class RandomGrayscale(T.RandomGrayscale):
+    def __call__(self, results):
+        results['img'] = np.array(self.forward(Image.fromarray(results['img'])))
+        return results
+
+
+@PIPELINES.register_module()
+class GaussianBlur(object):
+    """Gaussian blur augmentation in SimCLR https://arxiv.org/abs/2002.05709."""
+
+    def __init__(self, sigma_min, sigma_max):
+        self.sigma_min = sigma_min
+        self.sigma_max = sigma_max
+
+    def __call__(self, results):
+        for key in results.get('img_fields', ['img']):
+            img = Image.fromarray(results[key])
+            sigma = np.random.uniform(self.sigma_min, self.sigma_max)
+            results[key] = np.array(img.filter(ImageFilter.GaussianBlur(radius=sigma)))
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        return repr_str
+
+
+@PIPELINES.register_module()
+class Solarization(object):
+    """Solarization augmentation in BYOL https://arxiv.org/abs/2006.07733."""
+
+    def __init__(self, threshold=128):
+        self.threshold = threshold
+
+    def __call__(self, results):
+        for key in results.get('img_fields', ['img']):
+            img = results[key]
+            results[key] = np.where(img < self.threshold, img, 255 - img).astype(np.uint8)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        return repr_str
+
+
+@PIPELINES.register_module()
+class Normalize(object):
+    """Normalize the image.
+    Args:
+        mean (sequence): Mean values of 3 channels.
+        std (sequence): Std values of 3 channels.
+        to_rgb (bool): Whether to convert the image from BGR to RGB,
+            default is true.
+    """
+
+    def __init__(self, mean, std, to_rgb=True):
+        self.mean = np.array(mean, dtype=np.float32)
+        self.std = np.array(std, dtype=np.float32)
+        self.to_rgb = to_rgb
+
+    def __call__(self, results):
+        for key in results.get('img_fields', ['img']):
+            results[key] = mmcv.imnormalize(results[key], self.mean, self.std,
+                                            self.to_rgb)
+        results['img_norm_cfg'] = dict(
+            mean=self.mean, std=self.std, to_rgb=self.to_rgb)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f'(mean={list(self.mean)}, '
+        repr_str += f'std={list(self.std)}, '
+        repr_str += f'to_rgb={self.to_rgb})'
+        return 

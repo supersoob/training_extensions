@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-from .models import OTXEfficientNet, OTXEfficientNetV2, OTXMobileNetV3
+from .models import (
+    OTXEfficientNet,
+    OTXEfficientNetV2,
+    OTXMobileNetV3,
+    BYOL,
+    ConstrastiveHead,
+    SelfSLMLP)
 
-__all__ = ["OTXEfficientNet", "OTXEfficientNetV2", "OTXMobileNetV3"]
+__all__ = [
+    "OTXEfficientNet", "OTXEfficientNetV2", "OTXMobileNetV3",
+    "BYOL", "ConstrastiveHead", "SelfSLMLP"
+]

@@ -71,6 +71,7 @@ class ClassificationInferenceTask(
         self._empty_label = get_empty_label(task_environment.label_schema)
         self._multilabel = False
         self._hierarchical = False
+        self._warmstart = False
 
         self._multilabel = len(task_environment.label_schema.get_groups(False)) > 1 and len(
             task_environment.label_schema.get_groups(False)
@@ -82,6 +83,10 @@ class ClassificationInferenceTask(
         if not self._multilabel and len(task_environment.label_schema.get_groups(False)) > 1:
             self._hierarchical = True
             self._hierarchical_info = get_hierarchical_info(task_environment.label_schema)
+
+        if not self._multilabel and not self._hierarchical:
+            # TODO (sungchul): set more deterministic conditions
+            self._warmstart = True
 
     def infer(
         self,
@@ -272,7 +277,8 @@ class ClassificationInferenceTask(
                 samples_per_gpu=int(self._hyperparams.learning_parameters.batch_size),
                 workers_per_gpu=int(self._hyperparams.learning_parameters.num_workers),
             ),
-            runner=ConfigDict(max_epochs=int(self._hyperparams.learning_parameters.num_iters)),
+            # for warmstart, iter_runner is used and max_epochs is not required
+            # runner=ConfigDict(max_epochs=int(self._hyperparams.learning_parameters.num_iters)),
         )
 
     def _init_recipe(self):
@@ -303,6 +309,10 @@ class ClassificationInferenceTask(
         if train_type == TrainType.INCREMENTAL:
             recipe = os.path.join(recipe_root, "incremental.yaml")
 
+        if train_type == TrainType.SELFSUPERVISED:
+            # TODO (sungchul): set new recipe path
+            recipe = os.path.join(recipe_root, "warmstart.yaml")
+
         logger.info(f"train type = {train_type} - loading {recipe}")
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
@@ -329,6 +339,7 @@ class ClassificationInferenceTask(
 
         cfg.model.multilabel = self._multilabel
         cfg.model.hierarchical = self._hierarchical
+        cfg.model.warmstart = self._warmstart
         if self._hierarchical:
             cfg.model.head.hierarchical_info = self._hierarchical_info
         return cfg
@@ -377,6 +388,8 @@ class ClassificationInferenceTask(
                     cfg.hierarchical_info = self._hierarchical_info
                     if subset == "train":
                         cfg.drop_last = True  # For stable hierarchical information indexing
+                elif self._warmstart:
+                    cfg.type = "SelfSLDataset"
                 else:
                     cfg.type = "MPAClsDataset"
 
@@ -391,18 +404,29 @@ class ClassificationInferenceTask(
             cfg.labels = None
             cfg.empty_label = self._empty_label
             for pipeline_step in cfg.pipeline:
-                if subset == "train" and pipeline_step.type == "Collect":
-                    pipeline_step = get_meta_keys(pipeline_step)
-            patch_color_conversion(cfg.pipeline)
+                if self._warmstart:
+                    # TODO (sungchul): refactoring
+                    for pipeline_view in cfg.pipeline[pipeline_step]:
+                        if subset == "train" and pipeline_view.type == "Collect":
+                            pipeline_view = get_meta_keys(pipeline_view)
+                    patch_color_conversion(cfg.pipeline[pipeline_step])
+                else:
+                    if subset == "train" and pipeline_step.type == "Collect":
+                        pipeline_step = get_meta_keys(pipeline_step)
+
+            if not self._warmstart:
+                patch_color_conversion(cfg.pipeline)
 
     def _patch_evaluation(self, config: MPAConfig):
-        cfg = config.evaluation
-        if self._multilabel:
-            cfg.metric = ["accuracy-mlc", "mAP", "CP", "OP", "CR", "OR", "CF1", "OF1"]
-            config.early_stop_metric = "mAP"
-        elif self._hierarchical:
-            cfg.metric = ["MHAcc", "avgClsAcc", "mAP"]
-            config.early_stop_metric = "MHAcc"
-        else:
-            cfg.metric = ["accuracy", "class_accuracy"]
-            config.early_stop_metric = "accuracy"
+        cfg = config.get('evaluation', None)
+        # cfg = config.evaluation
+        if cfg:
+            if self._multilabel:
+                cfg.metric = ["accuracy-mlc", "mAP", "CP", "OP", "CR", "OR", "CF1", "OF1"]
+                config.early_stop_metric = "mAP"
+            elif self._hierarchical:
+                cfg.metric = ["MHAcc", "avgClsAcc", "mAP"]
+                config.early_stop_metric = "MHAcc"
+            else:
+                cfg.metric = ["accuracy", "class_accuracy"]
+                config.early_stop_metric = "accuracy"
