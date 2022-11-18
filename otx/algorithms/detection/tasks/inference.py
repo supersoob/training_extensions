@@ -330,12 +330,12 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
                 dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
 
             if saliency_map is not None:
-                saliency_map = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
+                actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
                 saliency_map_media = ResultMediaEntity(
                     name="Saliency Map",
                     type="saliency_map",
                     annotation_scene=dataset_item.annotation_scene,
-                    numpy=saliency_map,
+                    numpy=actmap,
                     roi=dataset_item.roi,
                 )
                 dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
@@ -392,11 +392,12 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
     def _add_explanations_to_dataset(self, explain_results, dataset):
         """Simple saliency map adder, following _add_predictions_to_dataset."""
         for dataset_item, saliency_map in zip(dataset, explain_results):
+            actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
             saliency_map_media = ResultMediaEntity(
                 name="Saliency Map",
                 type="saliency_map",
                 annotation_scene=dataset_item.annotation_scene,
-                numpy=saliency_map,
+                numpy=actmap,
                 roi=dataset_item.roi,
             )
             dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
