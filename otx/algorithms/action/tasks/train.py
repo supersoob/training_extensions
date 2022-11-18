@@ -55,7 +55,7 @@ from .inference import ActionClsInferenceTask
 logger = get_root_logger()
 
 
-# pylint: disable=too-many-locals, too-many-instance-attributes
+# pylint: disable=too-many-locals, too-many-instance-attributes, too-many-ancestors
 class ActionClsTrainTask(ActionClsInferenceTask, ITrainingTask):
     """Train Task Implementation of OTX Action Classification."""
 

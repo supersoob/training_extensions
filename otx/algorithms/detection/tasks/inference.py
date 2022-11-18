@@ -175,13 +175,14 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
     ) -> Tuple[Iterable, float]:
         """Almost similar to _infer_detector. The only difference is that this method returns saliency maps."""
 
-        stage_module = "DetectionInferrer"
+        stage_module = "DetectionExplainer"
         self._data_cfg = self._init_test_data_cfg(dataset)
         results = self._run_task(
             stage_module,
             mode="eval",
             dataset=dataset,
             dump_saliency_map=True,
+            explainer=explain_parameters.explainer if explain_parameters else None,
         )
         output = results["outputs"]
         return output["saliency_maps"]
