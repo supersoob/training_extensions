@@ -83,8 +83,8 @@ class ClassificationInferenceTask(
         if not self._multilabel and len(task_environment.label_schema.get_groups(False)) > 1:
             self._hierarchical = True
             self._hierarchical_info = get_hierarchical_info(task_environment.label_schema)
-
-        if task_environment.model_template.hyper_parameters.data['algo_backend']['train_type']['default_value'] == "SELFSUPERVISED":
+        
+        if self._hyperparams.algo_backend.train_type == TrainType.SELFSUPERVISED:
             # TODO (sungchul): set more deterministic conditions
             self._warmstart = True
 
