@@ -7,7 +7,7 @@ _base_: [
     '../../venv/lib/python3.8/site-packages/recipes/stages/_base_/schedules/cos_anneal.py',
     # '../../venv/lib/python3.8/site-packages/recipes/stages/_base_/models/cls_selfsl.py',
     # '../../venv/lib/python3.8/site-packages/recipes/stages/_base_/data/selfsl_dataset_bs128.py'
-    '../../configs/base/data/selfsl_dataset_bs128.py'
+    '../../configs/base/data/selfsl_data_32.py'
 ]
 
 model:
