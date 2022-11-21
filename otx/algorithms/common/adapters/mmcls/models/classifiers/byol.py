@@ -43,7 +43,7 @@ class BYOL(nn.Module):
         super(BYOL, self).__init__()
 
         # build backbone
-        self.online_backbone = build_backbone(backbone)
+        self.online_backbone = self.backbone = build_backbone(backbone)
         self.target_backbone = build_backbone(backbone)
 
         # build projector
