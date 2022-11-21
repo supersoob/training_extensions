@@ -84,7 +84,7 @@ class ClassificationInferenceTask(
             self._hierarchical = True
             self._hierarchical_info = get_hierarchical_info(task_environment.label_schema)
 
-        if not self._multilabel and not self._hierarchical:
+        if task_environment.model_template.hyper_parameters.data['algo_backend']['train_type']['default_value'] == "SELFSUPERVISED":
             # TODO (sungchul): set more deterministic conditions
             self._warmstart = True
 
@@ -339,7 +339,7 @@ class ClassificationInferenceTask(
 
         cfg.model.multilabel = self._multilabel
         cfg.model.hierarchical = self._hierarchical
-        cfg.model.warmstart = self._warmstart
+        # cfg.model.warmstart = self._warmstart
         if self._hierarchical:
             cfg.model.head.hierarchical_info = self._hierarchical_info
         return cfg
