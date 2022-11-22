@@ -212,7 +212,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         patch_evaluation(self._recipe_cfg)  # for OTX compatibility
         self.metric = self._recipe_cfg.evaluation.metric
         if not self.freeze:
-            remove_configs_by_type(self._recipe_cfg.custom_hooks, "FreezeLayers")
+            remove_from_configs_by_type(self._recipe_cfg.custom_hooks, "FreezeLayers")
         logger.info(f"initialized recipe = {recipe}")
 
     # TODO: make cfg_path loaded from custom model cfg file corresponding to train_type
