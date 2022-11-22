@@ -1,8 +1,8 @@
-"""EfficientNet-B0 for warmstart config."""
+"""MobileNet-V3-large-075 for multi-class config."""
 
 # pylint: disable=invalid-name
 
-_base_ = "../efficientnet_b0_cls_incr/model.py"
+_base_ = "../mobilenet_v3_large_075_cls_incr/model.py"
 
 model = dict(
     type="BYOL",
@@ -10,7 +10,7 @@ model = dict(
     base_momentum=0.996,
     neck=dict(
         type="SelfSLMLP",
-        in_channels=1280,
+        in_channels=720,
         hid_channels=4096,
         out_channels=256,
         with_avg_pool=True

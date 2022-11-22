@@ -1,8 +1,8 @@
-"""EfficientNet-B0 for warmstart config."""
+"""EfficientNet-V2 for multi-class config."""
 
 # pylint: disable=invalid-name
 
-_base_ = "../efficientnet_b0_cls_incr/model.py"
+_base_ = "../efficientnet_v2_s_cls_incr/model.py"
 
 model = dict(
     type="BYOL",
