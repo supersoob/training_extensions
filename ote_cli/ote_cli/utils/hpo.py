@@ -274,9 +274,9 @@ class HpoRunner:
 
                 # If trainset size is lower than min batch size range,
                 # fix batch size to trainset size
-                if min_val > max_val:
+                if min_val >= max_val:
                     print(
-                        "Train set size is lower than batch size range."
+                        "Train set size is equal or lower than batch size range."
                         "Batch size is fixed to train set size."
                     )
                     del self._hpo_config["hp_space"][batch_size_name]
