@@ -21,3 +21,12 @@
                                 timestamp,
                                 meta)
     ```
+
+- otx/algorithms/classification/venv/lib/python3.8/site-packages/recipes/stages/_base_/data/pipelines/semisl_pipeline.py L3
+    To use cifar/svhn, changing target_size 224 -> 32 is required.
+
+    ```python
+    img_norm_cfg = dict(
+        mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    __resize_target_size = 32
+    ```
