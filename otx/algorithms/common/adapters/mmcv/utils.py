@@ -18,7 +18,8 @@ import copy
 import glob
 import os
 import tempfile
-from typing import Union, List
+from collections.abc import Mapping
+from typing import Union, List, Any, Dict
 
 from mmcv import Config, ConfigDict
 
@@ -41,27 +42,121 @@ def remove_from_config(config: Union[Config, ConfigDict], key: str):
             raise ValueError(f"Unknown config type {type(config)}")
 
 
-def get_configs_by_type(
-    configs: List[ConfigDict],
-    key: str
-) -> List[Union[Config, ConfigDict]]:
-    found = []
-    for config in configs:
-        type = config.get("type", None)
-        if type == key:
-            found.append(config)
-    return found
-
-
-def remove_configs_by_type(configs: List[ConfigDict], key: str):
+def remove_from_configs_by_type(configs: List[ConfigDict], type: str):
     """Update & remove by type"""
     indices = []
     for i, config in enumerate(configs):
-        type = config.get("type", None)
-        if type == key:
+        type_ = config.get("type", None)
+        if type_ == type:
             indices.append(i)
     for i in reversed(indices):
         configs.pop(i)
+
+
+def get_configs_by_pairs(  # noqa: C901
+    config: Union[Config, ConfigDict],
+    pairs: Dict[Any, Any],
+    *,
+    path_separator: str = ".",
+    return_path: bool = False,
+) -> Union[List[ConfigDict], Dict[Any, ConfigDict]]:
+    # TODO: multiple instance
+
+    def get_config(config, path=""):
+        out = dict()
+        if isinstance(config, (Config, Mapping)):
+            if all(
+                [
+                    True if config.get(key, None) == value else False
+                    for key, value in pairs.items()
+                ]
+            ):
+                return {path[1:]: config}
+            for key, value in config.items():
+                out.update(get_config(value, f"{path}{path_separator}{key}"))
+        elif isinstance(config, (list, tuple)):
+            for idx, value in enumerate(config):
+                out.update(get_config(value, f"{path}{path_separator}{idx}"))
+        return out
+
+    out = get_config(config)
+    if return_path:
+        return out
+
+    out_ = []
+    for found in out.values():
+        if isinstance(found, (list, tuple)):
+            out_.extend(found)
+        else:
+            out_.append(found)
+    return out_
+
+
+def get_configs_by_keys(  # noqa: C901
+    config: Union[Config, ConfigDict],
+    keys: Union[Any, List[Any]],
+    *,
+    path_separator: str = ".",
+    return_path: bool = False,
+) -> Union[List[ConfigDict], Dict[Any, ConfigDict]]:
+    """Return a list of configs based on key."""
+
+    if not isinstance(keys, list):
+        keys = [keys]
+
+    def get_config(config, path=""):
+        if path.split(path_separator)[-1] in keys:
+            return {path[1:]: config}
+
+        out = dict()
+        if isinstance(config, (Config, Mapping)):
+            for key, value in config.items():
+                out.update(get_config(value, f"{path}{path_separator}{key}"))
+        elif isinstance(config, (list, tuple)):
+            for idx, value in enumerate(config):
+                out.update(get_config(value, f"{path}{path_separator}{idx}"))
+        return out
+
+    out = get_config(config)
+    if return_path:
+        return out
+
+    out_ = []
+    for found in out.values():
+        if isinstance(found, (list, tuple)):
+            out_.extend(found)
+        else:
+            out_.append(found)
+    return out_
+
+
+def update_config(
+    config: Union[Config, ConfigDict],
+    options: Dict[Any, Any],
+    *,
+    path_separator: str = "."
+):
+    for path, value in options.items():
+        path = list(reversed(path.split(path_separator)))
+        ptr = config
+        while path:
+            key = path.pop()
+            if key not in ptr:
+                ptr[key] = ConfigDict()
+            if len(path) == 0:
+                ptr[key] = value
+            ptr = ptr.get(key)
+
+
+@check_input_parameters_type()
+def get_dataset_configs(
+    config: Union[Config, ConfigDict], subset: str = "train"
+) -> List[ConfigDict]:
+    if config.data.get(subset, None) is None:
+        return []
+    data_cfg = config.data[subset]
+    data_cfgs = get_configs_by_keys(data_cfg, ["dataset", "datasets"])
+    return data_cfgs if data_cfgs else [data_cfg]
 
 
 @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
