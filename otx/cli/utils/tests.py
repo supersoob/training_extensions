@@ -481,7 +481,11 @@ def xfail_templates(templates, xfail_template_ids_reasons):
 def otx_explain_testing(template, root, otx_dir, args):
     template_work_dir = get_template_dir(template, root)
     test_algorithms = ["ActivationMap", "EigenCAM"]
+<<<<<<< HEAD
     check_files = ("Slide1_", "Slide2_", "intel_1_", "image_000000_")
+=======
+    check_files = ("Slide1_", "Slide2_", "intel_1_")
+>>>>>>> beff0ab04a2c4ba7e4c8c3cd99e67e651d5829ac
 
     train_ann_file = args.get("--train-ann-file", "")
     if "hierarchical" in train_ann_file:

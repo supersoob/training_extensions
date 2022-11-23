@@ -20,6 +20,10 @@ import re
 import struct
 import tempfile
 from pathlib import Path
+<<<<<<< HEAD
+=======
+from typing import List, Optional, Tuple
+>>>>>>> beff0ab04a2c4ba7e4c8c3cd99e67e651d5829ac
 from zipfile import ZipFile
 
 import cv2
@@ -249,7 +253,11 @@ def generate_label_schema(dataset: DatasetEntity, task_type: TaskType) -> LabelS
     return LabelSchemaEntity.from_labels(dataset.get_labels())
 
 
+<<<<<<< HEAD
 def get_image_files(root_dir: str):
+=======
+def get_image_files(root_dir: str) -> Optional[List[Tuple[str, str]]]:
+>>>>>>> beff0ab04a2c4ba7e4c8c3cd99e67e651d5829ac
     """Recursively get all image file paths from given root_dir."""
     img_data_formats = (
         ".jpg",

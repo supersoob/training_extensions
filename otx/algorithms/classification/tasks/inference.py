@@ -260,11 +260,12 @@ class ClassificationInferenceTask(
                 dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
 
             if saliency_map is not None:
+                actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
                 saliency_map_media = ResultMediaEntity(
                     name="Saliency Map",
                     type="saliency_map",
                     annotation_scene=dataset_item.annotation_scene,
-                    numpy=saliency_map,
+                    numpy=actmap,
                     roi=dataset_item.roi,
                 )
                 dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
@@ -319,7 +320,11 @@ class ClassificationInferenceTask(
     def _init_recipe(self):
         logger.info("called _init_recipe()")
 
-        recipe_root = os.path.join(MPAConstants.RECIPES_PATH, "stages/classification")
+        if self._multilabel:
+            recipe_root = os.path.join(MPAConstants.RECIPES_PATH, "stages/classification/multilabel")
+        else:
+            recipe_root = os.path.join(MPAConstants.RECIPES_PATH, "stages/classification")
+
         train_type = self._hyperparams.algo_backend.train_type
         logger.info(f"train type = {train_type}")
 
@@ -338,10 +343,7 @@ class ClassificationInferenceTask(
                 )
 
         if train_type == TrainType.INCREMENTAL:
-            if self._multilabel:
-                recipe = os.path.join(recipe_root, "class_incr_multilabel.yaml")
-            else:
-                recipe = os.path.join(recipe_root, "class_incr.yaml")
+            recipe = os.path.join(recipe_root, "incremental.yaml")
 
         logger.info(f"train type = {train_type} - loading {recipe}")
 
