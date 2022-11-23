@@ -34,6 +34,8 @@ def main(
     GPUS: int,
     MODELS,
     DATASETS,
+    MODES,
+    NUMDATAS,
     WORKDIR_ROOT: str = 'work_dirs/warmstart/cls/byol'
 ):
     if isinstance(MODELS, str):
@@ -69,8 +71,8 @@ def main(
                 run_command(command, WORKDIR)
 
             # finetuning
-            for MODE in ['warmstart', 'sup']:
-                for NUMDATA in ['full', 10000, 5000, 1000, 500]:
+            for MODE in MODES:
+                for NUMDATA in NUMDATAS:
                     WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/{MODE}_{NUMDATA}')
                     os.makedirs(f'{WORKDIR}', exist_ok=True)
 
