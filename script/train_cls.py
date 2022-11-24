@@ -49,9 +49,9 @@ def main(
             raise ValueError()
 
         for DATASET in DATASETS:
-            if DATASET in ['cifar10']:
+            if DATASET in ['cifar10', 'xray']:
                 VAL = f'test'
-            elif DATASET in ['CIFAR100', 'xray']:
+            elif DATASET in ['CIFAR100']:
                 VAL = f'val'
 
             # pretrained
