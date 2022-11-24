@@ -287,7 +287,7 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
                             annotation_scene=dataset_item.annotation_scene,
                             numpy=class_wise_saliency_map,
                             roi=dataset_item.roi,
-                            label=item_labels[0].label,
+                            label=item_labels[class_id].label,
                         )
                         dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
                 else:
