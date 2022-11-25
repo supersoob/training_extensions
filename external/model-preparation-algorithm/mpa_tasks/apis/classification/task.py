@@ -281,13 +281,14 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
                         class_wise_saliency_map = get_actmap(class_wise_saliency_map,
                                                              (dataset_item.width, dataset_item.height))
                         class_name_str = self._labels[class_id].name
+                        class_label = ScoredLabel(self._labels[class_id]).label,
                         saliency_map_media = ResultMediaEntity(
                             name=f"Saliency Map: {class_name_str}",
                             type="saliency_map",
                             annotation_scene=dataset_item.annotation_scene,
                             numpy=class_wise_saliency_map,
                             roi=dataset_item.roi,
-                            label=item_labels[class_id].label,
+                            label=class_label
                         )
                         dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
                 else:
