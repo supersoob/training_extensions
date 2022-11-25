@@ -49,7 +49,7 @@ def main(
             raise ValueError()
 
         for DATASET in DATASETS:
-            if DATASET in ['cifar10', 'xray']:
+            if DATASET in ['cifar10', 'xray', 'svhn']:
                 VAL = f'test'
             elif DATASET in ['CIFAR100']:
                 VAL = f'val'
