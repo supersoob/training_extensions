@@ -54,8 +54,8 @@ train_pipeline = [
 val_pipeline = [
     dict(type="SampleFrames", clip_len=clip_len, frame_interval=frame_interval, num_clips=1, test_mode=True),
     dict(type="RawFrameDecode"),
-    dict(type="Resize", scale=(-1, 256)),
-    dict(type="CenterCrop", crop_size=224),
+    dict(type="Resize", scale=(224, 224), keep_ratio=False),
+    # dict(type="CenterCrop", crop_size=224),
     dict(type="Normalize", **img_norm_cfg),
     dict(type="FormatShape", input_format="NCTHW"),
     dict(type="Collect", keys=["imgs", "label"], meta_keys=[]),
@@ -65,8 +65,8 @@ val_pipeline = [
 test_pipeline = [
     dict(type="SampleFrames", clip_len=clip_len, frame_interval=frame_interval, num_clips=1, test_mode=True),
     dict(type="RawFrameDecode"),
-    dict(type="Resize", scale=(-1, 256)),
-    dict(type="CenterCrop", crop_size=224),
+    dict(type="Resize", scale=(224, 224), keep_ratio=False),
+    # dict(type="CenterCrop", crop_size=224),
     dict(type="Normalize", **img_norm_cfg),
     dict(type="FormatShape", input_format="NCTHW"),
     dict(type="Collect", keys=["imgs"], meta_keys=[]),

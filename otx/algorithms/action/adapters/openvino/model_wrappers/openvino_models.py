@@ -84,7 +84,7 @@ class OTXActionCls(Model):
         """Pre-process."""
         frames = []
         # TODO: allow only .jpg, .png exts
-        rawframes = glob.glob(inputs.media["frame_dir"] + "/*")  # type: ignore[index]
+        rawframes = sorted(glob.glob(inputs.media["frame_dir"] + "/*")) # type: ignore[index]
         for rawframe in rawframes:
             frame = cv2.imread(rawframe)
             resized_frame = self.resize(frame, (self.w, self.h))
@@ -113,7 +113,7 @@ class OTXActionCls(Model):
             start = (frame_len - ori_clip_len + 1) / 2
         else:
             start = 0
-        frame_inds = np.arange(self.clip_len) * self.interval + int(start) + 1
+        frame_inds = np.arange(self.clip_len) * self.interval + int(start)
         frame_inds = np.clip(frame_inds, 0, frame_len - 1)
         frame_inds = frame_inds.astype(np.int)
         return frame_inds
