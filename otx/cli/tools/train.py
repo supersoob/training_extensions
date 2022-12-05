@@ -62,22 +62,22 @@ def parse_args():
     parser.add_argument("template")
     parser.add_argument(
         "--train-ann-files",
-        required=True,
+        required=False,
         help="Comma-separated paths to training annotation files.",
     )
     parser.add_argument(
         "--train-data-roots",
-        required=True,
+        required=False,
         help="Comma-separated paths to training data folders.",
     )
     parser.add_argument(
         "--val-ann-files",
-        required=True,
+        required=False,
         help="Comma-separated paths to validation annotation files.",
     )
     parser.add_argument(
         "--val-data-roots",
-        required=True,
+        required=False,
         help="Comma-separated paths to validation data folders.",
     )
     parser.add_argument(
@@ -139,8 +139,16 @@ def main():
             "ann_file": args.train_ann_files,
             "data_root": args.train_data_roots,
         },
-        val_subset={"ann_file": args.val_ann_files, "data_root": args.val_data_roots},
+        # val_subset={"ann_file": args.val_ann_files, "data_root": args.val_data_roots},
     )
+    if args.val_data_roots:
+        data_roots.update(
+            val_subset={
+                "ann_file": args.val_ann_files,
+                "data_root": args.val_data_roots
+            }
+        )
+        
     if args.unlabeled_data_roots:
         data_roots["unlabeled_subset"] = {
             "data_root": args.unlabeled_data_roots,
