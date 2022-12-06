@@ -58,7 +58,7 @@ ote_dir = os.getcwd()
 
 templates = Registry("external").filter(task_type="ANOMALY_SEGMENTATION").templates
 templates_ids = [template.model_template_id for template in templates]
-TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", False)
+TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", True)
 if TT_STABILITY_TESTS:
     default_template = parse_model_template(
         os.path.join("external/anomaly/configs", "segmentation", "padim", "template.yaml")
@@ -81,100 +81,100 @@ class TestToolsAnomalySegmentation:
     def test_ote_train(self, template):
         ote_train_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_export(self, template):
-        ote_export_testing(template, root)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_export(self, template):
+    #     ote_export_testing(template, root)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval(self, template):
-        ote_eval_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_eval(self, template):
+    #     ote_eval_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval_openvino(self, template):
-        ote_eval_openvino_testing(template, root, ote_dir, args, threshold=0.01)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_eval_openvino(self, template):
+    #     ote_eval_openvino_testing(template, root, ote_dir, args, threshold=0.01)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo(self, template):
-        ote_demo_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_demo(self, template):
+    #     ote_demo_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo_openvino(self, template):
-        ote_demo_openvino_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_demo_openvino(self, template):
+    #     ote_demo_openvino_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_deploy_openvino(self, template):
-        ote_deploy_openvino_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_deploy_openvino(self, template):
+    #     ote_deploy_openvino_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval_deployment(self, template):
-        ote_eval_deployment_testing(template, root, ote_dir, args, threshold=0.01)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_eval_deployment(self, template):
+    #     ote_eval_deployment_testing(template, root, ote_dir, args, threshold=0.01)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo_deployment(self, template):
-        ote_demo_deployment_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_ote_demo_deployment(self, template):
+    #     ote_demo_deployment_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_nncf_optimize(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_nncf_optimize(self, template):
+    #     if template.entrypoints.nncf is None:
+    #         pytest.skip("nncf entrypoint is none")
 
-        nncf_optimize_testing(template, root, ote_dir, args)
+    #     nncf_optimize_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_nncf_export(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_nncf_export(self, template):
+    #     if template.entrypoints.nncf is None:
+    #         pytest.skip("nncf entrypoint is none")
 
-        nncf_export_testing(template, root)
+    #     nncf_export_testing(template, root)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.xfail(reason="CVS-83124")
-    def test_nncf_eval(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # @pytest.mark.xfail(reason="CVS-83124")
+    # def test_nncf_eval(self, template):
+    #     if template.entrypoints.nncf is None:
+    #         pytest.skip("nncf entrypoint is none")
 
-        # TODO(AlexanderDokuchaev): return threshold=0.0001 after fix loading NNCF model
-        nncf_eval_testing(template, root, ote_dir, args, threshold=0.3)
+    #     # TODO(AlexanderDokuchaev): return threshold=0.0001 after fix loading NNCF model
+    #     nncf_eval_testing(template, root, ote_dir, args, threshold=0.3)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_nncf_eval_openvino(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_nncf_eval_openvino(self, template):
+    #     if template.entrypoints.nncf is None:
+    #         pytest.skip("nncf entrypoint is none")
 
-        nncf_eval_openvino_testing(template, root, ote_dir, args)
+    #     nncf_eval_openvino_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_pot_optimize(self, template):
-        pot_optimize_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_pot_optimize(self, template):
+    #     pot_optimize_testing(template, root, ote_dir, args)
 
-    @e2e_pytest_component
-    @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_pot_eval(self, template):
-        pot_eval_testing(template, root, ote_dir, args)
+    # @e2e_pytest_component
+    # @pytest.mark.skipif(TT_STABILITY_TESTS, reason="This is TT_STABILITY_TESTS")
+    # @pytest.mark.parametrize("template", templates, ids=templates_ids)
+    # def test_pot_eval(self, template):
+    #     pot_eval_testing(template, root, ote_dir, args)
