@@ -37,7 +37,7 @@ from otx.cli.utils.parser import (
 )
 
 ESC_BUTTON = 27
-SUPPORTED_EXPLAIN_ALGORITHMS = ["ActivationMap", "EigenCAM"]
+SUPPORTED_EXPLAIN_ALGORITHMS = ["ActivationMap", "EigenCAM", "ReciproCAM", "DetSaliencyMap"]
 
 
 def parse_args():
@@ -137,11 +137,12 @@ def main():
     )
 
     for explained_data, (_, fname) in zip(explained_dataset, image_files):
+        saliency_data = explained_data.get_metadata()[0].data
         save_saliency_output(
-            explained_data.numpy,
-            explained_data.get_metadata()[0].data.numpy,
-            args.save_explanation_to,
-            os.path.splitext(os.path.basename(fname))[0],
+            img=explained_data.numpy,
+            saliency_map=saliency_data.numpy,
+            save_dir=args.save_explanation_to,
+            fname=f"{os.path.splitext(os.path.basename(fname))[0]}_{saliency_data.name}",
             weight=args.weight,
         )
 

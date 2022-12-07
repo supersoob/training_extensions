@@ -37,7 +37,7 @@ from otx.api.entities.annotation import Annotation
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.id import ID
 from otx.api.entities.inference_parameters import InferenceParameters
-from otx.api.entities.label import Domain
+from otx.api.entities.label import Domain, LabelEntity
 from otx.api.entities.model import (
     ModelEntity,
     ModelFormat,
@@ -331,15 +331,41 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
                 dataset_item.append_metadata_item(active_score, model=self._task_environment.model)
 
             if saliency_map is not None:
-                actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
-                saliency_map_media = ResultMediaEntity(
-                    name="Saliency Map",
-                    type="saliency_map",
-                    annotation_scene=dataset_item.annotation_scene,
-                    numpy=actmap,
-                    roi=dataset_item.roi,
-                )
-                dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
+                if saliency_map.ndim == 4 and saliency_map.shape[0] == 1:
+                    saliency_map = saliency_map[0]
+                if saliency_map.ndim == 2:
+                    # Single saliency map per image, support e.g. EigenCAM use case
+                    actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
+                    saliency_media = ResultMediaEntity(
+                        name="Saliency Map",
+                        type="saliency_map",
+                        annotation_scene=dataset_item.annotation_scene,
+                        numpy=actmap,
+                        roi=dataset_item.roi,
+                    )
+                    dataset_item.append_metadata_item(saliency_media, model=self._task_environment.model)
+                elif saliency_map.ndim == 3:
+                    # Multiple saliency maps per image (class-wise saliency map)
+                    labels = self._labels
+                    num_saliency_maps = saliency_map.shape[0]
+                    if num_saliency_maps == len(labels) + 1:
+                        # Include the background as the last category
+                        labels.append(LabelEntity("background", Domain.DETECTION))
+                    for class_id, class_wise_saliency_map in enumerate(saliency_map):
+                        actmap = get_actmap(class_wise_saliency_map, (dataset_item.width, dataset_item.height))
+                        class_name_str = labels[class_id].name
+                        saliency_media = ResultMediaEntity(
+                            name=class_name_str,
+                            type="saliency_map",
+                            annotation_scene=dataset_item.annotation_scene,
+                            numpy=actmap,
+                            roi=dataset_item.roi,
+                        )
+                        dataset_item.append_metadata_item(saliency_media, model=self._task_environment.model)
+                else:
+                    raise RuntimeError(
+                        f"Single saliency map has to be 2 or 3-dimensional, but got {saliency_map.ndim} dims"
+                    )
 
     def _det_add_predictions_to_dataset(self, all_results, width, height, confidence_threshold):
         shapes = []
@@ -393,15 +419,41 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
     def _add_explanations_to_dataset(self, explain_results, dataset):
         """Simple saliency map adder, following _add_predictions_to_dataset."""
         for dataset_item, saliency_map in zip(dataset, explain_results):
-            actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
-            saliency_map_media = ResultMediaEntity(
-                name="Saliency Map",
-                type="saliency_map",
-                annotation_scene=dataset_item.annotation_scene,
-                numpy=actmap,
-                roi=dataset_item.roi,
-            )
-            dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
+            if saliency_map.ndim == 4 and saliency_map.shape[0] == 1:
+                saliency_map = saliency_map[0]
+            if saliency_map.ndim == 2:
+                # Single saliency map per image, support e.g. EigenCAM use case
+                actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
+                saliency_media = ResultMediaEntity(
+                    name="Saliency Map",
+                    type="saliency_map",
+                    annotation_scene=dataset_item.annotation_scene,
+                    numpy=actmap,
+                    roi=dataset_item.roi,
+                )
+                dataset_item.append_metadata_item(saliency_media, model=self._task_environment.model)
+            elif saliency_map.ndim == 3:
+                # Multiple saliency maps per image (class-wise saliency map)
+                labels = self._labels
+                num_saliency_maps = saliency_map.shape[0]
+                if num_saliency_maps == len(labels) + 1:
+                    # Include the background as the last category
+                    labels.append(LabelEntity("background", Domain.DETECTION))
+                for class_id, class_wise_saliency_map in enumerate(saliency_map):
+                    actmap = get_actmap(class_wise_saliency_map, (dataset_item.width, dataset_item.height))
+                    class_name_str = labels[class_id].name
+                    saliency_media = ResultMediaEntity(
+                        name=class_name_str,
+                        type="saliency_map",
+                        annotation_scene=dataset_item.annotation_scene,
+                        numpy=actmap,
+                        roi=dataset_item.roi,
+                    )
+                    dataset_item.append_metadata_item(saliency_media, model=self._task_environment.model)
+            else:
+                raise RuntimeError(
+                    f"Single saliency map has to be 2 or 3-dimensional, but got {saliency_map.ndim} dims"
+                )
 
     @staticmethod
     def _update_anchors(origin, new):
