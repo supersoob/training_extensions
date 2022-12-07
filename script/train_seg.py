@@ -109,7 +109,11 @@ def main(
                         for NUMDATA in NUMDATAS:
                             for CLASS in CLASSES:
                                 for SEED in SEEDS:
-                                    WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/{MODE}_{CLASS}_#{NUMDATA}_seed{SEED}')
+                                    WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/{CLASS}/{NUMDATA}/{MODE}')
+                                    if MODE == 'warmstart' and (BATCHSIZE != 8 or LR != 0.001):
+                                        WORKDIR += f'_batch{BATCHSIZE}_lr{LR}'
+                                    WORKDIR += f'_seed{SEED}'
+                                    
                                     if os.path.isfile(os.path.join(WORKDIR, 'weights.pth')):
                                         # skip if training was already done before
                                         continue
