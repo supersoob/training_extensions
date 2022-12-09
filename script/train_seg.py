@@ -80,7 +80,7 @@ def main(
                         assert MODE in ['warmstart', 'sup']
                         if MODE == 'warmstart':
                             # pretrained
-                            WARMSTART_WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/pretrained')
+                            WARMSTART_WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/pretrained_224')
                             if BATCHSIZE != 8 or LR != 0.001:
                                 WARMSTART_WORKDIR += f'_batch{BATCHSIZE}_lr{LR}'
 
@@ -109,7 +109,7 @@ def main(
                         for NUMDATA in NUMDATAS:
                             for CLASS in CLASSES:
                                 for SEED in SEEDS:
-                                    WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/{CLASS}/{NUMDATA}/{MODE}')
+                                    WORKDIR = os.path.join(WORKDIR_ROOT, f'{MODEL}/{DATASET}/{CLASS}/{NUMDATA}/{MODE}_224')
                                     if MODE == 'warmstart' and (BATCHSIZE != 8 or LR != 0.001):
                                         WORKDIR += f'_batch{BATCHSIZE}_lr{LR}'
                                     WORKDIR += f'_seed{SEED}'
