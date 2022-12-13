@@ -1,0 +1,74 @@
+{"dataset_storage_id": "63690138434823f2355b0c48", "dataset_view_id": "63894b683e13ad1ceb9b49f4", "export_parameters": [{"output_model_id": "63894f9d3e13ad1ceb9b6e85", "type": "openvino"}], "hyperparameters": {"algo_backend": {"description": "parameters for algo backend", "header": "Algo backend parameters", "train_type": {"affects_outcome_of": "NONE", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": "Incremental", "description": "Quantization preset that defines quantization scheme", "editable": false, "enum_name": "TrainType", "header": "Train type", "options": {"Incremental": "Incremental"}, "type": "SELECTABLE", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": "Incremental", "visible_in_ui": true, "warning": null}, "type": "PARAMETER_GROUP", "visible_in_ui": true}, "description": "Configuration for an image classification task", "header": "Configuration for an image classification task", "id": "6388ae430fb8d1853e353463", "learning_parameters": {"batch_size": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "possible", "auto_hpo_value": null, "default_value": 64, "description": "The number of training samples seen in each iteration of training. Increasing this value improves training time and may make the training more stable. A larger batch size has higher memory requirements.", "editable": true, "header": "Batch size", "max_value": 512, "min_value": 1, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 64, "visible_in_ui": true, "warning": "Increasing this value may cause the system to use more memory than available, potentially causing out of memory errors, please update with caution."}, "description": "Learning Parameters", "enable_early_stopping": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": true, "description": "Adaptive early exit from training when accuracy isn't changed or decreased for several epochs.", "editable": true, "header": "Enable adaptive early stopping of the training", "type": "BOOLEAN", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": true, "visible_in_ui": false, "warning": null}, "header": "Learning Parameters", "learning_rate": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "possible", "auto_hpo_value": null, "default_value": 0.016, "description": "Increasing this value will speed up training convergence but might make it unstable.", "editable": true, "header": "Learning rate", "max_value": 0.1, "min_value": 1e-07, "type": "FLOAT", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 0.016, "visible_in_ui": true, "warning": null}, "learning_rate_warmup_iters": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 100, "description": "", "editable": true, "header": "Number of iterations for learning rate warmup", "max_value": 10000, "min_value": 0, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 100, "visible_in_ui": true, "warning": null}, "max_num_epochs": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 200, "description": "Increasing this value causes the results to be more robust but training time will be longer.", "editable": true, "header": "Maximum number of training epochs", "max_value": 1000, "min_value": 1, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 200, "visible_in_ui": false, "warning": null}, "num_iters": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 90, "description": "Increasing this value causes the results to be more robust but training time will be longer.", "editable": true, "header": "Number of training iterations", "max_value": 100000, "min_value": 1, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 1, "visible_in_ui": true, "warning": null}, "num_workers": {"affects_outcome_of": "NONE", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 0, "description": "Increasing this value might improve training speed however it might cause out of memory errors. If the number of workers is set to zero, data loading will happen in the main training thread.", "editable": true, "header": "Number of cpu threads to use during batch generation", "max_value": 8, "min_value": 0, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 0, "visible_in_ui": true, "warning": null}, "type": "PARAMETER_GROUP", "visible_in_ui": true}, "nncf_optimization": {"description": "Optimization by NNCF", "enable_pruning": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": false, "description": "Enable filter pruning algorithm", "editable": true, "header": "Enable filter pruning algorithm", "type": "BOOLEAN", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": false, "visible_in_ui": true, "warning": null}, "enable_quantization": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": true, "description": "Enable quantization algorithm", "editable": true, "header": "Enable quantization algorithm", "type": "BOOLEAN", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": true, "visible_in_ui": true, "warning": null}, "header": "Optimization by NNCF", "maximal_accuracy_degradation": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 1, "description": "The maximal allowed accuracy metric drop", "editable": true, "header": "Maximum accuracy degradation", "max_value": 100, "min_value": 0, "type": "FLOAT", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 1, "visible_in_ui": true, "warning": null}, "pruning_supported": {"affects_outcome_of": "TRAINING", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": true, "description": "Whether filter pruning is supported", "editable": false, "header": "Whether filter pruning is supported", "type": "BOOLEAN", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": true, "visible_in_ui": false, "warning": null}, "type": "PARAMETER_GROUP", "visible_in_ui": true}, "pot_parameters": {"description": "POT Parameters", "header": "POT Parameters", "preset": {"affects_outcome_of": "NONE", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": "Performance", "description": "Quantization preset that defines quantization scheme", "editable": false, "enum_name": "POTQuantizationPreset", "header": "Preset", "options": {"MIXED": "Mixed", "PERFORMANCE": "Performance"}, "type": "SELECTABLE", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": "Performance", "visible_in_ui": false, "warning": null}, "stat_subset_size": {"affects_outcome_of": "NONE", "auto_hpo_state": "not_possible", "auto_hpo_value": null, "default_value": 300, "description": "Number of data samples used for post-training optimization", "editable": true, "header": "Number of data samples", "max_value": 9223372036854775807, "min_value": 1, "type": "INTEGER", "ui_rules": {"action": "DISABLE_EDITING", "operator": "AND", "rules": [], "type": "UI_RULES"}, "value": 300, "visible_in_ui": true, "warning": null}, "type": "PARAMETER_GROUP", "visible_in_ui": true}, "type": "CONFIGURABLE_PARAMETERS", "visible_in_ui": true}, "input_model_id": "", "label_schema_id": "63690138434823f2355b0cfd", "model_storage_id": "6388ae430fb8d1853e353462", "operation_id": "63894f9d3e13ad1ceb9b6e86", "train_parameters": {"output_model_id": "63894f9d3e13ad1ceb9b6e84", "resume": false}, "workspace_id": "6386fef30fb8d1853e353460"}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debug-workload-deployment
+  namespace: impt
+  labels:
+    app: debug-workload-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: debug-workload-deployment
+  template:
+    metadata:
+      labels:
+        app: debug-workload-deployment
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+      - name: training
+        command:  ['sleep', 'infinity']
+        image: 127.0.0.1:30000/impp/oteclassification-training-configuration:v1.2.3-1.0.0-test-20221130052815
+        volumeMounts:
+        - mountPath: /data
+          name: data-storage
+        - mountPath: /dev/shm
+          name: shared-memory
+        resources:
+          requests:
+            nvidia.com/gpu: 0
+          limits:
+            nvidia.com/gpu: 0
+        env:
+        - name: HTTP_PROXY
+          valueFrom:
+             configMapKeyRef:
+               name: impt-configuration
+               key: http_proxy
+        - name: HTTPS_PROXY
+          valueFrom:
+             configMapKeyRef:
+               name: impt-configuration
+               key: https_proxy
+        - name: NO_PROXY
+          valueFrom:
+            configMapKeyRef:
+              name: impt-configuration
+              key: no_proxy
+        - name: WORKDIR
+          value: /data/binary_data
+        - name: MODEL_TEMPLATES_DIR
+          value: /model_templates
+        - name: DATABASE_ADDRESS
+          value: mongodb://impt-mongodb:27017/
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: impt-mongodb
+              key: mongodb-username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: impt-mongodb
+              key: mongodb-password
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: data-storage-volume-claim
+      - name: shared-memory
+        emptyDir:
+          medium: Memory
