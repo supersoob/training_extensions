@@ -37,7 +37,7 @@ from otx.cli.utils.parser import (
 )
 
 ESC_BUTTON = 27
-SUPPORTED_EXPLAIN_ALGORITHMS = ["ActivationMap", "EigenCAM", "ReciproCAM", "DetSaliencyMap"]
+SUPPORTED_EXPLAIN_ALGORITHMS = ["ActivationMap", "EigenCAM", "ClassWiseSaliencyMap"]
 
 
 def parse_args():
