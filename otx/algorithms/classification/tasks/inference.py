@@ -45,6 +45,7 @@ from otx.api.usecases.tasks.interfaces.explain_interface import IExplainTask
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType, IExportTask
 from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
 from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
+from otx.api.utils.dataset_utils import add_saliency_maps_to_dataset_item
 from otx.api.utils.labels_utils import get_empty_label
 from otx.api.utils.vis_utils import get_actmap
 
@@ -262,38 +263,12 @@ class ClassificationInferenceTask(
             if saliency_map is not None:
                 if saliency_map.ndim == 4 and saliency_map.shape[0] == 1:
                     saliency_map = saliency_map[0]
-                if saliency_map.ndim == 2:
-                    # Single saliency map per image, support e.g. EigenCAM use case
-                    saliency_map = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
-                    saliency_map_media = ResultMediaEntity(
-                        name="Saliency Map",
-                        type="saliency_map",
-                        annotation_scene=dataset_item.annotation_scene,
-                        numpy=saliency_map,
-                        roi=dataset_item.roi,
-                        label=item_labels[0].label,
-                    )
-                    dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
-                elif saliency_map.ndim == 3:
-                    # Multiple saliency maps per image (class-wise saliency map), support e.g. Recipro-CAM use case
-                    for class_id, class_wise_saliency_map in enumerate(saliency_map):
-                        class_wise_saliency_map = get_actmap(
-                            class_wise_saliency_map, (dataset_item.width, dataset_item.height)
-                        )
-                        class_name_str = self._labels[class_id].name
-                        saliency_map_media = ResultMediaEntity(
-                            name=class_name_str,
-                            type="saliency_map",
-                            annotation_scene=dataset_item.annotation_scene,
-                            numpy=class_wise_saliency_map,
-                            roi=dataset_item.roi,
-                            label=item_labels[0].label,
-                        )
-                        dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
-                else:
-                    raise RuntimeError(
-                        f"Single saliency map has to be 2 or 3-dimensional, " f"but got {saliency_map.ndim} dims"
-                    )
+                add_saliency_maps_to_dataset_item(
+                    dataset_item=dataset_item,
+                    saliency_map=saliency_map,
+                    model=self._task_environment.model,
+                    labels=self._labels,
+                )
             update_progress_callback(int(i / dataset_size * 100))
 
     def _add_saliency_maps_to_dataset(self, saliency_maps, dataset, update_progress_callback):
@@ -302,36 +277,12 @@ class ClassificationInferenceTask(
         for i, (dataset_item, saliency_map) in enumerate(zip(dataset, saliency_maps)):
             if saliency_map.ndim == 4 and saliency_map.shape[0] == 1:
                 saliency_map = saliency_map[0]
-            if saliency_map.ndim == 2:
-                # Single saliency map per image, support e.g. EigenCAM use case
-                saliency_map = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
-                saliency_map_media = ResultMediaEntity(
-                    name="Saliency Map",
-                    type="saliency_map",
-                    annotation_scene=dataset_item.annotation_scene,
-                    numpy=saliency_map,
-                    roi=dataset_item.roi,
-                )
-                dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
-            elif saliency_map.ndim == 3:
-                # Multiple saliency maps per image (class-wise saliency map), support e.g. Recipro-CAM use case
-                for class_id, class_wise_saliency_map in enumerate(saliency_map):
-                    class_wise_saliency_map = get_actmap(
-                        class_wise_saliency_map, (dataset_item.width, dataset_item.height)
-                    )
-                    class_name_str = self._labels[class_id].name
-                    saliency_map_media = ResultMediaEntity(
-                        name=class_name_str,
-                        type="saliency_map",
-                        annotation_scene=dataset_item.annotation_scene,
-                        numpy=class_wise_saliency_map,
-                        roi=dataset_item.roi,
-                    )
-                    dataset_item.append_metadata_item(saliency_map_media, model=self._task_environment.model)
-            else:
-                raise RuntimeError(
-                    f"Single saliency map has to be 2 or 3-dimensional, " f"but got {saliency_map.ndim} dims"
-                )
+            add_saliency_maps_to_dataset_item(
+                dataset_item=dataset_item,
+                saliency_map=saliency_map,
+                model=self._task_environment.model,
+                labels=self._labels,
+            )
             update_progress_callback(int(i / dataset_size * 100))
 
     def _init_recipe_hparam(self) -> dict:
