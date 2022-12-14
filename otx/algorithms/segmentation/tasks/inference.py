@@ -184,7 +184,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         train_type = self._hyperparams.algo_backend.train_type
         logger.info(f"train type = {train_type}")
 
-        if train_type not in (TrainType.SEMISUPERVISED, TrainType.INCREMENTAL):
+        if train_type not in (TrainType.SEMISUPERVISED, TrainType.INCREMENTAL, TrainType.SELFSUPERVISED):
             raise NotImplementedError(f"Train type {train_type} is not implemented yet.")
         if train_type == TrainType.SEMISUPERVISED:
             if self._data_cfg.get("data", None) and self._data_cfg.data.get("unlabeled", None):
@@ -196,12 +196,17 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         if train_type == TrainType.INCREMENTAL:
             recipe = os.path.join(recipe_root, "incremental.py")
 
+        if train_type == TrainType.SELFSUPERVISED:
+            recipe = os.path.join(recipe_root, "warmstart.py")
+
         logger.info(f"train type = {train_type} - loading {recipe}")
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
         patch_datasets(self._recipe_cfg)  # for OTX compatibility
         patch_evaluation(self._recipe_cfg)  # for OTX compatibility
-        self.metric = self._recipe_cfg.evaluation.metric
+        if self._recipe_cfg.get('evaluation', None):
+            self.metric = self._recipe_cfg.evaluation.metric
+            
         if not self.freeze:
             remove_from_config(self._recipe_cfg, "params_config")
         logger.info(f"initialized recipe = {recipe}")
