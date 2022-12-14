@@ -37,7 +37,7 @@ from otx.cli.utils.parser import (
 )
 
 ESC_BUTTON = 27
-SUPPORTED_EXPLAIN_ALGORITHMS = ["ActivationMap", "EigenCAM", "ClassWiseSaliencyMap"]
+SUPPORTED_EXPLAIN_ALGORITHMS = ["activationmap", "eigencam", "classwisesaliencymap"]
 
 
 def parse_args():
@@ -123,7 +123,7 @@ def main():
 
     task = task_class(task_environment=environment)
 
-    if args.explain_algorithm not in SUPPORTED_EXPLAIN_ALGORITHMS:
+    if args.explain_algorithm.lower() not in SUPPORTED_EXPLAIN_ALGORITHMS:
         raise NotImplementedError(
             f"{args.explain_algorithm} currently not supported. \
             Currently only support {SUPPORTED_EXPLAIN_ALGORITHMS}"
