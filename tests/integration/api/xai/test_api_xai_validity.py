@@ -5,19 +5,17 @@
 import os
 
 import numpy as np
-import torch
 import pytest
-
+import torch
 from mmcls.models import build_classifier
 from mmdet.models import build_detector
-
 from mpa.det.stage import DetectionStage  # noqa
-from otx.algorithms.classification.tasks import ClassificationInferenceTask  # noqa
 from mpa.modules.hooks.recording_forward_hooks import DetSaliencyMapHook, ReciproCAMHook
 from mpa.utils.config_utils import MPAConfig
-from tests.test_suite.e2e_test_system import e2e_pytest_unit
-from otx.cli.registry import Registry
 
+from otx.algorithms.classification.tasks import ClassificationInferenceTask  # noqa
+from otx.cli.registry import Registry
+from tests.test_suite.e2e_test_system import e2e_pytest_unit
 
 torch.manual_seed(0)
 

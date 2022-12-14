@@ -5,21 +5,33 @@
 import os
 import os.path as osp
 
-import torch
 import pytest
+import torch
 
-from otx.algorithms.classification.tasks import ClassificationInferenceTask, ClassificationOpenVINOTask, ClassificationTrainTask
-from otx.algorithms.detection.tasks import DetectionInferenceTask, DetectionTrainTask, OpenVINODetectionTask
+from otx.algorithms.classification.tasks import (
+    ClassificationInferenceTask,
+    ClassificationOpenVINOTask,
+    ClassificationTrainTask,
+)
+from otx.algorithms.detection.tasks import (
+    DetectionInferenceTask,
+    DetectionTrainTask,
+    OpenVINODetectionTask,
+)
 from otx.api.entities.inference_parameters import InferenceParameters
-from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from otx.api.entities.model import ModelEntity
-from otx.api.entities.train_parameters import TrainParameters
 from otx.api.entities.result_media import ResultMediaEntity
-from otx.cli.utils.io import save_model_data, read_model
-
-from tests.integration.api.classification.test_api_classification import TestMPAClsAPI, DEFAULT_CLS_TEMPLATE_DIR
-from tests.integration.api.detection.test_api_detection import TestDetectionTaskAPI, DEFAULT_DET_TEMPLATE_DIR
-
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType
+from otx.cli.utils.io import read_model, save_model_data
+from tests.integration.api.classification.test_api_classification import (
+    DEFAULT_CLS_TEMPLATE_DIR,
+    TestMPAClsAPI,
+)
+from tests.integration.api.detection.test_api_detection import (
+    DEFAULT_DET_TEMPLATE_DIR,
+    TestDetectionTaskAPI,
+)
 from tests.test_suite.e2e_test_system import e2e_pytest_api
 
 torch.manual_seed(0)

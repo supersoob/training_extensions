@@ -14,9 +14,10 @@
 
 import json
 import os
-import pytest
 import shutil
 from subprocess import run  # nosec
+
+import pytest
 
 from otx.cli.tools.build import SUPPORTED_TASKS as build_supported_tasks
 from otx.cli.tools.find import SUPPORTED_BACKBONE_BACKENDS as find_supported_backends
