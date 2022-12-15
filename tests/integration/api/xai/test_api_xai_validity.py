@@ -17,7 +17,12 @@ from otx.algorithms.classification.tasks import ClassificationInferenceTask  # n
 from otx.cli.registry import Registry
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
 
-torch.manual_seed(0)
+random_seed = 5
+torch.manual_seed(random_seed)
+torch.cuda.manual_seed(random_seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+np.random.seed(random_seed)
 
 templates_cls = Registry("external/model-preparation-algorithm").filter(task_type="CLASSIFICATION").templates
 templates_cls_ids = [template.model_template_id for template in templates_cls]
@@ -28,9 +33,9 @@ templates_det_ids = [template.model_template_id for template in templates_det]
 
 class TestExplainMethods:
     ref_saliency_vals_cls = {
-        "EfficientNet-B0": np.array([36, 185, 190, 159, 173, 124, 19], dtype=np.uint8),
-        "MobileNet-V3-large-1x": np.array([21, 38, 56, 134, 100, 41, 38], dtype=np.uint8),
-        "EfficientNet-V2-S": np.array([166, 204, 201, 206, 218, 221, 138], dtype=np.uint8),
+        "EfficientNet-B0": np.array([ 0, 137, 151, 58, 113, 98, 4], dtype=np.uint8),
+        "MobileNet-V3-large-1x": np.array([25, 113, 112, 36, 47, 54,  3], dtype=np.uint8),
+        "EfficientNet-V2-S": np.array([ 0, 75, 89, 106, 90, 60, 48], dtype=np.uint8),
     }
 
     ref_saliency_shapes = {
@@ -40,9 +45,9 @@ class TestExplainMethods:
     }
 
     ref_saliency_vals_det = {
-        "ATSS": np.array([78, 217, 42, 102], dtype=np.uint8),
-        "SSD": np.array([225, 158, 221, 106, 146, 158, 227, 149, 137, 135, 200, 159, 255], dtype=np.uint8),
-        "YOLOX": np.array([109, 174, 82, 214, 178, 184, 168, 161, 163, 156, 220, 233, 195], dtype=np.uint8),
+        "ATSS": np.array([179, 157, 191, 134], dtype=np.uint8),
+        "SSD": np.array([255, 106, 99, 160, 181, 74, 170, 228, 137, 111, 129, 94, 90], dtype=np.uint8),
+        "YOLOX": np.array([167, 214, 153, 121, 241, 178, 117, 97, 123, 173, 115, 157, 150], dtype=np.uint8),
     }
 
     @e2e_pytest_unit
