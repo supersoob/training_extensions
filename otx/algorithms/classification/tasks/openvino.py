@@ -145,7 +145,7 @@ class ClassificationOpenVINOInferencer(BaseInferencer):
         return self.converter.convert_to_annotation(prediction, metadata)
 
     @check_input_parameters_type()
-    def predict(self, image: np.ndarray) -> Tuple[AnnotationSceneEntity, np.ndarray, np.ndarray, Any]:
+    def predict(self, image: np.ndarray) -> Tuple[AnnotationSceneEntity, np.ndarray, np.ndarray, np.ndarray, Any]:
         """Predict function of OpenVINO Classification Inferencer."""
 
         image, metadata = self.pre_process(image)
@@ -210,6 +210,7 @@ class ClassificationOpenVINOTask(IDeploymentTask, IInferenceTask, IEvaluationTas
             self.model.get_data("openvino.bin"),
         )
 
+    # pylint: disable-msg=too-many-locals
     @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
     def infer(
         self, dataset: DatasetEntity, inference_parameters: Optional[InferenceParameters] = None
@@ -226,8 +227,7 @@ class ClassificationOpenVINOTask(IDeploymentTask, IInferenceTask, IEvaluationTas
         for i, dataset_item in enumerate(dataset, 1):
             predicted_scene, probs, saliency_map, repr_vector, act_score = self.inferencer.predict(dataset_item.numpy)
             dataset_item.append_labels(predicted_scene.annotations[0].get_labels())
-            active_score_media = FloatMetadata(name="active_score", value=act_score,
-                                               float_type=FloatType.ACTIVE_SCORE)
+            active_score_media = FloatMetadata(name="active_score", value=act_score, float_type=FloatType.ACTIVE_SCORE)
             dataset_item.append_metadata_item(active_score_media, model=self.model)
 
             probs_meta = TensorEntity(name="probabilities", numpy=probs.reshape(-1))
@@ -239,10 +239,14 @@ class ClassificationOpenVINOTask(IDeploymentTask, IInferenceTask, IEvaluationTas
                 if saliency_map.ndim == 2:
                     # Single saliency map per image, support e.g. EigenCAM use case
                     actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
-                    saliency_media = ResultMediaEntity(name="Saliency Map", type="saliency_map",
-                                                       annotation_scene=dataset_item.annotation_scene,
-                                                       numpy=actmap, roi=dataset_item.roi,
-                                                       label=predicted_scene.annotations[0].get_labels()[0].label)
+                    saliency_media = ResultMediaEntity(
+                        name="Saliency Map",
+                        type="saliency_map",
+                        annotation_scene=dataset_item.annotation_scene,
+                        numpy=actmap,
+                        roi=dataset_item.roi,
+                        label=predicted_scene.annotations[0].get_labels()[0].label,
+                    )
                     dataset_item.append_metadata_item(saliency_media, model=self.model)
                 elif saliency_map.ndim == 3:
                     # Multiple saliency maps per image (class-wise saliency map), support e.g. Recipro-CAM use case
@@ -257,15 +261,19 @@ class ClassificationOpenVINOTask(IDeploymentTask, IInferenceTask, IEvaluationTas
                             #  when all/configurable set of saliency maps is returned
                             actmap = get_actmap(class_wise_saliency_map, (dataset_item.width, dataset_item.height))
                             label = predicted_scene.annotations[0].get_labels()[0].label
-                            saliency_media = ResultMediaEntity(name=class_name_str,
-                                                               type="saliency_map",
-                                                               annotation_scene=dataset_item.annotation_scene,
-                                                               numpy=actmap, roi=dataset_item.roi,
-                                                               label=label)
+                            saliency_media = ResultMediaEntity(
+                                name=class_name_str,
+                                type="saliency_map",
+                                annotation_scene=dataset_item.annotation_scene,
+                                numpy=actmap,
+                                roi=dataset_item.roi,
+                                label=label,
+                            )
                             dataset_item.append_metadata_item(saliency_media, model=self.model)
                 else:
-                    raise RuntimeError(f'Single saliency map has to be 2 or 3-dimensional, '
-                                       f'but got {saliency_map.ndim} dims')
+                    raise RuntimeError(
+                        f"Single saliency map has to be 2 or 3-dimensional, " f"but got {saliency_map.ndim} dims"
+                    )
 
             update_progress_callback(int(i / dataset_size * 100))
         return dataset

@@ -33,9 +33,9 @@ templates_det_ids = [template.model_template_id for template in templates_det]
 
 class TestExplainMethods:
     ref_saliency_vals_cls = {
-        "EfficientNet-B0": np.array([ 0, 137, 151, 58, 113, 98, 4], dtype=np.uint8),
-        "MobileNet-V3-large-1x": np.array([25, 113, 112, 36, 47, 54,  3], dtype=np.uint8),
-        "EfficientNet-V2-S": np.array([ 0, 75, 89, 106, 90, 60, 48], dtype=np.uint8),
+        "EfficientNet-B0": np.array([0, 137, 151, 58, 113, 98, 4], dtype=np.uint8),
+        "MobileNet-V3-large-1x": np.array([25, 113, 112, 36, 47, 54, 3], dtype=np.uint8),
+        "EfficientNet-V2-S": np.array([0, 75, 89, 106, 90, 60, 48], dtype=np.uint8),
     }
 
     ref_saliency_shapes = {

@@ -106,10 +106,12 @@ class OTXClassification(Classification):
 
         return get_multiclass_predictions(logits)
 
+    # pylint: disable=unused-argument
     @check_input_parameters_type()
     def postprocess_aux_outputs(self, outputs: Dict[str, np.ndarray], metadata: Dict[str, Any]):
-        saliency_map = outputs['saliency_map'][0]
-        repr_vector = outputs['feature_vector'].reshape(-1)
+        """Post-process for auxiliary outputs."""
+        saliency_map = outputs["saliency_map"][0]
+        repr_vector = outputs["feature_vector"].reshape(-1)
         logits = outputs[self.out_layer_name].squeeze()
         if self.multilabel:
             probs = sigmoid_numpy(logits)
@@ -137,13 +139,14 @@ def softmax_numpy(x: np.ndarray):
 
 @check_input_parameters_type()
 def activate_multihead_output(logits: np.ndarray, multihead_class_info: dict):
-    for i in range(multihead_class_info['num_multiclass_heads']):
-        logits_begin, logits_end = multihead_class_info['head_idx_to_logits_range'][i]
-        logits[logits_begin : logits_end] = softmax_numpy(logits[logits_begin : logits_end])
+    """Activate multihead output."""
+    for i in range(multihead_class_info["num_multiclass_heads"]):
+        logits_begin, logits_end = multihead_class_info["head_idx_to_logits_range"][i]
+        logits[logits_begin:logits_end] = softmax_numpy(logits[logits_begin:logits_end])
 
-    if multihead_class_info['num_multilabel_classes']:
-        logits_begin, logits_end = multihead_class_info['num_single_label_classes'], -1
-        logits[logits_begin : logits_end] = softmax_numpy(logits[logits_begin : logits_end])
+    if multihead_class_info["num_multilabel_classes"]:
+        logits_begin, logits_end = multihead_class_info["num_single_label_classes"], -1
+        logits[logits_begin:logits_end] = softmax_numpy(logits[logits_begin:logits_end])
 
     return logits
 
