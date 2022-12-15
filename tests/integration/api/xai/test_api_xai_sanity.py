@@ -42,18 +42,18 @@ assert_text_torch = "For the torch task the number of saliency maps should be eq
 assert_text_ov = "For the OV task the number of saliency maps should be equal to the number of predicted classes."
 
 
-def saliency_maps_check(predicted_dataset, task_labels, assert_text, only_predicted=False):
-    for data_point in predicted_dataset:
+def saliency_maps_check(predicted_dataset, task_labels, assert_text, predicted_class_only=False):
+    for dataset_item in predicted_dataset:
         saliency_map_counter = 0
-        metadata_list = data_point.get_metadata()
+        metadata_list = dataset_item.get_metadata()
         for metadata in metadata_list:
             if isinstance(metadata.data, ResultMediaEntity):
                 if metadata.data.type == "saliency_map":
                     saliency_map_counter += 1
                     assert metadata.data.numpy.ndim == 3
-                    assert metadata.data.numpy.shape == (data_point.height, data_point.width, 3)
-        if only_predicted:
-            assert saliency_map_counter == len(data_point.get_roi_labels(task_labels)), assert_text
+                    assert metadata.data.numpy.shape == (dataset_item.height, dataset_item.width, 3)
+        if predicted_class_only:
+            saliency_map_counter == len(dataset_item.annotation_scene.get_labels()), assert_text
         else:
             assert saliency_map_counter == len(task_labels), assert_text
 
@@ -106,7 +106,7 @@ class TestOVClsXAIAPI(TestMPAClsAPI):
         )
 
         # Check saliency maps OV task
-        saliency_maps_check(predicted_dataset_ov, task_labels, assert_text_ov, only_predicted=True)
+        saliency_maps_check(predicted_dataset_ov, task_labels, assert_text_ov, predicted_class_only=True)
 
 
 class TestOVDetXAIAPI(TestDetectionTaskAPI):
@@ -149,4 +149,4 @@ class TestOVDetXAIAPI(TestDetectionTaskAPI):
         )
 
         # Check saliency maps OV task
-        saliency_maps_check(predicted_dataset_ov, task_labels, assert_text_ov, only_predicted=True)
+        saliency_maps_check(predicted_dataset_ov, task_labels, assert_text_ov, predicted_class_only=True)

@@ -21,7 +21,7 @@ import numpy as np
 from otx.api.entities.annotation import AnnotationSceneEntity
 from otx.api.entities.dataset_item import DatasetItemEntity
 from otx.api.entities.datasets import DatasetEntity
-from otx.api.entities.label import LabelEntity
+from otx.api.entities.label import Domain, LabelEntity
 from otx.api.entities.model import ModelEntity
 from otx.api.entities.result_media import ResultMediaEntity
 from otx.api.entities.resultset import ResultSetEntity
@@ -200,7 +200,9 @@ def add_saliency_maps_to_dataset_item(
     add_label: bool = False,
 ):
     """Add saliency maps(2d for class-ignore saliency map, 3d for class-wise saliency maps) to a single dataset item."""
-    label = predicted_scene.annotations[0].get_labels()[0] if predicted_scene is not None else None
+    label = None
+    if predicted_scene and len(predicted_scene.annotations) > 0:
+        label = predicted_scene.annotations[0].get_labels()[0].label
     if saliency_map.ndim == 2:
         # Single saliency map per image, support e.g. EigenCAM use case
         actmap = get_actmap(saliency_map, (dataset_item.width, dataset_item.height))
@@ -220,14 +222,16 @@ def add_saliency_maps_to_dataset_item(
         # If predicted_scene is provided, add saliency map with only predicted classes(used for openvino task)
         predicted_class_set = (
             set(label.name for label in predicted_scene.annotations[0].get_labels())
-            if predicted_scene is not None
+            if predicted_scene is not None and len(predicted_scene.annotations) > 0
             else set()
         )
-
+        if len(saliency_map) == len(labels) + 1:
+            # Include the background as the last label
+            labels.append(LabelEntity("background", Domain.DETECTION))
         for class_id, class_wise_saliency_map in enumerate(saliency_map):
-            if predicted_scene is not None and labels[class_id].name not in predicted_class_set:
-                continue
             class_name_str = labels[class_id].name
+            if predicted_scene is not None and class_name_str not in predicted_class_set:
+                continue
             class_wise_saliency_map = get_actmap(class_wise_saliency_map, (dataset_item.width, dataset_item.height))
             saliency_media = dict(
                 name=class_name_str,
