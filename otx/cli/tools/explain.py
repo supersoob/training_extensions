@@ -76,12 +76,15 @@ def parse_args():
     )
     parser.add_argument(
         "--explain-algorithm",
-        default="EigenCAM",
-        help=f"Explain algorithm name, currently support {SUPPORTED_EXPLAIN_ALGORITHMS}",
+        default="ClassWiseSaliencyMap",
+        help=(
+            f"Explain algorithm name, currently support {SUPPORTED_EXPLAIN_ALGORITHMS}.",
+            "For Openvino task, only ClassWiseSaliencyMap is supported.",
+        ),
     )
     parser.add_argument(
         "-w",
-        "--weight",
+        "--overlay-weight",
         type=float,
         default=0.5,
         help="weight of the saliency map when overlaying the saliency map",
@@ -104,7 +107,9 @@ def main():
     hyper_parameters = create(hyper_parameters)
 
     # Get classes for Task, ConfigurableParameters and Dataset.
-    if args.load_weights.endswith(".pth"):
+    if any(args.load_weights.endswith(x) for x in (".bin", ".xml", ".zip")):
+        task_class = get_impl_class(template.entrypoints.openvino)
+    elif args.load_weights.endswith(".pth"):
         if is_checkpoint_nncf(args.load_weights):
             task_class = get_impl_class(template.entrypoints.nncf)
         else:
@@ -120,7 +125,6 @@ def main():
     )
 
     environment.model = read_model(environment.get_model_configuration(), args.load_weights, None)
-
     task = task_class(task_environment=environment)
 
     if args.explain_algorithm.lower() not in SUPPORTED_EXPLAIN_ALGORITHMS:
@@ -148,7 +152,7 @@ def main():
             saliency_map=saliency_data.numpy,
             save_dir=args.save_explanation_to,
             fname=f"{os.path.splitext(os.path.basename(fname))[0]}_{saliency_data.name}",
-            weight=args.weight,
+            weight=args.overlay_weight,
         )
 
     print(f"saliency maps saved to {args.save_explanation_to} for {len(image_files)} images...")

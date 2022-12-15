@@ -33,7 +33,6 @@ from otx.api.entities.model import (  # ModelStatus
     ModelOptimizationType,
     ModelPrecision,
 )
-from otx.api.entities.result_media import ResultMediaEntity
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.scored_label import ScoredLabel
 from otx.api.entities.task_environment import TaskEnvironment
@@ -47,7 +46,6 @@ from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
 from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
 from otx.api.utils.dataset_utils import add_saliency_maps_to_dataset_item
 from otx.api.utils.labels_utils import get_empty_label
-from otx.api.utils.vis_utils import get_actmap
 
 # pylint: disable=invalid-name
 
@@ -101,7 +99,7 @@ class ClassificationInferenceTask(
         dump_saliency_map = not inference_parameters.is_evaluation if inference_parameters else True
         results = self._run_task(
             stage_module,
-            mode="train",
+            mode="eval",
             dataset=dataset,
             dump_features=dump_features,
             dump_saliency_map=dump_saliency_map,
@@ -282,6 +280,7 @@ class ClassificationInferenceTask(
                 saliency_map=saliency_map,
                 model=self._task_environment.model,
                 labels=self._labels,
+                add_only_predicted_class=False,
             )
             update_progress_callback(int(i / dataset_size * 100))
 

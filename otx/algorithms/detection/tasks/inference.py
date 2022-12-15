@@ -45,7 +45,6 @@ from otx.api.entities.model import (
     ModelPrecision,
 )
 from otx.api.entities.model_template import TaskType
-from otx.api.entities.result_media import ResultMediaEntity
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.scored_label import ScoredLabel
 from otx.api.entities.shapes.polygon import Point, Polygon
@@ -65,7 +64,6 @@ from otx.api.utils.argument_checks import (
     check_input_parameters_type,
 )
 from otx.api.utils.dataset_utils import add_saliency_maps_to_dataset_item
-from otx.api.utils.vis_utils import get_actmap
 
 logger = get_logger()
 
