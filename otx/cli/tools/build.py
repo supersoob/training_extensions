@@ -34,6 +34,7 @@ def parse_args():
     parser.add_argument("--model", help="Input OTX model config file (e.g model.py).", default=None)
     parser.add_argument("--backbone", help="Enter the backbone configuration file path or available backbone type.")
     parser.add_argument("--save-backbone-to", help="Enter where to save the backbone configuration file.", default=None)
+    parser.add_argument("--data", help="The path for data root", default=None)
 
     return parser.parse_args()
 
@@ -64,7 +65,9 @@ def main():
             if missing_args:
                 raise ValueError("The selected backbone has inputs that the user must enter.")
             builder.build_model_config(args.model, args.backbone)
-
+    
+    # Support simple auto-config
+    if args.data:
 
 if __name__ == "__main__":
     main()
