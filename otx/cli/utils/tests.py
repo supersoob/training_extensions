@@ -50,12 +50,15 @@ def get_template_dir(template, root) -> str:
 
 def otx_train_testing(template, root, otx_dir, args):
     template_work_dir = get_template_dir(template, root)
-    command_line = [
-        "otx",
-        "train",
-        template.model_template_path
-    ]
-    for arg in ["--train-ann_file", "--train-data-roots", "--val-ann-file", "--val-data-roots", "--unlabeled-data-roots", "--unlabeled-file-list"]:
+    command_line = ["otx", "train", template.model_template_path]
+    for arg in [
+        "--train-ann_file",
+        "--train-data-roots",
+        "--val-ann-file",
+        "--val-data-roots",
+        "--unlabeled-data-roots",
+        "--unlabeled-file-list",
+    ]:
         arg_value = args.get(arg, None)
         if arg_value:
             command_line.extend([arg, os.path.join(otx_dir, arg_value)])
@@ -72,7 +75,7 @@ def otx_hpo_testing(template, root, otx_dir, args):
     template_work_dir = get_template_dir(template, root)
     if os.path.exists(f"{template_work_dir}/hpo"):
         shutil.rmtree(f"{template_work_dir}/hpo")
-    
+
     command_line = ["otx", "train", template.model_template_path]
 
     for arg in ["--train-data-roots", "--val-data-roots"]:
@@ -81,7 +84,6 @@ def otx_hpo_testing(template, root, otx_dir, args):
             command_line.extend([arg, os.path.join(otx_dir, arg_value)])
     command_line.extend(["--save-model-to", f"{template_work_dir}/hpo_trained_{template.model_template_id}"])
     command_line.extend(["--enable-hpo", "--hpo-time-ratio", "1"])
-
 
     command_line.extend(args["train_params"])
     assert run(command_line).returncode == 0

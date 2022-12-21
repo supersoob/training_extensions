@@ -1,4 +1,4 @@
-"""Tests for MPA Class-Incremental Learning for image classification with OTE CLI"""
+"""Tests for Class-Incremental Learning for image classification with OTX CLI"""
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -90,7 +90,7 @@ else:
     templates_ids = [template.model_template_id for template in templates]
 
 
-class TestToolsMPAClassification:
+class TestToolsOTXClassification:
     @e2e_pytest_component
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
     def test_otx_train(self, template, tmp_dir_path):
@@ -247,7 +247,7 @@ args_m = {
 }
 
 
-class TestToolsMPAMultilabelClassification:
+class TestToolsOTXMultilabelClassification:
     @e2e_pytest_component
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
     def test_otx_train(self, template, tmp_dir_path):
@@ -385,7 +385,7 @@ args_h = {
 }
 
 
-class TestToolsMPAHierarchicalClassification:
+class TestToolsOTXHierarchicalClassification:
     @e2e_pytest_component
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
     def test_otx_train(self, template, tmp_dir_path):
