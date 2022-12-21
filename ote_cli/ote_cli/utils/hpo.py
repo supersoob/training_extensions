@@ -129,7 +129,7 @@ class TaskManager:
             current_latest_epoch = -1
             latest_weight = None
 
-            for weight_name in  glob.iglob(osp.join(workdir, "**/epoch_*.pth"), recursive=True):
+            for weight_name in glob.iglob(osp.join(workdir, "**/epoch_*.pth"), recursive=True):
                 ret = pattern.search(weight_name)
                 epoch = int(ret.group(1))
                 if current_latest_epoch < epoch:
@@ -137,6 +137,15 @@ class TaskManager:
                     latest_weight = weight_name
 
         return latest_weight
+
+    def get_best_weight(self, workdir):
+        best_weight = None
+        if self.is_mpa_framework_task():
+            best_weights = list(glob.iglob(osp.join(workdir, "**/best*.pth"), recursive=True))
+            if best_weights:
+                best_weight = best_weights[0]
+
+        return best_weight
 
 class TaskEnvironmentManager:
     def __init__(self, environment: TaskEnvironment):
@@ -537,6 +546,7 @@ class Trainer:
         weight_dir_path = self._get_weight_dir_path()
         os.makedirs(weight_dir_path, exist_ok=True)
         self._task.copy_weight(task.output_path, weight_dir_path)
+        shutil.copy(self._task.get_best_weight(task.output_path), weight_dir_path)
         self._report_func(0, 0, done=True)
 
     def _get_weight_dir_path(self):
