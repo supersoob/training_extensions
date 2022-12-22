@@ -138,12 +138,10 @@ class TaskManager:
 
         return latest_weight
 
-    def get_best_weight(self, workdir):
+    def get_best_weights(self, workdir):
         best_weight = None
         if self.is_mpa_framework_task():
             best_weights = list(glob.iglob(osp.join(workdir, "**/best*.pth"), recursive=True))
-            if best_weights:
-                best_weight = best_weights[0]
 
         return best_weight
 
@@ -546,7 +544,8 @@ class Trainer:
         weight_dir_path = self._get_weight_dir_path()
         os.makedirs(weight_dir_path, exist_ok=True)
         self._task.copy_weight(task.output_path, weight_dir_path)
-        shutil.copy(self._task.get_best_weight(task.output_path), weight_dir_path)
+        for best_weight in self._task.get_best_weights(task.output_path):
+            shutil.copy(best_weight, weight_dir_path)
         self._report_func(0, 0, done=True)
 
     def _get_weight_dir_path(self):
