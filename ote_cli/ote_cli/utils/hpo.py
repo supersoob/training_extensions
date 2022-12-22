@@ -139,11 +139,11 @@ class TaskManager:
         return latest_weight
 
     def get_best_weights(self, workdir):
-        best_weight = None
+        best_weights = None
         if self.is_mpa_framework_task():
             best_weights = list(glob.iglob(osp.join(workdir, "**/best*.pth"), recursive=True))
 
-        return best_weight
+        return best_weights
 
 class TaskEnvironmentManager:
     def __init__(self, environment: TaskEnvironment):
