@@ -326,6 +326,11 @@ def patch_datasets(config: Config, domain=Domain.SEGMENTATION):
         cfg.otx_dataset = None
         cfg.labels = None
 
+
+        if subset == 'unlabeled':
+            cfg.orig_type = "MPASegDataset"
+            cfg.type = "UnlabeledSegDataset"
+
         remove_from_config(cfg, "ann_dir")
         remove_from_config(cfg, "img_dir")
         remove_from_config(cfg, "data_root")
