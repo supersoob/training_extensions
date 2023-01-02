@@ -14,18 +14,20 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
+import errno
 import os
 from collections.abc import Mapping
-from typing import Iterable, Optional, Tuple
-from functools import partial
+from typing import Iterable, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 from mmcv.utils import ConfigDict
+from mmcv.utils.config import Config
 from mpa import MPAConstants
 from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 
+from otx.algorithms.common.adapters.mmcv.utils import get_configs_by_keys
 from otx.algorithms.common.configs.training_base import TrainType
 from otx.algorithms.common.tasks.training_base import BaseTask
 from otx.algorithms.common.utils.callback import InferenceProgressCallback
@@ -34,9 +36,12 @@ from otx.algorithms.common.adapters.mmcv.utils import (
     patch_runner,
     patch_data_pipeline,
 )
-from otx.algorithms.detection.adapters.mmdet.utils import (
+from otx.algorithms.detection.adapters.mmdet.utils.config_utils import (
     patch_datasets,
     patch_evaluation,
+)
+from otx.algorithms.detection.adapters.mmdet.utils.builder import (
+    build_detector
 )
 from otx.algorithms.detection.adapters.mmdet.utils.config_utils import (
     cluster_anchors,
@@ -191,14 +196,20 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         output_model.optimization_type = ModelOptimizationType.MO
 
         stage_module = "DetectionExporter"
-        results = self._run_task(stage_module, mode="train", precision="FP32", export=True)
-        results = results.get("outputs")
-        logger.debug(f"results of run_task = {results}")
-        if results is None:
-            logger.error("error while exporting model, result is None")
+        results = self._run_task(
+            stage_module,
+            mode="train",
+            export=True,
+        )
+        outputs = results.get("outputs")
+        logger.debug(f"results of run_task = {outputs}")
+        if outputs is None:
+            logger.error(
+                f"error while exporting model, result is None: {results.get('msg')}"
+            )
         else:
-            bin_file = results.get("bin")
-            xml_file = results.get("xml")
+            bin_file = outputs.get("bin")
+            xml_file = outputs.get("xml")
             if xml_file is None or bin_file is None:
                 raise RuntimeError("invalid status of exporting. bin and xml should not be None")
             with open(bin_file, "rb") as f:
@@ -250,12 +261,12 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         logger.info(f"train type = {train_type} - loading {recipe}")
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
+        patch_default_config(self._recipe_cfg)
+        patch_runner(self._recipe_cfg)
         patch_data_pipeline(
             self._recipe_cfg,
             os.path.abspath(os.path.dirname(self.template_file_path))
         )
-        patch_default_config(self._recipe_cfg)
-        patch_runner(self._recipe_cfg)
         patch_datasets(self._recipe_cfg, self._task_type.domain)  # for OTX compatibility
         patch_evaluation(self._recipe_cfg)  # for OTX compatibility
         logger.info(f"initialized recipe = {recipe}")
@@ -375,14 +386,18 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
 
     def _initialize_post_hook(self, options=dict()):
         super()._initialize_post_hook(options)
+        options["model_builder"] = build_detector
 
         # if self._anchors are set somewhere, anchors had already been clusted
         # by this method or by loading trained model
         if should_cluster_anchors(self._model_cfg) and len(self._anchors) == 0:
+            otx_dataset = get_configs_by_keys(self._data_cfg.data.train, "otx_dataset")
+            assert len(otx_dataset) == 1
+            otx_dataset = otx_dataset[0]
             cluster_anchors(
                 self._model_cfg,
                 self._recipe_cfg,
-                self._data_cfg.data.train.otx_dataset,
+                otx_dataset,
             )
             self._update_anchors(
                 self._anchors, self._model_cfg.model.bbox_head.anchor_generator

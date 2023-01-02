@@ -15,16 +15,18 @@
 # and limitations under the License.
 
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import numpy as np
 from mmcv.utils import ConfigDict
+from mmcv.utils.config import Config
 from mpa import MPAConstants
 from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 
 from otx.algorithms.common.adapters.mmcv.utils import (
     remove_from_configs_by_type,
+    get_configs_by_dict,
 )
 from otx.algorithms.common.configs import TrainType
 from otx.algorithms.common.tasks import BaseTask
@@ -33,9 +35,12 @@ from otx.algorithms.common.adapters.mmcv.utils import (
     patch_default_config,
     patch_runner,
 )
-from otx.algorithms.segmentation.adapters.mmseg.utils import (
+from otx.algorithms.segmentation.adapters.mmseg.utils.config_utils import (
     patch_datasets,
     patch_evaluation,
+)
+from otx.algorithms.segmentation.adapters.mmseg.utils.builder import (
+    build_segmentor,
 )
 from otx.algorithms.segmentation.adapters.openvino.model_wrappers.blur import (
     get_activation_map,
@@ -143,15 +148,21 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         output_model.optimization_type = ModelOptimizationType.MO
 
         stage_module = "SegExporter"
-        results = self._run_task(stage_module, mode="train", precision="FP32", export=True)
-        results = results.get("outputs")
-        logger.debug(f"results of run_task = {results}")
-        if results is None:
-            logger.error("error while exporting model result is None")
+        results = self._run_task(
+            stage_module,
+            mode="train",
+            export=True,
+        )
+        outputs = results.get("outputs")
+        logger.debug(f"results of run_task = {outputs}")
+        if outputs is None:
+            logger.error(
+                f"error while exporting model, result is None: {results.get('msg')}"
+            )
             # output_model.model_status = ModelStatus.FAILED
         else:
-            bin_file = results.get("bin")
-            xml_file = results.get("xml")
+            bin_file = outputs.get("bin")
+            xml_file = outputs.get("xml")
             if xml_file is None or bin_file is None:
                 raise RuntimeError("invalid status of exporting. bin and xml should not be None")
             with open(bin_file, "rb") as f:
@@ -283,3 +294,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
                         numpy=class_act_map,
                     )
                     dataset_item.append_metadata_item(result_media, model=self._task_environment.model)
+
+    def _initialize_post_hook(self, options=dict()):
+        super()._initialize_post_hook(options)
+        options["model_builder"] = build_segmentor
