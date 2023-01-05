@@ -14,8 +14,9 @@ from typing import Any, Dict, Optional
 import torch
 import torch.distributed as dist
 from mmcls.models.builder import CLASSIFIERS, build_backbone, build_head, build_neck
-from mpa.utils.logger import get_logger
 from torch import nn
+
+from otx.mpa.utils.logger import get_logger
 
 logger = get_logger()
 
@@ -169,10 +170,13 @@ class BYOL(nn.Module):
         """Parse loss dictionary.
 
         Args:
-            losses (dict): ...
+            losses (dict): Raw output of the network, which usually contain
+                losses and other necessary information.
 
         Returns:
-            tuple: ...
+            tuple[Tensor, dict]: (loss, log_vars), loss is the loss tensor
+                which may be a weighted sum of all losses, log_vars contains
+                all the variables to be sent to the logger.
         """
         log_vars = OrderedDict()
         for loss_name, loss_value in losses.items():

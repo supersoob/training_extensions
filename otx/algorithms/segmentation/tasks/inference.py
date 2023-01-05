@@ -19,9 +19,6 @@ from typing import Dict, Optional
 
 import numpy as np
 from mmcv.utils import ConfigDict
-from mpa import MPAConstants
-from mpa.utils.config_utils import MPAConfig
-from mpa.utils.logger import get_logger
 
 from otx.algorithms.common.adapters.mmcv.utils import (
     patch_data_pipeline,
@@ -64,8 +61,14 @@ from otx.api.utils.segmentation_utils import (
     create_annotation_from_segmentation_map,
     create_hard_prediction_from_soft_prediction,
 )
+from otx.mpa import MPAConstants
+from otx.mpa.utils.config_utils import MPAConfig
+from otx.mpa.utils.logger import get_logger
 
 logger = get_logger()
+
+
+SUPPORTED_TRAIN_TYPE = (TrainType.SEMISUPERVISED, TrainType.INCREMENTAL, TrainType.SELFSUPERVISED)
 
 
 # pylint: disable=too-many-locals, too-many-instance-attributes, attribute-defined-outside-init
@@ -189,7 +192,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         self.model_dir = os.path.abspath(os.path.dirname(self.template_file_path))
         pipeline_path = os.path.abspath(self.data_pipeline_path)
 
-        if train_type not in (TrainType.SEMISUPERVISED, TrainType.INCREMENTAL):
+        if train_type not in SUPPORTED_TRAIN_TYPE:
             raise NotImplementedError(f"Train type {train_type} is not implemented yet.")
         if train_type == TrainType.SEMISUPERVISED:
             if (
@@ -204,6 +207,11 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         if train_type == TrainType.INCREMENTAL:
             recipe = os.path.join(recipe_root, "incremental.py")
 
+        if train_type == TrainType.SELFSUPERVISED:
+            recipe = os.path.join(recipe_root, "selfsl.py")
+            self.model_dir = os.path.join(self.model_dir, "selfsl")
+            pipeline_path = os.path.join(os.path.dirname(pipeline_path), "selfsl/data_pipeline.py")
+
         logger.info(f"train type = {train_type} - loading {recipe}")
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
@@ -211,7 +219,9 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
         patch_data_pipeline(self._recipe_cfg, pipeline_path)
         patch_datasets(self._recipe_cfg)  # for OTX compatibility
         patch_evaluation(self._recipe_cfg)  # for OTX compatibility
-        self.metric = self._recipe_cfg.evaluation.metric
+        if self._recipe_cfg.get("evaluation", None):
+            self.metric = self._recipe_cfg.evaluation.metric
+
         if not self.freeze:
             remove_from_config(self._recipe_cfg, "params_config")
         logger.info(f"initialized recipe = {recipe}")
