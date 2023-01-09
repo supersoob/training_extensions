@@ -1,35 +1,36 @@
-from mmseg.datasets import DATASETS, build_dataset
 import numpy as np
-from mmseg.datasets import CustomDataset
-from mmseg.datasets.pipelines import Compose
-from mmseg.core import add_prefix
 import torch
+from mmseg.core import add_prefix
+from mmseg.datasets import DATASETS, CustomDataset, build_dataset
+from mmseg.datasets.pipelines import Compose
+
 
 @DATASETS.register_module()
 class UnlabeledSegDataset(CustomDataset):
     """Dataset wrapper for Semi-SL Semantic Seg experiments.
     Input : splits of labeled & unlabeld datasets
     """
+
     def __init__(self, orig_type=None, **kwargs):
         # Original dataset
         dataset_cfg = kwargs.copy()
-        if 'cutmix' in dataset_cfg:
-            self.cutmix_flag = dataset_cfg.pop('cutmix', False)
+        if "cutmix" in dataset_cfg:
+            self.cutmix_flag = dataset_cfg.pop("cutmix", False)
         else:
             self.cutmix_flag = False
-        dataset_cfg['type'] = orig_type
+        dataset_cfg["type"] = orig_type
         self.unlabeled_dataset = build_dataset(dataset_cfg)
-        
+
         # TODO remove
         self.cutmix_flag = True
-        
+
         # Subsets
         self.num_unlabeled = len(self.unlabeled_dataset)
         self.unlabeled_index = np.random.permutation(self.num_unlabeled)
         if self.cutmix_flag:
             self.cutmix_unlabeled_index = np.random.permutation(self.num_unlabeled)
             self.mask_generator = BoxMaskGenerator()
-        print('----------- #Unlabeled: ', self.num_unlabeled)
+        print("----------- #Unlabeled: ", self.num_unlabeled)
 
     def __len__(self):
         """Total number of samples of data."""
@@ -40,7 +41,7 @@ class UnlabeledSegDataset(CustomDataset):
         mask_size = img0.shape[2:]
         n_masks = img0.shape[0]
         masks = torch.Tensor(self.mask_generator.generate_params(n_masks, mask_size))
-        cutmix_img = (1-masks) * img0 + masks * img1
+        cutmix_img = (1 - masks) * img0 + masks * img1
 
         return dict(img=cutmix_img, masks=masks)
 
@@ -51,17 +52,24 @@ class UnlabeledSegDataset(CustomDataset):
         if self.cutmix_flag:
             unlabeled_cutmix_idx = int(self.cutmix_unlabeled_index[idx])
             unlabeled_cutmix_data = self.unlabeled_dataset[unlabeled_cutmix_idx]
-            
-            cutmixed_data = self._cutmix(unlabeled_data['img'].data, unlabeled_cutmix_data['img'].data)
+
+            cutmixed_data = self._cutmix(unlabeled_data["img"].data, unlabeled_cutmix_data["img"].data)
             unlabeled_data.update(add_prefix(unlabeled_cutmix_data, "img1"))
             unlabeled_data.update(add_prefix(cutmixed_data, "cutmix"))
 
         return unlabeled_data
 
 
-class BoxMaskGenerator (object):
-    def __init__(self, prop_range=(0.25, 0.4), n_boxes=1, random_aspect_ratio=True,
-                 prop_by_area=True, within_bounds=True, invert=True):
+class BoxMaskGenerator(object):
+    def __init__(
+        self,
+        prop_range=(0.25, 0.4),
+        n_boxes=1,
+        random_aspect_ratio=True,
+        prop_by_area=True,
+        within_bounds=True,
+        invert=True,
+    ):
         if isinstance(prop_range, float):
             prop_range = (prop_range, prop_range)
         self.prop_range = prop_range
@@ -128,5 +136,7 @@ class BoxMaskGenerator (object):
             masks = np.ones((n_masks, 1) + mask_shape)
         for i, sample_rectangles in enumerate(rectangles):
             for y0, x0, y1, x1 in sample_rectangles:
-                masks[i, 0, int(y0):int(y1), int(x0):int(x1)] = 1 - masks[i, 0, int(y0):int(y1), int(x0):int(x1)]
+                masks[i, 0, int(y0) : int(y1), int(x0) : int(x1)] = (
+                    1 - masks[i, 0, int(y0) : int(y1), int(x0) : int(x1)]
+                )
         return masks

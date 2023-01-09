@@ -9,9 +9,17 @@ from mmcv.parallel import DataContainer as DC
 from mmseg.datasets import PIPELINES
 from mmseg.datasets.pipelines.formating import to_tensor
 
-class BoxMaskGenerator (object):
-    def __init__(self, prop_range=(0.25, 0.4), n_boxes=1, random_aspect_ratio=True,
-                 prop_by_area=True, within_bounds=True, invert=True):
+
+class BoxMaskGenerator(object):
+    def __init__(
+        self,
+        prop_range=(0.25, 0.4),
+        n_boxes=1,
+        random_aspect_ratio=True,
+        prop_by_area=True,
+        within_bounds=True,
+        invert=True,
+    ):
         if isinstance(prop_range, float):
             prop_range = (prop_range, prop_range)
         self.prop_range = prop_range
@@ -78,30 +86,43 @@ class BoxMaskGenerator (object):
             masks = np.ones((n_masks, 1) + mask_shape)
         for i, sample_rectangles in enumerate(rectangles):
             for y0, x0, y1, x1 in sample_rectangles:
-                masks[i, 0, int(y0):int(y1), int(x0):int(x1)] = 1 - masks[i, 0, int(y0):int(y1), int(x0):int(x1)]
+                masks[i, 0, int(y0) : int(y1), int(x0) : int(x1)] = (
+                    1 - masks[i, 0, int(y0) : int(y1), int(x0) : int(x1)]
+                )
         return masks
+
 
 @PIPELINES.register_module()
 class Cutmix(object):
-    def __init__(self, prop_range=(0.25, 0.4), n_boxes=1, random_aspect_ratio=True,
-                 prop_by_area=True, within_bounds=True, invert=True):
-        self.mask_generator = BoxMaskGenerator(prop_range, n_boxes, random_aspect_ratio, prop_by_area, within_bounds, invert)
+    def __init__(
+        self,
+        prop_range=(0.25, 0.4),
+        n_boxes=1,
+        random_aspect_ratio=True,
+        prop_by_area=True,
+        within_bounds=True,
+        invert=True,
+    ):
+        self.mask_generator = BoxMaskGenerator(
+            prop_range, n_boxes, random_aspect_ratio, prop_by_area, within_bounds, invert
+        )
 
     def __call__(self, results):
-        img0 = results['img']
+        img0 = results["img"]
         breakpoint()
-        if results.get('img1', None):
-            img1 = results['img1']
+        if results.get("img1", None):
+            img1 = results["img1"]
 
             mask_size = img0.shape[2:]
             n_masks = img0.shape[0]
             masks = torch.Tensor(self.mask_generator.generate_params(n_masks, mask_size))
-            cutmix_img = (1-masks) * img0 + masks * img1
+            cutmix_img = (1 - masks) * img0 + masks * img1
 
-            results['cutmix.img'] = cutmix_img
-            results['cutmix.masks'] = masks
+            results["cutmix.img"] = cutmix_img
+            results["cutmix.masks"] = masks
 
         return results
+
 
 @PIPELINES.register_module(force=True)
 class Normalize(object):
