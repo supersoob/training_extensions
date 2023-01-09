@@ -96,7 +96,7 @@ class BoxMaskGenerator(object):
 
 @SEGMENTORS.register_module()
 class CutmixSegNaive(BaseSegmentor):
-    def __init__(self, orig_type=None, unsup_weight=0.1, warmup_start_iter=30, **kwargs):
+    def __init__(self, orig_type=None, unsup_weight=0.1, warmup_start_iter=0, **kwargs):
         print("CutmixSegNaive init!")
         super(CutmixSegNaive, self).__init__()
         self.test_cfg = kwargs["test_cfg"]
@@ -132,7 +132,7 @@ class CutmixSegNaive(BaseSegmentor):
     def forward_dummy(self, img, **kwargs):
         return self.model_s.forward_dummy(img, **kwargs)
 
-    def save_img(self, img_tensor, gt_tensor, filename):
+    def save_img(self, img_tensor, gt_tensor=None, filename=""):
         from torchvision.utils import save_image
 
         image = img_tensor[0].clone().detach().cpu()
@@ -143,71 +143,48 @@ class CutmixSegNaive(BaseSegmentor):
             save_image(gt, f"/home/soobee/training_extensions/cutmix_images/{filename}_gt.png")
 
     def forward_train(self, img, img_metas, gt_semantic_seg, **kwargs):
-
-        ul_data = kwargs["extra_0"]
-
-        breakpoint()
-
         self.count_iter += 1
         if self.warmup_start_iter > self.count_iter:
             x = self.model_s.extract_feat(img)
             loss_decode, _ = self.model_s._decode_head_forward_train(x, img_metas, gt_semantic_seg=gt_semantic_seg)
             return loss_decode
 
-        ul_s_img0 = ul_data["ul_w_img"].clone().detach()
-        ul_w_img0 = ul_data["ul_w_img"]
-
-        ##
-        self.save_img(ul_s_img0, ul_w_img0, "is_aug")
-
-        ul_s_img1 = ul_data["cutmix.ul_w_img"].clone().detach()
-        ul_w_img1 = ul_data["cutmix.ul_w_img"]
-
+        ul_data = kwargs["extra_0"]
+        ul_img0 = ul_data["img"]
         ul_img0_metas = ul_data["img_metas"]
-        ul_img1_metas = ul_data["cutmix.img_metas"]
+        ul_img1 = ul_data["img1.img"]
+        ul_img1_metas = ul_data["img1.img_metas"]
 
-        mask_size = ul_s_img0.shape[2:]
-        n_masks = ul_s_img0.shape[0]
-        masks = torch.Tensor(self.mask_generator.generate_params(n_masks, mask_size))
-        if ul_s_img0.is_cuda:
-            masks = masks.cuda()
+        ul_cutmix = ul_data["cutmix.img"]
+        masks = ul_data["cutmix.masks"]
 
-        try:
-            ul_img_cutmix = (1 - masks) * ul_s_img0 + masks * ul_s_img1
-        except Exception as e:
-            breakpoint()
+        self.save_img(ul_img0, None, "img0")
+        self.save_img(ul_cutmix, None, "cutmix")
+
+        breakpoint()
 
         with torch.no_grad():
-            ul1_feat = self.model_t.extract_feat(ul_w_img0)
-            ul1_logit = self.model_t._decode_head_forward_test(ul1_feat, ul_img0_metas)
+            ul0_feat = self.model_t.extract_feat(ul_img0)
+            ul0_logit = self.model_t._decode_head_forward_test(ul0_feat, ul_img0_metas)
+            ul0_logit = resize(
+                input=ul0_logit, size=ul_img0.shape[2:], mode="bilinear", align_corners=self.align_corners
+            )
+            ul0_conf, ul0_pl = torch.max(torch.softmax(ul0_logit, axis=1), axis=1, keepdim=True)
+
+            ul1_feat = self.model_t.extract_feat(ul_img1)
+            ul1_logit = self.model_t._decode_head_forward_test(ul1_feat, ul_img1_metas)
             ul1_logit = resize(
-                input=ul1_logit, size=ul_w_img0.shape[2:], mode="bilinear", align_corners=self.align_corners
+                input=ul1_logit, size=ul_img1.shape[2:], mode="bilinear", align_corners=self.align_corners
             )
             ul1_conf, ul1_pl = torch.max(torch.softmax(ul1_logit, axis=1), axis=1, keepdim=True)
 
-            ul2_feat = self.model_t.extract_feat(ul_w_img1)
-            ul2_logit = self.model_t._decode_head_forward_test(ul2_feat, ul_img1_metas)
-            ul2_logit = resize(
-                input=ul2_logit, size=ul_w_img1.shape[2:], mode="bilinear", align_corners=self.align_corners
-            )
-            ul2_conf, ul2_pl = torch.max(torch.softmax(ul2_logit, axis=1), axis=1, keepdim=True)
-
-            ##
-            self.save_img(ul1_pl.float(), ul2_pl.float(), "pseudo_labels")
-            self.save_img(ul_w_img0, ul_w_img1, "imgs")
-
-            pl_cutmixed = (1 - masks) * ul1_pl + masks * ul2_pl
-
-            ##
-            self.save_img(ul_img_cutmix, pl_cutmixed, "cutmixed")
-            # breakpoint()
-
+            pl_cutmixed = (1 - masks) * ul0_pl + masks * ul1_pl
             pl_cutmixed = pl_cutmixed.long()
 
         losses = dict()
 
         x = self.model_s.extract_feat(img)
-        x_u_cutmixed = self.model_s.extract_feat(ul_img_cutmix)
+        x_u_cutmixed = self.model_s.extract_feat(ul_cutmix)
         loss_decode, _ = self.model_s._decode_head_forward_train(x, img_metas, gt_semantic_seg=gt_semantic_seg)
         loss_decode_u, _ = self.model_s._decode_head_forward_train(
             x_u_cutmixed, ul_img0_metas, gt_semantic_seg=pl_cutmixed

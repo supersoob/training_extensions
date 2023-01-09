@@ -37,13 +37,12 @@ class UnlabeledSegDataset(CustomDataset):
         return self.num_unlabeled
 
     def _cutmix(self, img0, img1):
-        breakpoint()
-        mask_size = img0.shape[2:]
-        n_masks = img0.shape[0]
+        mask_size = img0.shape[1:]
+        n_masks = 1
         masks = torch.Tensor(self.mask_generator.generate_params(n_masks, mask_size))
         cutmix_img = (1 - masks) * img0 + masks * img1
 
-        return dict(img=cutmix_img, masks=masks)
+        return dict(img=torch.squeeze(cutmix_img), masks=torch.squeeze(masks))
 
     def __getitem__(self, idx):
         unlabeled_idx = int(self.unlabeled_index[idx])
