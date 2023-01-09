@@ -3,6 +3,7 @@
 #
 
 import otx.mpa.modules.datasets.pipelines.transforms.seg_custom_pipelines
+import otx.mpa.modules.datasets.seg_unlabeled_dataset
 import otx.mpa.modules.datasets.seg_incr_cityscapes_dataset
 import otx.mpa.modules.datasets.seg_incr_voc_dataset
 import otx.mpa.modules.datasets.seg_task_adapt_dataset

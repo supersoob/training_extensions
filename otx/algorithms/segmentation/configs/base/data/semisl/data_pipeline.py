@@ -45,24 +45,9 @@ unlabeled_pipeline = [
     dict(type="RandomFlip", prob=0.5, direction="horizontal"),
     dict(type="RandomRotate", prob=0.5, degree=30, pad_val=0, seg_pad_val=255),
     dict(type="Pad", size=__crop_size, pad_val=0, seg_pad_val=255),
-    dict(type="BranchImage", key_map=dict(img="ul_w_img")),
-    dict(
-        type="ProbCompose",
-        probs=[0.7, 0.3],
-        transforms=[
-            dict(
-                type="PhotoMetricDistortion",
-                brightness_delta=32,
-                contrast_range=(0.5, 1.5),
-                saturation_range=(0.5, 1.5),
-                hue_delta=18,
-            ),
-            dict(type="RGB2Gray"),
-        ],
-    ),
     dict(type="Normalize", **__img_norm_cfg),
     dict(type="DefaultFormatBundle"),
-    dict(type="Collect", keys=["img", "ul_w_img"]),
+    dict(type="Collect", keys=["img"]),
 ]
 
 # TODO (Soobee) : Remove Repeatdataset in data config
