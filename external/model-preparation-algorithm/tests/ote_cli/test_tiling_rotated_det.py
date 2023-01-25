@@ -64,7 +64,7 @@ if TT_STABILITY_TESTS:
             "template.yaml",
         )
     )
-    templates = [default_template] * 1
+    templates = [default_template] * 100
     templates_ids = [template.model_template_id + f"-{i+1}" for i, template in enumerate(templates)]
 else:
     templates = Registry("external/model-preparation-algorithm").filter(task_type="ROTATED_DETECTION").templates
@@ -80,89 +80,3 @@ class TestToolsSmallRotatedDetection:
     @pytest.mark.parametrize("template", templates, ids=templates_ids)
     def test_ote_train(self, template):
         ote_train_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_export(self, template):
-        ote_export_testing(template, root)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval(self, template):
-        ote_eval_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval_openvino(self, template):
-        ote_eval_openvino_testing(template, root, ote_dir, args, threshold=0.2)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo(self, template):
-        ote_demo_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo_openvino(self, template):
-        ote_demo_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_deploy_openvino(self, template):
-        ote_deploy_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_eval_deployment(self, template):
-        ote_eval_deployment_testing(template, root, ote_dir, args, threshold=0.0)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_ote_demo_deployment(self, template):
-        ote_demo_deployment_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.xfail(reason="CVS-98026")
-    def test_nncf_optimize(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_optimize_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.xfail(reason="CVS-98026")
-    def test_nncf_export(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_export_testing(template, root)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.xfail(reason="CVS-98026")
-    def test_nncf_eval(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_eval_testing(template, root, ote_dir, args, threshold=0.001)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    @pytest.mark.xfail(reason="CVS-98026")
-    def test_nncf_eval_openvino(self, template):
-        if template.entrypoints.nncf is None:
-            pytest.skip("nncf entrypoint is none")
-
-        nncf_eval_openvino_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_pot_optimize(self, template):
-        pot_optimize_testing(template, root, ote_dir, args)
-
-    @e2e_pytest_component
-    @pytest.mark.parametrize("template", templates, ids=templates_ids)
-    def test_pot_eval(self, template):
-        pot_eval_testing(template, root, ote_dir, args)

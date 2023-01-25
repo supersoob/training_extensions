@@ -63,7 +63,7 @@ if TT_STABILITY_TESTS:
     default_template = parse_model_template(
         os.path.join("external/anomaly/configs", "segmentation", "padim", "template.yaml")
     )
-    templates = [default_template] * 1
+    templates = [default_template] * 100
     templates_ids = [template.model_template_id + f"-{i+1}" for i, template in enumerate(templates)]
 else:
     templates = Registry("external").filter(task_type="ANOMALY_SEGMENTATION").templates

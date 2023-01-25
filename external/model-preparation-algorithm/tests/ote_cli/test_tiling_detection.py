@@ -61,7 +61,7 @@ if TT_STABILITY_TESTS:
             "external/model-preparation-algorithm/configs", "detection", "mobilenetv2_atss_cls_incr", "template.yaml"
         )
     )
-    templates = [default_template] * 1
+    templates = [default_template] * 100
     templates_ids = [template.model_template_id + f"-{i+1}" for i, template in enumerate(templates)]
 else:
     templates = Registry("external/model-preparation-algorithm").filter(task_type="DETECTION").templates
