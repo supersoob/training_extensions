@@ -7,6 +7,7 @@ import os
 import pytest
 
 from ote_sdk.test_suite.e2e_test_system import e2e_pytest_component
+from ote_sdk.entities.model_template import parse_model_template
 
 from ote_cli.registry import Registry
 from ote_cli.utils.tests import (
@@ -53,9 +54,21 @@ args = {
 root = "/tmp/ote_cli/"
 ote_dir = os.getcwd()
 
-templates = Registry("external/model-preparation-algorithm").filter(task_type="ROTATED_DETECTION").templates
-templates_ids = [template.model_template_id for template in templates]
-
+TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", True)
+if TT_STABILITY_TESTS:
+    default_template = parse_model_template(
+        os.path.join(
+            "external/model-preparation-algorithm/configs",
+            "rotated-detection",
+            "resnet50_maskrcnn",
+            "template.yaml",
+        )
+    )
+    templates = [default_template] * 1
+    templates_ids = [template.model_template_id + f"-{i+1}" for i, template in enumerate(templates)]
+else:
+    templates = Registry("external/model-preparation-algorithm").filter(task_type="ROTATED_DETECTION").templates
+    templates_ids = [template.model_template_id for template in templates]
 
 class TestToolsSmallRotatedDetection:
     @e2e_pytest_component
