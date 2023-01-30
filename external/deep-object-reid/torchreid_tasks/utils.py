@@ -256,8 +256,8 @@ def generate_label_schema(not_empty_labels: List[LabelEntity], multilabel: bool 
 
 
 @check_input_parameters_type()
-def get_multihead_class_info(label_schema: LabelSchemaEntity):
-    all_groups = label_schema.get_groups(include_empty=False)
+def get_multihead_class_info(label_schema: LabelSchemaEntity, with_empty=False):
+    all_groups = label_schema.get_groups(include_empty=with_empty)
     all_groups_str = []
     for g in all_groups:
         group_labels_str = [lbl.name for lbl in g.labels]
