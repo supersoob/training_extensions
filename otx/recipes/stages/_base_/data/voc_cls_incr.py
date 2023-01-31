@@ -1,7 +1,7 @@
 _base_ = ["./data_seg.py"]
 
-__dataset_type = "SegIncrVOCDataset"
-__data_root = "data/pascal_voc"
+__dataset_type = "CustomDataset"
+__data_root = "data/common_semantic_segmentation_dataset"
 
 data = dict(
     train=dict(
@@ -10,26 +10,23 @@ data = dict(
         dataset=dict(
             type=__dataset_type,
             data_root=__data_root,
-            img_dir="train/img",
-            ann_dir="train/anno",
-            split="train.txt",
-            classes=["background", "person", "car"],
+            img_dir="train/images",
+            ann_dir="train/masks",
+            classes=["background", "person"],
         ),
     ),
     val=dict(
         type=__dataset_type,
         data_root=__data_root,
-        img_dir="val/img",
-        ann_dir="val/anno",
-        split="val.txt",
-        classes=["background", "person", "car"],
+        img_dir="val/images",
+        ann_dir="val/masks",
+        classes=["background", "person"],
     ),
     test=dict(
         type=__dataset_type,
         data_root=__data_root,
-        img_dir="test/img",
-        ann_dir="test/anno",
-        split="test.txt",
-        classes=["background", "person", "car"],
+        img_dir="val/images",
+        ann_dir="val/masks",
+        classes=["background", "person"],
     ),
 )

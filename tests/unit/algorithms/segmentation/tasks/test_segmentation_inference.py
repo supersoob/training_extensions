@@ -33,7 +33,7 @@ from otx.api.entities.shapes.rectangle import Rectangle
 from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
-from tests.unit.api.test_helpers import generate_random_annotated_image
+from tests.test_helpers import generate_random_annotated_image
 
 DEFAULT_SEG_TEMPLATE_DIR = os.path.join("otx/algorithms/segmentation/configs", "ocr_lite_hrnet_18_mod2")
 
