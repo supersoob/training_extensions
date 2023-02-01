@@ -32,7 +32,7 @@ from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
 from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset
 
-class TestOTXSegTaskInference:
+class TestOpenVINOSegmentationInferencer:
     @pytest.fixture(autouse=True)
     def setup(self) -> None:
         model_template = parse_model_template(os.path.join(DEFAULT_SEG_TEMPLATE_DIR, "template.yaml"))
