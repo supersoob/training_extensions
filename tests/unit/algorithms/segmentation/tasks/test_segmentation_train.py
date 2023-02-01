@@ -16,7 +16,7 @@ from otx.api.entities.metrics import NullPerformance
 from otx.api.entities.model import ModelConfiguration, ModelEntity
 from otx.api.entities.model_template import parse_model_template
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
-from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset
+from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset, create_model
 
 class TestOTXSegTaskTrain:
     @pytest.fixture(autouse=True)
@@ -25,11 +25,7 @@ class TestOTXSegTaskTrain:
         hyper_parameters = create(model_template.hyper_parameters.data)
         task_env = init_environment(hyper_parameters, model_template)
         self.seg_train_task = SegmentationTrainTask(task_env)
-        model_configuration = ModelConfiguration(
-            configurable_parameters=ConfigurableParameters(header="header", description="description"),
-            label_schema=LabelSchemaEntity(),
-        )
-        self.model = ModelEntity(train_dataset=DatasetEntity(), configuration=model_configuration)
+        self.model = create_model()
         self.model_ckpt_path = self.seg_train_task._output_path
 
     @e2e_pytest_unit

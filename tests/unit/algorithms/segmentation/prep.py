@@ -37,7 +37,14 @@ from tests.test_helpers import generate_random_annotated_image
 
 DEFAULT_SEG_TEMPLATE_DIR = os.path.join("otx/algorithms/segmentation/configs", "ocr_lite_hrnet_18_mod2")
 
-def generate_otx_label_schema(label_names):
+def create_model():
+    model_configuration = ModelConfiguration(
+            configurable_parameters=ConfigurableParameters(header="header", description="description"),
+            label_schema=LabelSchemaEntity(),
+        )
+    return ModelEntity(train_dataset=DatasetEntity(), configuration=model_configuration)
+        
+def generate_otx_label_schema(label_names=("rectangle", "ellipse", "triangle")):
     label_domain = Domain.SEGMENTATION
     rgb = [int(i) for i in np.random.randint(0, 256, 3)]
     colors = [Color(*rgb) for _ in range(len(label_names))]
@@ -71,7 +78,7 @@ def init_environment(params, model_template):
 
     return environment
 
-def generate_otx_dataset(number_of_images):
+def generate_otx_dataset(number_of_images=5):
     items = []
     labels_names = ("rectangle", "ellipse", "triangle")
     labels_schema = generate_otx_label_schema(labels_names)

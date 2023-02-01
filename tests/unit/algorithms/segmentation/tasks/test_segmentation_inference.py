@@ -30,7 +30,7 @@ from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.shapes.polygon import Point, Polygon
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
-from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset
+from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset, create_model
 
 class TestOTXSegTaskInference:
     @pytest.fixture(autouse=True)
@@ -39,11 +39,7 @@ class TestOTXSegTaskInference:
         hyper_parameters = create(model_template.hyper_parameters.data)
         task_env = init_environment(hyper_parameters, model_template)
         self.seg_train_task = SegmentationInferenceTask(task_env)
-        model_configuration = ModelConfiguration(
-            configurable_parameters=ConfigurableParameters(header="header", description="description"),
-            label_schema=LabelSchemaEntity(),
-        )
-        self.model = ModelEntity(train_dataset=DatasetEntity(), configuration=model_configuration)
+        self.model = create_model()
         self.output_path = self.seg_train_task._output_path
 
     @e2e_pytest_unit
@@ -96,7 +92,6 @@ class TestOTXSegTaskInference:
             f.write(b"bar")
 
         fake_output = {"outputs" : {"bin": f"{self.output_path}/model.xml", "xml" : f"{self.output_path}/model.bin"}}
-
         mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
         self.seg_train_task.export(ExportType.OPENVINO, self.model)
 
