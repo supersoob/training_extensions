@@ -9,6 +9,7 @@ import warnings
 import numpy as np
 import pytest
 
+from otx.algorithms.common.tasks import BaseTask
 from otx.algorithms.segmentation.tasks import SegmentationTrainTask
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
@@ -129,8 +130,6 @@ class TestOTXSegTaskTrain:
     def setup(self) -> None:
         model_template = parse_model_template(os.path.join(DEFAULT_SEG_TEMPLATE_DIR, "template.yaml"))
         hyper_parameters = create(model_template.hyper_parameters.data)
-        hyper_parameters.learning_parameters.num_iters = 1
-        hyper_parameters.learning_parameters.batch_size = 5
         task_env, self.dataset = self.init_environment(hyper_parameters, model_template, 5)
         self.seg_train_task = SegmentationTrainTask(task_env)
         model_configuration = ModelConfiguration(
@@ -150,10 +149,20 @@ class TestOTXSegTaskTrain:
 
     @e2e_pytest_unit
     def test_train(self, mocker):
+        from otx.algorithms.common.adapters.mmcv.hooks import OTXLoggerHook
+        
+        mock_lcurve_val = OTXLoggerHook.Curve()
+        mock_lcurve_val.x = [0,1]
+        mock_lcurve_val.y = [0.1, 0.2]
+
+        mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value={"final_ckpt":""})
+        self.seg_train_task._learning_curves = {f"val/{self.seg_train_task.metric}" : mock_lcurve_val}
         mocker.patch.object(SegmentationTrainTask, "save_model")
         self.seg_train_task.train(self.dataset, self.model)
 
+        mock_run_task.assert_called_once()
         assert self.model.performance != NullPerformance()
+        assert self.model.performance.score.value == 0.2
 
     @e2e_pytest_unit
     def test_cancel_training(self):

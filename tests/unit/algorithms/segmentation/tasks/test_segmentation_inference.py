@@ -10,6 +10,9 @@ import warnings
 import numpy as np
 import pytest
 
+from otx.algorithms.common.tasks import BaseTask
+from otx.api.utils.shape_factory import ShapeFactory
+
 from otx.algorithms.segmentation.tasks import SegmentationInferenceTask
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
@@ -21,6 +24,8 @@ from otx.api.entities.annotation import (
 from otx.api.entities.color import Color
 from otx.api.entities.dataset_item import DatasetItemEntity
 from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.scored_label import ScoredLabel
+
 from otx.api.entities.image import Image
 from otx.api.entities.label import Domain, LabelEntity
 from otx.api.entities.label_schema import LabelGroup, LabelGroupType, LabelSchemaEntity
@@ -122,8 +127,6 @@ class TestOTXSegTaskTrain:
     def setup(self) -> None:
         model_template = parse_model_template(os.path.join(DEFAULT_SEG_TEMPLATE_DIR, "template.yaml"))
         hyper_parameters = create(model_template.hyper_parameters.data)
-        hyper_parameters.learning_parameters.num_iters = 1
-        hyper_parameters.learning_parameters.batch_size = 5
         task_env = self.init_environment(hyper_parameters, model_template)
         self.seg_train_task = SegmentationInferenceTask(task_env)
         model_configuration = ModelConfiguration(
@@ -134,16 +137,24 @@ class TestOTXSegTaskTrain:
         self.output_path = self.seg_train_task._output_path
 
     @e2e_pytest_unit
-    def test_infer(self):
+    def test_infer(self, mocker):
         dataset = self.generate_dataset(5)
-        anns = {}
-        for dataset_item in dataset:
-            anns[dataset_item.roi.id] = copy.deepcopy(dataset_item.annotation_scene)
+
+        fake_output = {"outputs" : {"eval_predictions": np.zeros((5,1)), "feature_vectors" : np.zeros((5,1))}}
+        fake_annotation = [Annotation(Polygon(points=[Point(0,0)]), id=0, labels=[ScoredLabel(LabelEntity(name="fake", domain="SEGMENTATION"), probability=1.0)])]
+        
+        mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
+        mocker.patch("numpy.transpose")
+        mocker.patch("otx.algorithms.segmentation.tasks.inference.create_hard_prediction_from_soft_prediction")
+        mocker.patch("otx.algorithms.segmentation.tasks.inference.create_annotation_from_segmentation_map", return_value=fake_annotation)
+        mocker.patch("otx.algorithms.segmentation.tasks.inference.get_activation_map", return_value=np.zeros((1,1)))
+        mocker.patch.object(ShapeFactory, "shape_produces_valid_crop", return_value=True)
 
         updated_dataset = self.seg_train_task.infer(dataset, None)
 
+        mock_run_task.assert_called_once()
         for updated in updated_dataset:
-            assert len(updated.annotation_scene.annotations) > len(anns[updated.roi.id].annotations)
+            assert updated.annotation_scene.contains_any([LabelEntity(name="fake", domain="SEGMENTATION")])
 
     @e2e_pytest_unit
     def test_evaluate(self):
@@ -155,10 +166,35 @@ class TestOTXSegTaskTrain:
         with pytest.raises(ValueError):
             self.seg_train_task.evaluate(result_set)
 
-    def test_export(self):
+    @e2e_pytest_unit
+    def test_export(self, mocker):
+        fake_output = {"outputs" : {"bin": None, "xml" : None}}
+        mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
+        
+        with pytest.raises(RuntimeError):
+            self.seg_train_task.export(ExportType.OPENVINO, self.model)
+            mock_run_task.assert_called_once()
+    
+    @e2e_pytest_unit
+    def test_export_with_xml_file(self, mocker):
+        with open(f"{self.output_path}/model.xml", "wb") as f:
+            f.write(b"foo")
+        with open(f"{self.output_path}/model.bin", "wb") as f:
+            f.write(b"bar")
+
+        fake_output = {"outputs" : {"bin": f"{self.output_path}/model.xml", "xml" : f"{self.output_path}/model.bin"}}
+
+        mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
         self.seg_train_task.export(ExportType.OPENVINO, self.model)
 
+        mock_run_task.assert_called_once()
         assert self.model.get_data("openvino.bin")
         assert self.model.get_data("openvino.xml")
-        assert glob.glob(os.path.join(self.output_path, "**/model.xml"))
-        assert glob.glob(os.path.join(self.output_path, "**/model.bin"))
+
+    @e2e_pytest_unit
+    def test_unload(self, mocker):
+        mock_cleanup = mocker.patch.object(BaseTask, "cleanup")
+        self.seg_train_task.unload()
+        
+        mock_cleanup.assert_called_once()
+

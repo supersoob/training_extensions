@@ -63,5 +63,3 @@ def test_seg_replace_ImageToTensor():
         else:    
             values = [ pipeline['type'] ]
         assert "ImageToTensor" not in values
-    
-

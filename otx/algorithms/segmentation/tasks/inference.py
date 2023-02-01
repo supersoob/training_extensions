@@ -252,6 +252,7 @@ class SegmentationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluati
                 soft_prediction=soft_prediction,
                 label_map=self._label_dictionary,
             )
+
             dataset_item.append_annotations(annotations=annotations)
 
             if feature_vector is not None:

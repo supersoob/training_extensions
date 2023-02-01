@@ -324,7 +324,6 @@ class DatasetItemEntity(metaclass=abc.ABCMeta):
                 "such as segmentation).",
                 n_invalid_shapes,
             )
-
         self.annotation_scene.append_annotations(validated_annotations)
 
     def get_roi_labels(
