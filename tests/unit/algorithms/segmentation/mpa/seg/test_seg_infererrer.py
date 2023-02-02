@@ -20,12 +20,12 @@ class TestOTXSegTrainer:
 
     @e2e_pytest_unit
     def test_seg_inferrer_run(self, mocker):
-        fake_output = {"classes" : [1,2], "eval_predictions" : None, "feature_vectors" : None}
+        fake_output = {"classes": [1, 2], "eval_predictions": None, "feature_vectors": None}
         mock_infer = mocker.patch.object(SegInferrer, "infer", return_value=fake_output)
 
         returned_value = self.inferrer.run(self.model_cfg, "", self.data_cfg)
         mock_infer.assert_called_once()
-        assert returned_value == {"outputs" : fake_output}
+        assert returned_value == {"outputs": fake_output}
 
     @e2e_pytest_unit
     def test_seg_inferrer_infer(self, mocker):
@@ -36,11 +36,12 @@ class TestOTXSegTrainer:
 
         returned_value = self.inferrer.infer(cfg)
         mock_infer_callback.assert_called_once()
-        
+
         assert "classes" in returned_value
         assert "eval_predictions" in returned_value
         assert "feature_vectors" in returned_value
-        assert len(returned_value["eval_predictions"]) > 0        
+        assert len(returned_value["eval_predictions"]) > 0
+
 
 @e2e_pytest_unit
 def test_seg_replace_ImageToTensor():
@@ -56,10 +57,10 @@ def test_seg_replace_ImageToTensor():
         dict(type="ImageToTensor", keys=["img"]),
     ]
     returned_value = replace_ImageToTensor(test_pipeline)
-    
+
     for pipeline in returned_value:
         if "transforms" in pipeline:
-            values = [ p['type'] for p in pipeline["transforms"] ]
-        else:    
-            values = [ pipeline['type'] ]
+            values = [p["type"] for p in pipeline["transforms"]]
+        else:
+            values = [pipeline["type"]]
         assert "ImageToTensor" not in values

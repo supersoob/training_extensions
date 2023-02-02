@@ -38,5 +38,3 @@ class TestOTXSegTrainer:
 
         self.trainer.run(self.model_cfg, "", self.data_cfg)
         mock_train_segmentor.assert_called_once()
-
-
