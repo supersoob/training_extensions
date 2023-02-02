@@ -7,13 +7,9 @@ import pytest
 
 from otx.algorithms.common.tasks import BaseTask
 from otx.algorithms.segmentation.tasks import SegmentationTrainTask
-from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
 
-from otx.api.entities.datasets import DatasetEntity
-from otx.api.entities.label_schema import LabelSchemaEntity
 from otx.api.entities.metrics import NullPerformance
-from otx.api.entities.model import ModelConfiguration, ModelEntity
 from otx.api.entities.model_template import parse_model_template
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
 from tests.unit.algorithms.segmentation.prep import DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset, create_model
@@ -39,7 +35,7 @@ class TestOTXSegTaskTrain:
     @e2e_pytest_unit
     def test_train(self, mocker):
         from otx.algorithms.common.adapters.mmcv.hooks import OTXLoggerHook
-        self.dataset = generate_otx_dataset(5)
+        self.dataset = generate_otx_dataset()
 
         mock_lcurve_val = OTXLoggerHook.Curve()
         mock_lcurve_val.x = [0,1]

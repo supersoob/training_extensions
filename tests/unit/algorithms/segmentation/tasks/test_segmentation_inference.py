@@ -11,20 +11,14 @@ from otx.algorithms.common.tasks import BaseTask
 from otx.api.utils.shape_factory import ShapeFactory
 
 from otx.algorithms.segmentation.tasks import SegmentationInferenceTask
-from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
-from otx.api.entities.annotation import (
-    Annotation,
-)
+from otx.api.entities.annotation import Annotation
 
-from otx.api.usecases.evaluation.dice import DiceAverage
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.scored_label import ScoredLabel
 from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
 from otx.api.entities.metrics import Performance, ScoreMetric
 from otx.api.entities.label import LabelEntity
-from otx.api.entities.label_schema import LabelSchemaEntity
-from otx.api.entities.model import ModelConfiguration, ModelEntity
 from otx.api.entities.model_template import parse_model_template
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.shapes.polygon import Point, Polygon
@@ -85,7 +79,7 @@ class TestOTXSegTaskInference:
             mock_run_task.assert_called_once()
     
     @e2e_pytest_unit
-    def test_export_with_xml_file(self, mocker):
+    def test_export_with_model_files(self, mocker):
         with open(f"{self.output_path}/model.xml", "wb") as f:
             f.write(b"foo")
         with open(f"{self.output_path}/model.bin", "wb") as f:

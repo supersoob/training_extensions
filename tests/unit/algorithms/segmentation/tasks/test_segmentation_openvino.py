@@ -7,28 +7,23 @@ import os
 import numpy as np
 import pytest
 
-from otx.algorithms.common.tasks import BaseTask
 from otx.api.utils.shape_factory import ShapeFactory
 
+import otx.algorithms.segmentation.tasks.openvino
 from otx.algorithms.segmentation.tasks.openvino import OpenVINOSegmentationTask, OpenVINOSegmentationInferencer
-from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
 from otx.api.entities.annotation import (
     Annotation,
 )
 
-from otx.api.usecases.evaluation.dice import DiceAverage
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.scored_label import ScoredLabel
 from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
 from otx.api.entities.metrics import Performance, ScoreMetric
 from otx.api.entities.label import LabelEntity
-from otx.api.entities.label_schema import LabelSchemaEntity
-from otx.api.entities.model import ModelConfiguration, ModelEntity
 from otx.api.entities.model_template import parse_model_template
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.shapes.polygon import Point, Polygon
-from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
 from tests.unit.algorithms.segmentation.prep import create_model, DEFAULT_SEG_TEMPLATE_DIR, init_environment, generate_otx_dataset, generate_otx_label_schema
 from openvino.model_zoo.model_api.models import Model
@@ -38,12 +33,8 @@ from otx.api.entities.annotation import (
     AnnotationSceneKind,
 )
 from otx.algorithms.segmentation.configs.base import SegmentationConfig
-import io
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
 
-from tempfile import TemporaryDirectory
-from pathlib import Path
-from otx.api.configuration import otx_config_helper
 
 class TestOpenVINOSegmentationInferencer:
     @pytest.fixture(autouse=True)
@@ -142,8 +133,8 @@ class TestOpenVINOSegmentationTask:
     def test_deploy(self):
         output_model = create_model()
         self.seg_ov_task.model = create_model()
-        self.seg_ov_task.model.set_data("openvino.bin", io.BytesIO(b"foo").getvalue())
-        self.seg_ov_task.model.set_data("openvino.xml", io.BytesIO(b"bar").getvalue())
+        self.seg_ov_task.model.set_data("openvino.bin", b"foo")
+        self.seg_ov_task.model.set_data("openvino.xml", b"bar")
         self.seg_ov_task.deploy(output_model)
         
         assert output_model.exportable_code is not None
@@ -159,13 +150,14 @@ class TestOpenVINOSegmentationTask:
         dataset = generate_otx_dataset()
         output_model = create_model()
         self.seg_ov_task.model = create_model()
-        self.seg_ov_task.model.set_data("openvino.bin", io.BytesIO(b"foo").getvalue())
-        self.seg_ov_task.model.set_data("openvino.xml", io.BytesIO(b"bar").getvalue())
+        self.seg_ov_task.model.set_data("openvino.bin", b"foo")
+        self.seg_ov_task.model.set_data("openvino.xml", b"bar")
         mocker.patch("otx.algorithms.segmentation.tasks.openvino.load_model", autospec=True)
         mocker.patch("otx.algorithms.segmentation.tasks.openvino.create_pipeline", autospec=True)
-        mock_save_model = mocker.patch("otx.algorithms.segmentation.tasks.openvino.save_model", new=patch_save_model)
-        
+        mocker.patch("otx.algorithms.segmentation.tasks.openvino.save_model", new=patch_save_model)
+        spy_compress = mocker.spy(otx.algorithms.segmentation.tasks.openvino, "compress_model_weights")
         self.seg_ov_task.optimize(OptimizationType.POT, dataset=dataset, output_model=output_model)
         
-        
-        mock_save_model.assert_called_once()
+        spy_compress.assert_called_once()
+        assert self.seg_ov_task.model.get_data("openvino.bin")
+        assert self.seg_ov_task.model.get_data("openvino.xml")
