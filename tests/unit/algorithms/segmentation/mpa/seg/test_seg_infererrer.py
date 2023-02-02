@@ -5,21 +5,22 @@ import pytest
 from otx.mpa.seg.inferrer import SegInferrer, replace_ImageToTensor
 from otx.mpa.utils.config_utils import MPAConfig
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
-
-DEFAULT_SEG_TEMPLATE_DIR = os.path.join("otx/algorithms/segmentation/configs", "ocr_lite_hrnet_18_mod2")
-DEFAULT_CONFIG_PATH = "./otx/recipes/stages/segmentation/incremental.py"
+from tests.unit.algorithms.segmentation.prep import (
+    DEFAULT_RECIPE_CONFIG_PATH,
+    DEFAULT_SEG_TEMPLATE_DIR,
+)
 
 
 class TestOTXSegTrainer:
     @pytest.fixture(autouse=True)
     def setup(self) -> None:
-        cfg = MPAConfig.fromfile(DEFAULT_CONFIG_PATH)
+        cfg = MPAConfig.fromfile(DEFAULT_RECIPE_CONFIG_PATH)
         self.inferrer = SegInferrer(name="", mode="train", config=cfg, common_cfg=None, index=0)
         self.model_cfg = MPAConfig.fromfile(os.path.join(DEFAULT_SEG_TEMPLATE_DIR, "model.py"))
         self.data_cfg = MPAConfig.fromfile(os.path.join(DEFAULT_SEG_TEMPLATE_DIR, "data_pipeline.py"))
 
     @e2e_pytest_unit
-    def test_seg_inferrer_run(self, mocker):
+    def test_run(self, mocker):
         fake_output = {"classes": [1, 2], "eval_predictions": None, "feature_vectors": None}
         mock_infer = mocker.patch.object(SegInferrer, "infer", return_value=fake_output)
 
@@ -28,7 +29,7 @@ class TestOTXSegTrainer:
         assert returned_value == {"outputs": fake_output}
 
     @e2e_pytest_unit
-    def test_seg_inferrer_infer(self, mocker):
+    def test_infer(self, mocker):
         cfg = self.inferrer.configure(self.model_cfg, "", self.data_cfg, training=False)
         mocker.patch.object(SegInferrer, "configure_samples_per_gpu")
         mocker.patch.object(SegInferrer, "configure_compat_cfg")
@@ -44,7 +45,7 @@ class TestOTXSegTrainer:
 
 
 @e2e_pytest_unit
-def test_seg_replace_ImageToTensor():
+def test_replace_ImageToTensor():
     test_pipeline = [
         dict(type="LoadImageFromFile"),
         dict(
