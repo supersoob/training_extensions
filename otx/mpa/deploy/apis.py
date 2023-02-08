@@ -153,25 +153,25 @@ class NaiveExporter:
 
 if is_mmdeploy_enabled():
     import mmdeploy.apis.openvino as openvino_api
-    from mmdeploy.apis import build_task_processor, torch2onnx
+    from mmdeploy.apis import build_task_processor, torch2onnx, extract_model, get_predefined_partition_cfg
     from mmdeploy.apis.openvino import get_input_info_from_cfg, get_mo_options_from_cfg
     from mmdeploy.core import FUNCTION_REWRITER
-    from mmdeploy.utils import get_ir_config
+    from mmdeploy.utils import get_ir_config, get_partition_config
 
-    @FUNCTION_REWRITER.register_rewriter(
-        "mmdeploy.core.optimizers.function_marker.mark_tensors",
-        backend="openvino",
-    )
-    def remove_mark__openvino(ctx, xs: Any, *args, **kwargs):
-        """Disable all marks for openvino backend
+    # @FUNCTION_REWRITER.register_rewriter(
+    #     "mmdeploy.core.optimizers.function_marker.mark_tensors",
+    #     backend="openvino",
+    # )
+    # def remove_mark__openvino(ctx, xs: Any, *args, **kwargs):
+    #     """Disable all marks for openvino backend
 
-        As the Node `mark` is not able to be traced, we just return original input
-        for the function `mark_tensors`.
+    #     As the Node `mark` is not able to be traced, we just return original input
+    #     for the function `mark_tensors`.
 
-        Args:
-            xs (Any): Input structure which contains tensor.
-        """
-        return xs
+    #     Args:
+    #         xs (Any): Input structure which contains tensor.
+    #     """
+    #     return xs
 
     class MMdeployExporter:
         @staticmethod
@@ -239,6 +239,33 @@ if is_mmdeploy_enabled():
                 model_checkpoint=cfg.load_from,
                 device="cpu",
             )
+
+            # partition model
+            partition_cfgs = get_partition_config(deploy_cfg)
+
+            if partition_cfgs is not None:
+                if 'partition_cfg' in partition_cfgs:
+                    partition_cfgs = partition_cfgs.get('partition_cfg', None)
+                else:
+                    assert 'type' in partition_cfgs
+                    partition_cfgs = get_predefined_partition_cfg(
+                        deploy_cfg, partition_cfgs['type'])
+
+                origin_ir_file = os.path.join(output_dir, onnx_file_name)
+                for partition_cfg in partition_cfgs:
+                    save_file = partition_cfg['save_file']
+                    save_path = os.path.join(output_dir, save_file)
+                    start = partition_cfg['start']
+                    end = partition_cfg['end']
+                    dynamic_axes = partition_cfg.get('dynamic_axes', None)
+
+                    extract_model(
+                        origin_ir_file,
+                        start,
+                        end,
+                        dynamic_axes=dynamic_axes,
+                        save_file=save_path)
+
             return os.path.join(output_dir, onnx_file_name)
 
         @staticmethod

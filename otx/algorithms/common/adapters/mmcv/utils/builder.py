@@ -79,7 +79,7 @@ def build_dataloader(
         config.data.pop(f"{subset}_dataloader", {}) if consume else config.data.get(f"{subset}_dataloader", {})
     )
     loader_cfg = {**loader_cfg, **specific_loader_cfg, **kwargs}
-
+    loader_cfg['samples_per_gpu'] = 1
     dataloader = dataloader_builder(
         dataset,
         **loader_cfg,

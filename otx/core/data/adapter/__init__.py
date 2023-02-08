@@ -65,6 +65,7 @@ ADAPTERS = {
 
 def get_dataset_adapter(
     task_type: TaskType,
+    data_root: str = None,
     train_data_roots: str = None,
     val_data_roots: str = None,
     test_data_roots: str = None,
@@ -86,6 +87,7 @@ def get_dataset_adapter(
 
     return getattr(module, ADAPTERS[task_type]["class"])(
         task_type=task_type,
+        data_root=data_root,
         train_data_roots=train_data_roots,
         val_data_roots=val_data_roots,
         test_data_roots=test_data_roots,

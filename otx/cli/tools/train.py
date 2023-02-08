@@ -165,15 +165,11 @@ def main():  # pylint: disable=too-many-branches
     data_config = configure_dataset(args)
 
     data_roots = dict(
-        train_subset={
-            "data_root": data_config["data"]["train"]["data-roots"],
-        },
+        data_root=data_config["data"]["data-roots"],
+        train_subset=data_config["data"]["train"],
     )
-    if data_config["data"]["val"]["data-roots"]:
-        data_roots["val_subset"] = {
-            "ann_file": data_config["data"]["val"]["ann-files"],
-            "data_root": data_config["data"]["val"]["data-roots"],
-        }
+    if data_config["data"]["val"]:
+        data_roots["val_subset"] = data_config["data"]["val"]
     if "unlabeled" in data_config["data"] and data_config["data"]["unlabeled"]["data-roots"]:
         data_roots["unlabeled_subset"] = {
             "data_root": data_config["data"]["unlabeled"]["data-roots"],
@@ -183,8 +179,9 @@ def main():  # pylint: disable=too-many-branches
     # Datumaro
     dataset_adapter = get_dataset_adapter(
         template.task_type,
-        train_data_roots=data_roots["train_subset"]["data_root"],
-        val_data_roots=data_roots["val_subset"]["data_root"] if data_config["data"]["val"]["data-roots"] else None,
+        data_root=data_roots["data_root"],
+        train_data_roots=data_roots["train_subset"],
+        val_data_roots=data_roots["val_subset"] if data_config["data"]["val"] else None,
         unlabeled_data_roots=data_roots["unlabeled_subset"]["data_root"]
         if "unlabeled" in data_config["data"] and data_config["data"]["unlabeled"]["data-roots"]
         else None,
@@ -243,7 +240,7 @@ def main():  # pylint: disable=too-many-branches
         args.save_model_to = "./models"
     save_model_data(output_model, args.save_model_to)
 
-    if data_config["data"]["val"]["data-roots"]:
+    if data_config["data"]["val"]:
         validation_dataset = dataset.get_subset(Subset.VALIDATION)
         predicted_validation_dataset = task.infer(
             validation_dataset.with_empty_annotations(),

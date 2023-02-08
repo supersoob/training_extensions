@@ -57,6 +57,7 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
     def __init__(
         self,
         task_type: TaskType,
+        data_root: Optional[str] = None,
         train_data_roots: Optional[str] = None,
         val_data_roots: Optional[str] = None,
         test_data_roots: Optional[str] = None,
@@ -68,6 +69,7 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
         self.is_train_phase: bool
 
         self.dataset = self._import_dataset(
+            data_root=data_root,
             train_data_roots=train_data_roots,
             val_data_roots=val_data_roots,
             test_data_roots=test_data_roots,
@@ -81,6 +83,7 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
 
     def _import_dataset(
         self,
+        data_root: Optional[str] = None,
         train_data_roots: Optional[str] = None,
         val_data_roots: Optional[str] = None,
         test_data_roots: Optional[str] = None,
@@ -101,36 +104,26 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
         if train_data_roots is None and test_data_roots is None:
             raise ValueError("At least 1 data_root is needed to train/test.")
 
+        # Find self.data_type and task_type
+        data_type_candidates = self._detect_dataset_format(path=data_root)
+        self.data_type = self._select_data_type(data_type_candidates)
+
         # Construct dataset for training, validation, testing, unlabeled
         if train_data_roots:
-            # Find self.data_type and task_type
-            data_type_candidates = self._detect_dataset_format(path=train_data_roots)
-            self.data_type = self._select_data_type(data_type_candidates)
-
-            datumaro_dataset = DatumaroDataset.import_from(train_data_roots, format=self.data_type)
-
             # Prepare subsets by using Datumaro dataset
-            for k, v in datumaro_dataset.subsets().items():
-                if "train" in k or "default" in k:
-                    dataset[Subset.TRAINING] = v
-                elif "val" in k:
-                    dataset[Subset.VALIDATION] = v
+            dataset[Subset.TRAINING] = DatumaroDataset.import_from(
+                train_data_roots, format=self.data_type, subset="train")
+            dataset[Subset.VALIDATION] = DatumaroDataset.import_from(
+                val_data_roots, format=self.data_type, subset="val")
             self.is_train_phase = True
-
-            # If validation is manually defined --> set the validation data according to user's input
-            if val_data_roots:
-                val_data_candidates = self._detect_dataset_format(path=val_data_roots)
-                val_data_type = self._select_data_type(val_data_candidates)
-                dataset[Subset.VALIDATION] = DatumaroDataset.import_from(val_data_roots, format=val_data_type)
 
             if Subset.VALIDATION not in dataset:
                 # TODO: auto_split
                 pass
 
         if test_data_roots:
-            test_data_candidates = self._detect_dataset_format(path=test_data_roots)
-            test_data_type = self._select_data_type(test_data_candidates)
-            dataset[Subset.TESTING] = DatumaroDataset.import_from(test_data_roots, format=test_data_type)
+            dataset[Subset.TESTING] = DatumaroDataset.import_from(
+                test_data_roots, format=self.data_type, subset="test")
             self.is_train_phase = False
 
         if unlabeled_data_roots is not None:

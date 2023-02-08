@@ -120,12 +120,11 @@ def main():
     data_config = configure_dataset(args)
 
     data_roots = dict(
-        test_subset={
-            "data_root": data_config["data"]["test"]["data-roots"],
-        }
+        data_root=data_config["data"]["data-roots"],
+        test_subset=data_config["data"]["test"]
     )
 
-    dataset_adapter = get_dataset_adapter(template.task_type, test_data_roots=data_roots["test_subset"]["data_root"])
+    dataset_adapter = get_dataset_adapter(template.task_type, data_root=data_roots["data_root"], test_data_roots=data_roots["test_subset"])
 
     dataset = dataset_adapter.get_otx_dataset()
     label_schema = dataset_adapter.get_label_schema()
