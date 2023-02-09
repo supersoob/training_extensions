@@ -189,11 +189,40 @@ class CustomMaskRCNN(SAMDetectorMixin, L2SPDetectorMixin, MaskRCNN):
 
 if is_mmdeploy_enabled():
     from mmdeploy.core import FUNCTION_REWRITER, mark
+    from mmdeploy.utils import is_dynamic_shape
 
     from otx.mpa.modules.hooks.recording_forward_hooks import (
         ActivationMapHook,
         FeatureVectorHook,
     )
+
+    @mark("custom_maskrcnn_forward", inputs=["input"], outputs=["dets", "labels", "masks", "feats", "saliencies"])
+    def __forward_impl(ctx, self, img, img_metas, **kwargs):
+        assert isinstance(img, torch.Tensor)
+
+        deploy_cfg = ctx.cfg
+        is_dynamic_flag = is_dynamic_shape(deploy_cfg)
+        # get origin input shape as tensor to support onnx dynamic shape
+        img_shape = torch._shape_as_tensor(img)[2:]
+        if not is_dynamic_flag:
+            img_shape = [int(val) for val in img_shape]
+        img_metas[0]["img_shape"] = img_shape
+        return self.simple_test(img, img_metas, **kwargs)
+
+    @FUNCTION_REWRITER.register_rewriter(
+        "otx.mpa.modules.models.detectors.custom_maskrcnn_detector.CustomMaskRCNN.forward"
+    )
+    def custom_maskrcnn__forward(ctx, self, img, img_metas=None, return_loss=False, **kwargs):
+        if img_metas is None:
+            img_metas = [{}]
+        else:
+            assert len(img_metas) == 1, "do not support aug_test"
+            img_metas = img_metas[0]
+
+        if isinstance(img, list):
+            img = img[0]
+
+        return __forward_impl(ctx, self, img, img_metas=img_metas, **kwargs)
 
     @FUNCTION_REWRITER.register_rewriter(
         "otx.mpa.modules.models.detectors.custom_maskrcnn_detector.CustomMaskRCNN.simple_test"
@@ -201,13 +230,10 @@ if is_mmdeploy_enabled():
     def custom_mask_rcnn__simple_test(ctx, self, img, img_metas, proposals=None, **kwargs):
         assert self.with_bbox, "Bbox head must be implemented."
 
-        prob = self.tile_classifier.simple_test(img)
+        # @mark('tile_classifier', inputs=['prob'])
+        # def t(prob):
+        #     return prob
 
-        @mark('tile_classifier', inputs=['prob'])
-        def t(prob):
-            return prob
-
-        t(prob)
         x = self.extract_feat(img)
         feature_vector = FeatureVectorHook.func(x)
         saliency_map = ActivationMapHook.func(x[-1])
