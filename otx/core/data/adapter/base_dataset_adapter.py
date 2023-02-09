@@ -58,21 +58,22 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
         self,
         task_type: TaskType,
         data_root: Optional[str] = None,
-        train_data_roots: Optional[str] = None,
-        val_data_roots: Optional[str] = None,
-        test_data_roots: Optional[str] = None,
+        train_ann_file: Optional[str] = None,
+        val_ann_file: Optional[str] = None,
+        test_ann_file: Optional[str] = None,
         unlabeled_data_roots: Optional[str] = None,
+        is_train_phase: Optional[bool] = False,
     ):
         self.task_type = task_type
         self.domain = task_type.domain
         self.data_type: str
-        self.is_train_phase: bool
+        self.is_train_phase: bool = is_train_phase
 
         self.dataset = self._import_dataset(
             data_root=data_root,
-            train_data_roots=train_data_roots,
-            val_data_roots=val_data_roots,
-            test_data_roots=test_data_roots,
+            train_ann_file=train_ann_file,
+            val_ann_file=val_ann_file,
+            test_ann_file=test_ann_file,
             unlabeled_data_roots=unlabeled_data_roots,
         )
 
@@ -84,9 +85,9 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
     def _import_dataset(
         self,
         data_root: Optional[str] = None,
-        train_data_roots: Optional[str] = None,
-        val_data_roots: Optional[str] = None,
-        test_data_roots: Optional[str] = None,
+        train_ann_file: Optional[str] = None,
+        val_ann_file: Optional[str] = None,
+        test_ann_file: Optional[str] = None,
         unlabeled_data_roots: Optional[str] = None,
     ) -> Dict[Subset, DatumaroDataset]:
         """Import dataset by using Datumaro.import_from() method.
@@ -101,30 +102,37 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
             DatumaroDataset: Datumaro Dataset
         """
         dataset = {}
-        if train_data_roots is None and test_data_roots is None:
-            raise ValueError("At least 1 data_root is needed to train/test.")
+        if data_root is None:
+            if train_ann_file is None and test_ann_file is None:
+                raise ValueError("At least 1 data_root is needed to train/test.")
 
         # Find self.data_type and task_type
         data_type_candidates = self._detect_dataset_format(path=data_root)
         self.data_type = self._select_data_type(data_type_candidates)
 
         # Construct dataset for training, validation, testing, unlabeled
-        if train_data_roots:
+        if data_root:
+            datumaro_dataset = DatumaroDataset.import_from(data_root, format=self.data_type)
+            dataset[Subset.TRAINING] = datumaro_dataset.get_subset("train")
+            dataset[Subset.VALIDATION] = datumaro_dataset.get_subset("val")
+            dataset[Subset.TESTING] = datumaro_dataset.get_subset("test")
+
+        elif train_ann_file:
             # Prepare subsets by using Datumaro dataset
             dataset[Subset.TRAINING] = DatumaroDataset.import_from(
-                train_data_roots, format=self.data_type, subset="train")
-            dataset[Subset.VALIDATION] = DatumaroDataset.import_from(
-                val_data_roots, format=self.data_type, subset="val")
-            self.is_train_phase = True
+                train_ann_file, format=self.data_type, subset="train")
+
+            if val_ann_file:
+                dataset[Subset.VALIDATION] = DatumaroDataset.import_from(
+                    val_ann_file, format=self.data_type, subset="val")
 
             if Subset.VALIDATION not in dataset:
                 # TODO: auto_split
                 pass
 
-        if test_data_roots:
+        if test_ann_file:
             dataset[Subset.TESTING] = DatumaroDataset.import_from(
-                test_data_roots, format=self.data_type, subset="test")
-            self.is_train_phase = False
+                test_ann_file, format=self.data_type, subset="test")
 
         if unlabeled_data_roots is not None:
             dataset[Subset.UNLABELED] = DatumaroDataset.import_from(unlabeled_data_roots, format="image_dir")

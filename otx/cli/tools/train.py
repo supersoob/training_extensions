@@ -69,12 +69,17 @@ def parse_args():
     required = not os.path.exists(parsed.data)
 
     parser.add_argument(
-        "--train-data-roots",
+        "--data-root",
+        required=required,
+        help="Path to data folder."
+    )
+    parser.add_argument(
+        "--train-ann-file",
         required=required,
         help="Comma-separated paths to training data folders.",
     )
     parser.add_argument(
-        "--val-data-roots",
+        "--val-ann-file",
         required=False,
         help="Comma-separated paths to validation data folders.",
     )
@@ -164,27 +169,17 @@ def main():  # pylint: disable=too-many-branches
     task_class = get_impl_class(template.entrypoints.base)
     data_config = configure_dataset(args)
 
-    data_roots = dict(
-        data_root=data_config["data"]["data-roots"],
-        train_subset=data_config["data"]["train"],
-    )
-    if data_config["data"]["val"]:
-        data_roots["val_subset"] = data_config["data"]["val"]
-    if "unlabeled" in data_config["data"] and data_config["data"]["unlabeled"]["data-roots"]:
-        data_roots["unlabeled_subset"] = {
-            "data_root": data_config["data"]["unlabeled"]["data-roots"],
-            "file_list": data_config["data"]["unlabeled"]["file-list"],
-        }
-
     # Datumaro
     dataset_adapter = get_dataset_adapter(
         template.task_type,
-        data_root=data_roots["data_root"],
-        train_data_roots=data_roots["train_subset"],
-        val_data_roots=data_roots["val_subset"] if data_config["data"]["val"] else None,
-        unlabeled_data_roots=data_roots["unlabeled_subset"]["data_root"]
-        if "unlabeled" in data_config["data"] and data_config["data"]["unlabeled"]["data-roots"]
+        data_root=data_config["data-root"],
+        train_ann_file=data_config["train"],
+        val_ann_file=data_config["val"],
+        test_ann_file=data_config["test"],
+        unlabeled_data_roots=data_config["unlabeled_subset"]["data_root"]
+        if "unlabeled" in data_config and data_config["unlabeled"]["data-roots"]
         else None,
+        is_train_phase=True,
     )
     dataset = dataset_adapter.get_otx_dataset()
     label_schema = dataset_adapter.get_label_schema()
@@ -240,7 +235,7 @@ def main():  # pylint: disable=too-many-branches
         args.save_model_to = "./models"
     save_model_data(output_model, args.save_model_to)
 
-    if data_config["data"]["val"]:
+    if data_config["val"]:
         validation_dataset = dataset.get_subset(Subset.VALIDATION)
         predicted_validation_dataset = task.infer(
             validation_dataset.with_empty_annotations(),
