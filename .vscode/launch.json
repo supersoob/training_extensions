@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Train",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/otx/cli/tools/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                // "Custom_Object_Detection_Gen3_ATSS", 
+                // "--data-root", "/home/yuchunli/_DATASET/Aerial_Maritime/large",
+                // "params",
+                // "--learning_parameters.num_iters", 
+                // "4",
+                // "--learning_parameters.batch_size", 
+                // "4", 
+                
+                "Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50",
+                "--data", "data.yaml",
+                "--save-model-to", "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50",
+                "params",
+                "--learning_parameters.num_iters", 
+                "2",
+                "--learning_parameters.batch_size", 
+                "4", 
+                "--tiling_parameters.enable_tiling",
+                "1"
+            ]
+        },
+        {
+            "name": "Eval",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/otx/cli/tools/eval.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50",
+                "--data", "data.yaml",
+                // "--data-root", "/home/yuchunli/_DATASET/Vitens-Coliform-coco",
+                "--load-weights",  "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/weights.pth"
+            ]
+        },
+        {
+            "name": "Eval - OpenVINO",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/otx/cli/tools/eval.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50",
+                "--test-data-roots", "/home/yuchunli/_DATASET/Vitens-Coliform-coco",
+                "--load-weights", "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/exported/openvino.bin",
+            ]
+        },
+        {
+            "name": "Export",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/otx/cli/tools/export.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "otx/algorithms/detection/configs/instance_segmentation/resnet50_maskrcnn/template.yaml",
+                "--load-weights",  "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/weights.pth",
+                "--save-model-to", "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/exported"
+            ]
+        },
+    ]
+}
