@@ -120,7 +120,7 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         else:
             task_type = self.task_type
             if not task_type and not model:
-                task_type = self.auto_task_detection(self.args.train_data_roots)
+                task_type = self.auto_task_detection(self.args.data_root)
             self.template = self._get_template(task_type, model=model)
         self.task_type = self.template.task_type
         self.model = self.template.name

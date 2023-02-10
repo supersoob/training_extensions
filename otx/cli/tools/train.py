@@ -45,17 +45,14 @@ def get_args():
 
     parser.add_argument(
         "--data-root",
-        required=required,
         help="Path to data folder."
     )
     parser.add_argument(
         "--train-ann-file",
-        required=required,
         help="Comma-separated paths to training data folders.",
     )
     parser.add_argument(
         "--val-ann-file",
-        required=False,
         help="Comma-separated paths to validation data folders.",
     )
     parser.add_argument(
