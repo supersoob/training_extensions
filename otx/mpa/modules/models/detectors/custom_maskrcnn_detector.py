@@ -5,7 +5,6 @@
 import functools
 
 import torch
-
 from mmdet.models.builder import DETECTORS
 from mmdet.models.detectors.mask_rcnn import MaskRCNN
 

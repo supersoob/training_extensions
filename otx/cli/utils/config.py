@@ -36,7 +36,7 @@ def override_parameters(overrides, parameters):
                 raise ValueError(f'The "{k}" is not in allowed_keys: {allowed_keys}')
 
 
-def configure_dataset(args):
+def configure_dataset(args, data_yaml_path=None):
     """Configure dataset args."""
 
     # Create instances of Task, ConfigurableParameters and Dataset.
