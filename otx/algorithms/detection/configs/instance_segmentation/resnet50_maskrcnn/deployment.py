@@ -3,7 +3,7 @@
 _base_ = ["../../base/deployments/base_instance_segmentation_dynamic.py"]
 
 ir_config = dict(
-    output_names=["boxes", "labels", "masks", "feature_vector", "saliency_map"],
+    output_names=["boxes", "labels", "masks", "feature_vector", "saliency_map", "tile_prob"],
 )
 
 backend_config = dict(
@@ -11,12 +11,12 @@ backend_config = dict(
     model_inputs=[dict(opt_shapes=dict(input=[1, 3, 800, 1344]))],
 )
 
-partition_config = dict(
-    type='tile_classifier',
-    apply_marks=True,
-    partition_cfg=[
-        dict(
-            save_file='classifier.onnx',
-            start=['custom_maskrcnn_forward:input'],
-            end=['custom_maskrcnn_forward:output'],
-            output_names=["boxes", "labels", "masks", "feature_vector", "saliency_map"])])
+# partition_config = dict(
+#     type='tile_classifier',
+#     apply_marks=True,
+#     partition_cfg=[
+#         dict(
+#             save_file='classifier.onnx',
+#             start=['custom_maskrcnn_forward:input'],
+#             end=['tile_classifier:output'],
+#             output_names=["prob"])])

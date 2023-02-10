@@ -196,7 +196,36 @@ if is_mmdeploy_enabled():
         FeatureVectorHook,
     )
 
-    @mark("custom_maskrcnn_forward", inputs=["input"], outputs=["dets", "labels", "masks", "feats", "saliencies"])
+    @mark("tile_classifier", inputs=["img"], outputs=["prob"])
+    def tile_classifier__simple_test_impl(ctx, self, img):
+        """ Tile Classifier Simple Test Impl with added mmdeploy marking for model partitioning
+
+        Args:
+            ctx (_type_): _description_
+            img (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        return self.sigmoid(self.forward(img))[0][0]
+
+    @FUNCTION_REWRITER.register_rewriter(
+        "otx.mpa.modules.models.detectors.custom_maskrcnn_detector.TileClassifier.simple_test"
+    )
+    def tile_classifier__simple_test(ctx, self, img, **kwargs):
+        """ Tile Classifier Simple Test Rewriter
+
+        Args:
+            ctx (_type_): 
+            img (_type_): 
+
+        Returns:
+            _type_: _description_
+        """
+        return tile_classifier__simple_test_impl(ctx, self, img)
+
+
+    @mark("custom_maskrcnn_forward", inputs=["input"], outputs=["dets", "labels", "masks", "feats", "saliencies", "tile_prob"])
     def __forward_impl(ctx, self, img, img_metas, **kwargs):
         assert isinstance(img, torch.Tensor)
 
@@ -229,10 +258,7 @@ if is_mmdeploy_enabled():
     )
     def custom_mask_rcnn__simple_test(ctx, self, img, img_metas, proposals=None, **kwargs):
         assert self.with_bbox, "Bbox head must be implemented."
-
-        # @mark('tile_classifier', inputs=['prob'])
-        # def t(prob):
-        #     return prob
+        tile_prob = self.tile_classifier.simple_test(img)
 
         x = self.extract_feat(img)
         feature_vector = FeatureVectorHook.func(x)
@@ -240,4 +266,5 @@ if is_mmdeploy_enabled():
         if proposals is None:
             proposals, _ = self.rpn_head.simple_test_rpn(x, img_metas)
         out = self.roi_head.simple_test(x, proposals, img_metas, rescale=False)
-        return (*out, feature_vector, saliency_map)
+        # NOTE: tile_prob should not returned but it is required for model tracing
+        return (*out, feature_vector, saliency_map, tile_prob)
