@@ -93,7 +93,7 @@ def preprocess(
         "ori_shape": (ori_h, ori_w),
         "pad_shape": (height, width),
         "filename": "demo_vid.png",
-        "scale_factor": np.array([width / ori_w, height / ori_h, width / ori_w, height / ori_h]),
+        "scale_factor": torch.Tensor([width / ori_w, height / ori_h, width / ori_w, height / ori_h]),
         "flip": False,
         "show_img": False,
         "flip_direction": None,
@@ -146,9 +146,10 @@ def pytorch2onnx(
             model.add_detector()
             model.patch_pools()
         input_tensor, meta = preprocess(input_shape[2], input_shape[3], input_shape[4])
-        model.forward = partial(model.forward_infer, img_metas=meta)
-        onnx_input = [input_tensor]
-        input_names = ["data"]
+        # model.forward = partial(model.forward_infer, img_metas=meta)
+        model.forward = model.forward_infer
+        onnx_input = (input_tensor, meta[0])
+        input_names = ["data", "meta"]
         output_names = ["det_bboxes", "det_labels"]
     else:
         if hasattr(model, "forward_dummy"):

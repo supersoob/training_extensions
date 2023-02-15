@@ -98,9 +98,10 @@ class AVAFastRCNN(FastRCNN):
 
     def forward_infer(self, imgs, img_metas):
         """Forward function for inference without pre-proposal."""
-        clip_len = imgs[0].shape[2]
-        img = imgs[0][:, :, int(clip_len / 2), :, :]
-        det_bboxes, det_labels = self.detector.onnx_export(img, img_metas[0])
-        prediction = [det_bboxes[0][det_labels[0] == 0]]
-        prediction = self.forward_test(imgs, img_metas, proposals=[prediction])
-        return prediction
+        clip_len = imgs.shape[2]
+        img = imgs[:, :, int(clip_len / 2), :, :]
+        det_bboxes, det_labels = self.detector.onnx_export(img, img_metas)
+        return det_bboxes, det_labels
+        # prediction = [det_bboxes[0][det_labels[0] == 0]]
+        # prediction = self.forward_test(imgs, img_metas, proposals=[prediction])
+        # return prediction
