@@ -117,7 +117,7 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
             dataset[Subset.VALIDATION] = datumaro_dataset.get_subset("val")
             dataset[Subset.TESTING] = datumaro_dataset.get_subset("test")
 
-        elif train_ann_file:
+        if train_ann_file:
             # Prepare subsets by using Datumaro dataset
             dataset[Subset.TRAINING] = DatumaroDataset.import_from(
                 train_ann_file, format=self.data_type, subset="train")

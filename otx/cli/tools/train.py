@@ -48,6 +48,10 @@ def get_args():
         help="Path to data folder."
     )
     parser.add_argument(
+        "--data",
+        help="Path to yaml."
+    )
+    parser.add_argument(
         "--train-ann-file",
         help="Comma-separated paths to training data folders.",
     )

@@ -1,4 +1,4 @@
-'data-root': '/home/yuchunli/_DATASET/Vitens-Coliform-coco'
-'train': '/home/yuchunli/_DATASET/Vitens-Coliform-coco/annotations/instances_train_shorten_to_10.json'
-'val': '/home/yuchunli/_DATASET/Vitens-Coliform-coco/annotations/instances_val_shorten_to_10.json'
-'test': '/home/yuchunli/_DATASET/Vitens-Coliform-coco/annotations/instances_test_shorten_to_10.json'
+'data-root': '/home/eugene/DATA/Vitens-Coliform-coco'
+'train': '/home/eugene/DATA/Vitens-Coliform-coco/annotations/instances_train_shorten_to_10.json'
+'val': '/home/eugene/DATA/Vitens-Coliform-coco/annotations/instances_val_shorten_to_10.json'
+'test': '/home/eugene/DATA/Vitens-Coliform-coco/annotations/instances_test_shorten_to_10.json'

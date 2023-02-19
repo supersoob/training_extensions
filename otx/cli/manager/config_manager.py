@@ -131,7 +131,7 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         data_yaml_path = self.workspace_root / "data.yaml"
         data_yaml = configure_dataset(self.args, data_yaml_path=data_yaml_path)
         if self.mode in ("train", "build"):
-            use_auto_split = data_yaml["data"]["train"]["data-roots"] and not data_yaml["data"]["val"]["data-roots"]
+            use_auto_split = data_yaml["train"] and not data_yaml["val"]
             # FIXME: Hardcoded for Self-Supervised Learning
             if use_auto_split and str(self.train_type).upper() != "SELFSUPERVISED":
                 splitted_dataset = self.auto_split_data(data_yaml["data"]["train"]["data-roots"], self.task_type)
@@ -275,10 +275,10 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         Returns:
             dict: dataset_config
         """
-        dataset_config = {"task_type": self.task_type}
+        dataset_config = {"task_type": self.task_type, "data_root": self.data_config["data-root"]}
         for subset in subsets:
-            if f"{subset}_subset" in self.data_config and self.data_config[f"{subset}_subset"]["data_root"]:
-                dataset_config.update({f"{subset}_data_roots": self.data_config[f"{subset}_subset"]["data_root"]})
+            if f"{subset}" in self.data_config:
+                dataset_config.update({f"{subset}_ann_file": self.data_config[f"{subset}"]})
         return dataset_config
 
     def update_data_config(self, data_yaml: dict) -> None:
@@ -288,13 +288,15 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         Args:
             data_yaml (dict): data.yaml format
         """
-        if data_yaml["data"]["train"]["data-roots"]:
-            self.data_config["train_subset"] = {"data_root": data_yaml["data"]["train"]["data-roots"]}
-        if data_yaml["data"]["val"]["data-roots"]:
-            self.data_config["val_subset"] = {"data_root": data_yaml["data"]["val"]["data-roots"]}
-        if data_yaml["data"]["test"]["data-roots"]:
-            self.data_config["test_subset"] = {"data_root": data_yaml["data"]["test"]["data-roots"]}
-        if "unlabeled" in data_yaml["data"] and data_yaml["data"]["unlabeled"]["data-roots"]:
+        if data_yaml["data-root"]:
+            self.data_config["data-root"] = data_yaml["data-root"]
+        if data_yaml["train"]:
+            self.data_config["train"] = data_yaml["train"]
+        if data_yaml["val"]:
+            self.data_config["val"] = data_yaml["val"]
+        if data_yaml["test"]:
+            self.data_config["test"] = data_yaml["test"]
+        if "unlabeled" in data_yaml and data_yaml["unlabeled"]["data-roots"]:
             self.data_config["unlabeled_subset"] = {
                 "data_root": data_yaml["data"]["unlabeled"]["data-roots"],
                 "file_list": data_yaml["data"]["unlabeled"]["file-list"],
