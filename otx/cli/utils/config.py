@@ -42,7 +42,7 @@ def configure_dataset(args, data_yaml_path=None):
     # Create instances of Task, ConfigurableParameters and Dataset.
     data_config = {"data-root": None, "train": None, "val": None, "test": None}
     data_config["unlabeled"] = {"file-list": None, "data-roots": None}
-    if args.data is not None and os.path.exists(args.data):
+    if args.data is not None:
         with open(args.data, "r", encoding="UTF-8") as stream:
             data_config = yaml.safe_load(stream)
 

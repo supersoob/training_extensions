@@ -251,15 +251,15 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         """Save the splitted dataset and data.yaml to the workspace."""
         data_yaml = self._create_empty_data_cfg()
         if self.mode == "train":
-            if self.args.train_data_roots:
-                data_yaml["data"]["train"]["data-roots"] = self.args.train_data_roots
-            if self.args.val_data_roots:
-                data_yaml["data"]["val"]["data-roots"] = self.args.val_data_roots
+            if self.args.train_ann_file:
+                data_yaml["train"] = self.args.train_ann_file
+            if self.args.val_ann_file:
+                data_yaml["val"] = self.args.val_ann_file
             if self.args.unlabeled_data_roots:
-                data_yaml["data"]["unlabeled"]["data-roots"] = self.args.unlabeled_data_roots
+                data_yaml["unlabeled"]["data-roots"] = self.args.unlabeled_data_roots
         elif self.mode == "test":
-            if self.args.test_data_roots:
-                data_yaml["data"]["test"]["data-roots"] = self.args.test_data_roots
+            if self.args.test_ann_file:
+                data_yaml["test"] = self.args.test_ann_file
         return data_yaml
 
     def _save_data(

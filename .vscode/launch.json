@@ -22,7 +22,7 @@
                 
                 "otx/algorithms/detection/configs/instance_segmentation/resnet50_maskrcnn/template.yaml",
                 "--data", "data.yaml",
-                "--save-model-to", "otx/demo/vitens-coliform-resnet50",
+                "--save-model-to", "demo/vitens-coliform-resnet50",
                 "params",
                 "--learning_parameters.num_iters", 
                 "1",
@@ -68,7 +68,7 @@
             "justMyCode": false,
             "args": [
                 "otx/algorithms/detection/configs/instance_segmentation/resnet50_maskrcnn/template.yaml",
-                "--load-weights",  "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/weights.pth",
+                "--load-weights",  "otx/demo/vitens-coliform-resnet50/weights",
                 "--save-model-to", "/home/yuchunli/git/otx/demo/vitens-coliform-resnet50/exported"
             ]
         }
