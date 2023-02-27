@@ -3,14 +3,13 @@
 # Copyright (C) 2023 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
-import os
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import mmcv
 from datumaro.components.dataset import Dataset
 from datumaro.components.dataset_base import IDataset
+from omegaconf import OmegaConf
 
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.configuration.helper import create
@@ -20,13 +19,18 @@ from otx.cli.utils.config import configure_dataset, override_parameters
 from otx.cli.utils.importing import get_otx_root_path
 from otx.cli.utils.parser import gen_param_help, gen_params_dict_from_args
 from otx.core.data.manager.dataset_manager import DatasetManager
-from otx.mpa.utils.config_utils import MPAConfig
 
 DEFAULT_MODEL_TEMPLATE_ID = {
     "CLASSIFICATION": "Custom_Image_Classification_EfficinetNet-B0",
     "DETECTION": "Custom_Object_Detection_Gen3_ATSS",
     "INSTANCE_SEGMENTATION": "Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50",
+    "ROTATED_DETECTION": "Custom_Rotated_Detection_via_Instance_Segmentation_MaskRCNN_ResNet50",
     "SEGMENTATION": "Custom_Semantic_Segmentation_Lite-HRNet-18-mod2_OCR",
+    "ACTION_CLASSIFICATION": "Custom_Action_Classificaiton_X3D",
+    "ACTION_DETECTION": "Custom_Action_Detection_X3D_FAST_RCNN",
+    "ANOMALY_CLASSIFICATION": "ote_anomaly_classification_padim",
+    "ANOMALY_DETECTION": "ote_anomaly_detection_padim",
+    "ANOMALY_SEGMENTATION": "ote_anomaly_segmentation_padim",
 }
 
 AUTOSPLIT_SUPPORTED_FORMAT = [
@@ -46,6 +50,7 @@ TASK_TYPE_TO_SUPPORTED_FORMAT = {
     "ANOMALY_DETECTION": ["mvtec"],
     "ANOMALY_SEGMENTATION": ["mvtec"],
     "INSTANCE_SEGMENTATION": ["coco", "voc"],
+    "ROTATED_DETECTION": ["coco", "voc"],
 }
 
 TASK_TYPE_TO_SUB_DIR_NAME = {
@@ -55,11 +60,9 @@ TASK_TYPE_TO_SUB_DIR_NAME = {
 }
 
 
-def set_workspace(task: str, model: str = None, root: str = None, name: str = "otx-workspace"):
+def set_workspace(task: str, root: str = None, name: str = "otx-workspace"):
     """Set workspace path according to arguments."""
     path = f"{root}/{name}-{task}" if root else f"./{name}-{task}"
-    if model:
-        path += f"-{model}"
     return path
 
 
@@ -84,6 +87,7 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         self.otx_root = get_otx_root_path()
         self.workspace_root = Path(workspace_root) if workspace_root else Path(".")
         self.mode = mode
+        self.rebuild: bool = False
 
         self.args = args
         self.template = args.template
@@ -95,18 +99,30 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         self.data_format: str = ""
         self.data_config: Dict[str, dict] = {}
 
+    @property
+    def data_config_file_path(self) -> Path:
+        """The path of the data configuration yaml to use for the task.
+
+        Raises:
+            FileNotFoundError: If data is received as args from otx train and the file does not exist, Error.
+
+        Returns:
+            Path: Path of target data configuration file.
+        """
+        if "data" in self.args and self.args.data:
+            if Path(self.args.data).exists():
+                return Path(self.args.data)
+            raise FileNotFoundError(f"Not found: {self.args.data}")
+        return self.workspace_root / "data.yaml"
+
     def check_workspace(self) -> bool:
         """Check that the class's workspace_root is an actual workspace folder.
 
         Returns:
             bool: true for workspace else false
         """
-        default_workspace_components = {
-            "template_path": self.workspace_root / "template.yaml",
-            "data_path": self.workspace_root / "data.yaml",
-        }
-        has_template_yaml = default_workspace_components["template_path"].exists()
-        has_data_yaml = default_workspace_components["data_path"].exists()
+        has_template_yaml = (self.workspace_root / "template.yaml").exists()
+        has_data_yaml = self.data_config_file_path.exists()
         return has_template_yaml and has_data_yaml
 
     def configure_template(self, model: str = None) -> None:
@@ -114,6 +130,10 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         if self.check_workspace():
             # Workspace -> template O
             self.template = parse_model_template(str(self.workspace_root / "template.yaml"))
+            if self.mode == "build" and self._check_rebuild():
+                self.rebuild = True
+                model = model if model else self.template.name
+                self.template = self._get_template(str(self.task_type), model=model)
         elif self.template and Path(self.template).exists():
             # No workspace -> template O
             self.template = parse_model_template(self.template)
@@ -126,29 +146,55 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         self.model = self.template.name
         self.train_type = self._get_train_type()
 
+    def _check_rebuild(self):
+        """Checking for Rebuild status."""
+        if self.args.task and str(self.template.task_type) != self.args.task.upper():
+            raise NotImplementedError("Task Update is not yet supported.")
+        result = False
+        if self.args.model and self.template.name != self.args.model.upper():
+            print(f"[*] Rebuild model: {self.template.name} -> {self.args.model.upper()}")
+            result = True
+        template_train_type = self._get_train_type(ignore_args=True)
+        if self.args.train_type and template_train_type != self.args.train_type.upper():
+            self.train_type = self.args.train_type.upper()
+            print(f"[*] Rebuild train-type: {template_train_type} -> {self.train_type}")
+            result = True
+        return result
+
     def configure_data_config(self, update_data_yaml: bool = True) -> None:
         """Configure data_config according to the situation and create data.yaml."""
-        data_yaml_path = self.workspace_root / "data.yaml"
+        data_yaml_path = self.data_config_file_path
         data_yaml = configure_dataset(self.args, data_yaml_path=data_yaml_path)
         if self.mode in ("train", "build"):
             use_auto_split = data_yaml["train"] and not data_yaml["val"]
             # FIXME: Hardcoded for Self-Supervised Learning
             if use_auto_split and str(self.train_type).upper() != "SELFSUPERVISED":
-                splitted_dataset = self.auto_split_data(data_yaml["data"]["train"]["data-roots"], self.task_type)
+                splitted_dataset = self.auto_split_data(data_yaml["data"]["train"]["data-roots"], str(self.task_type))
                 default_data_folder_name = "splitted_dataset"
                 data_yaml = self._get_arg_data_yaml()
                 self._save_data(splitted_dataset, default_data_folder_name, data_yaml)
         if update_data_yaml:
             self._export_data_cfg(data_yaml, str(data_yaml_path))
+            print(f"[*] Update data configuration file to: {str(data_yaml_path)}")
         self.update_data_config(data_yaml)
 
-    def _get_train_type(self) -> str:
+    def _get_train_type(self, ignore_args: bool = False) -> str:
         """Check and return the train_type received as input args."""
-        args_hyper_parameters = gen_params_dict_from_args(self.args)
-        algo_backend = args_hyper_parameters.get("algo_backend", False)
+        if not ignore_args:
+            args_hyper_parameters = gen_params_dict_from_args(self.args)
+            arg_algo_backend = args_hyper_parameters.get("algo_backend", False)
+            if arg_algo_backend:
+                train_type = arg_algo_backend.get("train_type", {"value": "INCREMENTAL"})  # type: ignore
+                return train_type.get("value", "INCREMENTAL")
+            if self.mode in ("build") and self.args.train_type:
+                self.train_type = self.args.train_type.upper()
+            if self.train_type in TASK_TYPE_TO_SUB_DIR_NAME:
+                return self.train_type
+
+        algo_backend = self.template.hyper_parameters.parameter_overrides.get("algo_backend", False)
         if algo_backend:
-            train_type = algo_backend.get("train_type", {"value": "INCREMENTAL"})
-            return train_type.get("value", "INCREMENTAL")
+            train_type = algo_backend.get("train_type", {"default_value": "INCREMENTAL"})
+            return train_type.get("default_value", "INCREMENTAL")
         return "INCREMENTAL"
 
     def auto_task_detection(self, data_roots: str) -> str:
@@ -156,7 +202,6 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         if not data_roots:
             raise ValueError("Workspace must already exist or one of {task or model or train-data-roots} must exist.")
         self.data_format = self.dataset_manager.get_data_format(data_roots)
-        print(f"[*] Detected dataset format: {self.data_format}")
         return self._get_task_type_from_data_format(self.data_format)
 
     def _get_task_type_from_data_format(self, data_format: str) -> str:
@@ -210,6 +255,8 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
                 data_yaml["data"]["train"]["data-roots"] = self.args.train_data_roots
             if self.args.val_data_roots:
                 data_yaml["data"]["val"]["data-roots"] = self.args.val_data_roots
+            if self.args.unlabeled_data_roots:
+                data_yaml["data"]["unlabeled"]["data-roots"] = self.args.unlabeled_data_roots
         elif self.mode == "test":
             if self.args.test_data_roots:
                 data_yaml["data"]["test"]["data-roots"] = self.args.test_data_roots
@@ -229,8 +276,8 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
             data_config (dict): dictionary that has information about data path
         """
         for phase, dataset in splitted_dataset.items():
-            dst_dir_path = os.path.join(self.workspace_root, default_data_folder_name, phase)
-            data_config["data"][phase]["data-roots"] = os.path.abspath(dst_dir_path)
+            dst_dir_path = self.workspace_root / default_data_folder_name / phase
+            data_config["data"][phase]["data-roots"] = str(dst_dir_path.absolute())
             # Convert Datumaro class: DatasetFilter(IDataset) --> Dataset
             if isinstance(dataset, Dataset):
                 datum_dataset = dataset
@@ -241,7 +288,12 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
             # Currently, saving all images to the workspace.
             # It might needs quite large disk storage.
             self.dataset_manager.export_dataset(
-                dataset=datum_dataset, output_dir=dst_dir_path, data_format=self.data_format, save_media=True
+                dataset=datum_dataset, output_dir=str(dst_dir_path), data_format=self.data_format, save_media=True
+            )
+
+        if data_config["data"]["unlabeled"]["data-roots"] is not None:
+            data_config["data"]["unlabeled"]["data-roots"] = str(
+                Path(data_config["data"]["unlabeled"]["data-roots"]).absolute()
             )
 
     def _create_empty_data_cfg(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
@@ -255,14 +307,15 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
 
     def _export_data_cfg(self, data_cfg: Dict[str, Dict[str, Dict[str, Any]]], output_path: str) -> None:
         """Export the data configuration file to output_path."""
-        mmcv.dump(data_cfg, output_path)
-        print(f"[*] Saving data configuration file to: {output_path}")
+        Path(output_path).write_text(OmegaConf.to_yaml(data_cfg), encoding="utf-8")
 
-    def get_hyparams_config(self) -> ConfigurableParameters:
+    def get_hyparams_config(self, override_param: Optional[List] = None) -> ConfigurableParameters:
         """Separates the input params received from args and updates them.."""
         hyper_parameters = self.template.hyper_parameters.data
         type_hint = gen_param_help(hyper_parameters)
-        updated_hyper_parameters = gen_params_dict_from_args(self.args, type_hint=type_hint)
+        updated_hyper_parameters = gen_params_dict_from_args(
+            self.args, override_param=override_param, type_hint=type_hint
+        )
         override_parameters(updated_hyper_parameters, hyper_parameters)
         return create(hyper_parameters)
 
@@ -340,11 +393,18 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
 
         # Create OTX-workspace
         # Check whether the workspace is existed or not
+        if self.check_workspace() and not self.rebuild:
+            return
+        if self.rebuild:
+            print(f"[*] \t- Rebuild: model-{self.model} / train type-{self.train_type}")
         if new_workspace_path:
             self.workspace_root = Path(new_workspace_path)
         elif not self.check_workspace():
-            self.workspace_root = Path(set_workspace(task=self.task_type, model=self.model))
+            self.workspace_root = Path(set_workspace(task=self.task_type))
         self.workspace_root.mkdir(exist_ok=True, parents=True)
+        print(f"[*] Workspace Path: {self.workspace_root}")
+        print(f"[*] Load Model Template ID: {self.template.model_template_id}")
+        print(f"[*] Load Model Name: {self.template.name}")
 
         template_dir = Path(self.template.model_template_path).parent
 
@@ -352,7 +412,7 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         task_configuration_path = template_dir / self.template.hyper_parameters.base_path
         shutil.copyfile(task_configuration_path, str(self.workspace_root / "configuration.yaml"))
         # Load Model Template
-        template_config = MPAConfig.fromfile(self.template.model_template_path)
+        template_config = OmegaConf.load(self.template.model_template_path)
         template_config.hyper_parameters.base_path = "./configuration.yaml"
 
         # Configuration of Train Type value
@@ -372,14 +432,11 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
 
         # Update Hparams
         if (model_dir / "hparam.yaml").exists():
-            template_config.merge_from_dict(MPAConfig.fromfile(str(model_dir / "hparam.yaml")))
-
-        # Load & Save Model config
-        model_config = MPAConfig.fromfile(str(model_dir / "model.py"))
-        model_config.dump(str(train_type_dir / "model.py"))
+            template_config = OmegaConf.merge(template_config, OmegaConf.load(str(model_dir / "hparam.yaml")))
 
         # Copy config files
         config_files = [
+            (model_dir, "model.py", train_type_dir),
             (model_dir, "data_pipeline.py", train_type_dir),
             (template_dir, "tile_pipeline.py", self.workspace_root),
             (template_dir, "deployment.py", self.workspace_root),
@@ -389,7 +446,7 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
         ]
         for target_dir, file_name, dest_dir in config_files:
             self._copy_config_files(target_dir, file_name, dest_dir)
-        template_config.dump(str(self.workspace_root / "template.yaml"))
+        (self.workspace_root / "template.yaml").write_text(OmegaConf.to_yaml(template_config))
 
         # Copy compression_config.json
         if (model_dir / "compression_config.json").exists():
@@ -397,13 +454,33 @@ class ConfigManager:  # pylint: disable=too-many-instance-attributes
                 str(model_dir / "compression_config.json"),
                 str(train_type_dir / "compression_config.json"),
             )
+            print(f"[*] \t- Updated: {str(train_type_dir / 'compression_config.json')}")
+        # Copy compression_config.json
+        if (model_dir / "pot_optimization_config.json").exists():
+            shutil.copyfile(
+                str(model_dir / "pot_optimization_config.json"),
+                str(train_type_dir / "pot_optimization_config.json"),
+            )
+            print(f"[*] \t- Updated: {str(train_type_dir / 'pot_optimization_config.json')}")
+
+        if not (self.workspace_root / "data.yaml").exists():
+            data_yaml = self._get_arg_data_yaml()
+            self._export_data_cfg(data_yaml, str((self.workspace_root / "data.yaml")))
 
         self.template = parse_model_template(str(self.workspace_root / "template.yaml"))
-        print(f"[*] Load Model Template ID: {self.template.model_template_id}")
-        print(f"[*] Load Model Name: {self.template.name}")
 
     def _copy_config_files(self, target_dir: Path, file_name: str, dest_dir: Path) -> None:
         """Copy Configuration files for workspace."""
         if (target_dir / file_name).exists():
-            config = MPAConfig.fromfile(str(target_dir / file_name))
-            config.dump(str(dest_dir / file_name))
+            if file_name.endswith(".py"):
+                try:
+                    from otx.mpa.utils.config_utils import MPAConfig
+
+                    config = MPAConfig.fromfile(str(target_dir / file_name))
+                    config.dump(str(dest_dir / file_name))
+                except Exception as exc:
+                    raise ImportError(f"{self.task_type} requires mmcv-full to be installed.") from exc
+            elif file_name.endswith((".yml", ".yaml")):
+                config = OmegaConf.load(str(target_dir / file_name))
+                (dest_dir / file_name).write_text(OmegaConf.to_yaml(config))
+            print(f"[*] \t- Updated: {str(dest_dir / file_name)}")

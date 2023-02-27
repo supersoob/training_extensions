@@ -36,7 +36,7 @@ from otx.core.data.adapter import get_dataset_adapter
 
 def get_args():
     """Parses command line arguments."""
-    parser, hyper_parameters, _ = get_parser_and_hprams_data()
+    parser, hyper_parameters, params = get_parser_and_hprams_data()
 
     parser.add_argument(
         "--data-root",
@@ -64,8 +64,9 @@ def get_args():
     )
 
     add_hyper_parameters_sub_parser(parser, hyper_parameters, modes=("INFERENCE",))
+    override_param = [f"params.{param[2:].split('=')[0]}" for param in params if param.startswith("--")]
 
-    return parser.parse_args()
+    return parser.parse_args(), override_param
 
 
 def check_label_schemas(label_schema_a, label_schema_b):
@@ -85,7 +86,7 @@ def main():
     """Main function that is used for model evaluation."""
 
     # Dynamically create an argument parser based on override parameters.
-    args = get_args()
+    args, override_param = get_args()
 
     config_manager = ConfigManager(args, workspace_root=args.work_dir, mode="eval")
     # Auto-Configuration for model template
@@ -95,7 +96,7 @@ def main():
         args.load_weights = str(config_manager.workspace_root / "models/weights.pth")
 
     # Update Hyper Parameter Configs
-    hyper_parameters = config_manager.get_hyparams_config()
+    hyper_parameters = config_manager.get_hyparams_config(override_param)
 
     # Get classes for Task, ConfigurableParameters and Dataset.
     template = config_manager.template
@@ -110,10 +111,7 @@ def main():
         raise ValueError(f"Unsupported file: {args.load_weights}")
 
     # Auto-Configuration for Dataset configuration
-    # FIXME: Anomaly currently does not support workspace.
-    is_anomaly_task = "anomaly" in args.template if args.template else False
-    update_data_yaml = not is_anomaly_task
-    config_manager.configure_data_config(update_data_yaml=update_data_yaml)
+    config_manager.configure_data_config(update_data_yaml=config_manager.check_workspace())
     dataset_config = config_manager.get_dataset_config(subsets=["test"])
     dataset_adapter = get_dataset_adapter(**dataset_config)
     dataset, label_schema = dataset_adapter.get_otx_dataset(), dataset_adapter.get_label_schema()

@@ -15,6 +15,7 @@ from datumaro.components.annotation import Annotation as DatumaroAnnotation
 from datumaro.components.annotation import AnnotationType as DatumaroAnnotationType
 from datumaro.components.annotation import Categories as DatumaroCategories
 from datumaro.components.dataset import Dataset as DatumaroDataset
+from datumaro.components.dataset import DatasetSubset as DatumaroDatasetSubset
 
 from otx.api.entities.annotation import (
     Annotation,
@@ -148,6 +149,16 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
         """Get Label Schema."""
         return self._generate_default_label_schema(self.label_entities)
 
+    def _get_subset_data(self, subset: str, dataset: DatumaroDataset) -> DatumaroDatasetSubset:
+        """Get subset dataset according to subset."""
+        for k, v in dataset.subsets().items():
+            if subset in k or "default" in k:
+                return v
+            if subset == "test" and "val" in k:
+                return v
+
+        raise ValueError("Can't find proper dataset.")
+
     def _detect_dataset_format(self, path: str) -> str:
         """Detect dataset format (ImageNet, COCO, ...)."""
         return datumaro.Environment().detect_dataset(path=path)
@@ -193,6 +204,16 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
 
         return {"category_items": category_items, "label_groups": label_groups, "label_entities": label_entities}
 
+    def _is_normal_polygon(self, annotation: DatumaroAnnotationType.polygon) -> bool:
+        """To filter out the abnormal polygon."""
+        x_points = [annotation.points[i] for i in range(0, len(annotation.points), 2)]
+        y_points = [annotation.points[i + 1] for i in range(0, len(annotation.points), 2)]
+        return min(x_points) < max(x_points) and min(y_points) < max(y_points)
+
+    def _is_normal_bbox(self, x1: float, y1: float, x2: float, y2: float) -> bool:
+        """To filter out the abrnormal bbox."""
+        return x1 < x2 and y1 < y2
+
     def _select_data_type(self, data_candidates: Union[List[str], str]) -> str:
         """Select specific type among candidates.
 
@@ -220,12 +241,13 @@ class BaseDatasetAdapter(metaclass=abc.ABCMeta):
 
     def _get_normalized_bbox_entity(self, annotation: DatumaroAnnotation, width: int, height: int) -> Annotation:
         """Get bbox entity w/ normalization."""
+        x1, y1, x2, y2 = annotation.points
         return Annotation(
             Rectangle(
-                x1=annotation.points[0] / width,
-                y1=annotation.points[1] / height,
-                x2=annotation.points[2] / width,
-                y2=annotation.points[3] / height,
+                x1=x1 / width,
+                y1=y1 / height,
+                x2=x2 / width,
+                y2=y2 / height,
             ),
             labels=[ScoredLabel(label=self.label_entities[annotation.label])],
         )

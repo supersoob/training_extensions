@@ -13,15 +13,16 @@ from otx.api.entities.inference_parameters import InferenceParameters
 from otx.api.entities.label import Domain
 from otx.api.entities.label_schema import LabelSchemaEntity
 from otx.api.entities.metrics import Performance, ScoreMetric
-from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.model import ModelConfiguration, ModelEntity, ModelPrecision
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
-from tests.integration.api.classification.test_api_classification import (
-    DEFAULT_CLS_TEMPLATE_DIR,
-    ClassificationTaskAPIBase,
-)
 from tests.test_suite.e2e_test_system import e2e_pytest_unit
+from tests.unit.algorithms.classification.test_helper import (
+    DEFAULT_CLS_TEMPLATE,
+    init_environment,
+    setup_configurable_parameters,
+)
 
 
 @pytest.fixture
@@ -37,10 +38,8 @@ class TestOTXClassificationInferenceTask:
     @pytest.fixture(autouse=True)
     def setup(self, otx_classification_model, tmp_dir_path) -> None:
         self.dataset_len = 5
-        self.hyper_parameters, self.model_template = ClassificationTaskAPIBase.setup_configurable_parameters(
-            DEFAULT_CLS_TEMPLATE_DIR
-        )
-        task_environment, self.dataset = ClassificationTaskAPIBase.init_environment(
+        self.hyper_parameters, self.model_template = setup_configurable_parameters(DEFAULT_CLS_TEMPLATE)
+        task_environment, self.dataset = init_environment(
             self.hyper_parameters, self.model_template, False, False, self.dataset_len
         )
 
@@ -51,7 +50,7 @@ class TestOTXClassificationInferenceTask:
     @pytest.mark.parametrize("multilabel, hierarchical", [(False, False), (True, False), (False, True)])
     @e2e_pytest_unit
     def test_infer(self, mocker, multilabel, hierarchical):
-        task_environment, dataset = ClassificationTaskAPIBase.init_environment(
+        task_environment, dataset = init_environment(
             self.hyper_parameters, self.model_template, multilabel, hierarchical, self.dataset_len
         )
         custom_cls_inference_task = ClassificationInferenceTask(task_environment, output_path=self.output_path)
@@ -114,17 +113,19 @@ class TestOTXClassificationInferenceTask:
 
         assert result_set.performance.score.value == 0.1
 
+    @pytest.mark.parametrize("precision", [ModelPrecision.FP16, ModelPrecision.FP32])
     @e2e_pytest_unit
-    def test_export_empty_model(self, mocker):
+    def test_export_empty_model(self, mocker, precision: ModelPrecision):
         fake_output = {"outputs": {"bin": None, "xml": None}}
         mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
 
         with pytest.raises(RuntimeError):
-            self.cls_inference_task.export(ExportType.OPENVINO, self.model)
+            self.cls_inference_task.export(ExportType.OPENVINO, self.model, precision)
             mock_run_task.assert_called_once()
 
+    @pytest.mark.parametrize("precision", [ModelPrecision.FP16, ModelPrecision.FP32])
     @e2e_pytest_unit
-    def test_export_with_model_files(self, mocker):
+    def test_export_with_model_files(self, mocker, precision: ModelPrecision):
         with open(f"{self.output_path}/model.xml", "wb") as f:
             f.write(b"foo")
         with open(f"{self.output_path}/model.bin", "wb") as f:
@@ -132,7 +133,7 @@ class TestOTXClassificationInferenceTask:
 
         fake_output = {"outputs": {"bin": f"{self.output_path}/model.xml", "xml": f"{self.output_path}/model.bin"}}
         mock_run_task = mocker.patch.object(BaseTask, "_run_task", return_value=fake_output)
-        self.cls_inference_task.export(ExportType.OPENVINO, self.model)
+        self.cls_inference_task.export(ExportType.OPENVINO, self.model, precision)
 
         mock_run_task.assert_called_once()
         assert self.model.get_data("openvino.bin")

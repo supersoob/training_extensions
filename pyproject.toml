@@ -13,6 +13,22 @@ build-backend = "setuptools.build_meta"
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# COVERAGE CONFIGURATION.                                                     #
+[tool.coverage.run]
+source = [
+    "otx/",
+]
+omit = [
+    "otx/algorithms/*/configs/**/*pipeline*.py",
+    "otx/algorithms/*/configs/**/model*.py",
+    "otx/algorithms/*/configs/**/deployment.py",
+    "otx/algorithms/**/configs/**/backbones/*",
+    "otx/algorithms/**/*sample*.py",
+    "**/__init__.py",
+    "otx/recipes/*",
+]
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # ISORT CONFIGURATION.                                                        #
 [tool.isort]
 profile = "black"
@@ -84,6 +100,7 @@ good-names = [
     "i",
     "j",
     "k",
+    "e",
     "ex",
     "Run",
     "_",

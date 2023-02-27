@@ -69,7 +69,7 @@ class TestTilingDetection(unittest.TestCase):
                     dict(type="Collect", keys=["img", "gt_bboxes", "gt_labels"]),
                 ],
                 dataset=dict(
-                    type="MPADetDataset",
+                    type="OTXDetDataset",
                     pipeline=[
                         dict(type="LoadImageFromOTXDataset"),
                         dict(
@@ -105,7 +105,7 @@ class TestTilingDetection(unittest.TestCase):
                     )
                 ],
                 dataset=dict(
-                    type="MPADetDataset",
+                    type="OTXDetDataset",
                     pipeline=[dict(type="LoadImageFromOTXDataset")],
                     otx_dataset=self.otx_dataset.with_empty_annotations(),
                     labels=list(self.labels),
@@ -132,7 +132,7 @@ class TestTilingDetection(unittest.TestCase):
         """Test that the testing dataloader is built correctly for tiling"""
 
         dataset = build_dataset(self.test_data_cfg)
-        stride = (1 - self.tile_cfg["overlap_ratio"]) * self.tile_cfg["tile_size"]
+        stride = int((1 - self.tile_cfg["overlap_ratio"]) * self.tile_cfg["tile_size"])
         num_tile_rows = ((self.height - self.tile_cfg["tile_size"]) // stride) + 1
         num_tile_cols = ((self.width - self.tile_cfg["tile_size"]) // stride) + 1
         # +1 for the original image

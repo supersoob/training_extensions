@@ -41,7 +41,12 @@ from otx.algorithms.common.utils.callback import InferenceProgressCallback
 from otx.api.entities.annotation import Annotation
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.inference_parameters import InferenceParameters
-from otx.api.entities.model import ModelEntity, ModelFormat, ModelOptimizationType
+from otx.api.entities.model import (
+    ModelEntity,
+    ModelFormat,
+    ModelOptimizationType,
+    ModelPrecision,
+)
 from otx.api.entities.model_template import TaskType
 from otx.api.entities.result_media import ResultMediaEntity
 from otx.api.entities.resultset import ResultSetEntity
@@ -279,7 +284,7 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
     ):
         """Evaluate function of OTX Action Task."""
         logger.info("called evaluate()")
-        self.remove_empty_frames(output_resultset.ground_truth_dataset)
+        self._remove_empty_frames(output_resultset.ground_truth_dataset)
         metric = self._get_metric(output_resultset)
         performance = metric.get_performance()
         logger.info(f"Final model performance: {str(performance)}")
@@ -293,7 +298,7 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
             return MetricsHelper.compute_f_measure(output_resultset)
         raise NotImplementedError(f"{self._task_type} is not supported in action task")
 
-    def remove_empty_frames(self, dataset: DatasetEntity):
+    def _remove_empty_frames(self, dataset: DatasetEntity):
         """Remove empty frame for action detection dataset."""
         remove_indices = []
         for idx, item in enumerate(dataset):
@@ -307,8 +312,21 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
             self._delete_scratch_space()
 
     @check_input_parameters_type()
-    def export(self, export_type: ExportType, output_model: ModelEntity):
+    def export(
+        self,
+        export_type: ExportType,
+        output_model: ModelEntity,
+        precision: ModelPrecision = ModelPrecision.FP32,
+        dump_features: bool = True,
+    ):
         """Export function of OTX Action Task."""
+        # TODO: add dumping saliency maps and representation vectors according to dump_features flag
+        if not dump_features:
+            logger.warning(
+                "Ommitting feature dumping is not implemented."
+                "The saliency maps and representation vector outputs will be dumped in the exported model."
+            )
+
         # copied from OTX inference_task.py
         logger.info("Exporting the model")
         if export_type != ExportType.OPENVINO:
@@ -316,6 +334,9 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
         output_model.model_format = ModelFormat.OPENVINO
         output_model.optimization_type = ModelOptimizationType.MO
         self._init_task()
+
+        self._precision[0] = precision
+        half_precision = precision == ModelPrecision.FP16
 
         try:
             from torch.jit._trace import TracerWarning
@@ -326,6 +347,7 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
                 self._recipe_cfg,
                 onnx_model_path=f"{self._output_path}/openvino.onnx",
                 output_dir_path=f"{self._output_path}",
+                half_precision=half_precision,
             )
             bin_file = [f for f in os.listdir(self._output_path) if f.endswith(".bin")][0]
             xml_file = [f for f in os.listdir(self._output_path) if f.endswith(".xml")][0]
@@ -400,7 +422,7 @@ class ActionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationTask
 
     def _add_det_predictions_to_dataset(self, prediction_results: Iterable, dataset: DatasetEntity):
         confidence_threshold = 0.05
-        self.remove_empty_frames(dataset)
+        self._remove_empty_frames(dataset)
         for dataset_item, (all_results, feature_vector, saliency_map) in zip(dataset, prediction_results):
             shapes = []
             for label_idx, detections in enumerate(all_results):

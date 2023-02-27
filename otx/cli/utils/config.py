@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-import os
+from pathlib import Path
 
 import yaml
 
@@ -45,7 +45,6 @@ def configure_dataset(args, data_yaml_path=None):
     if args.data is not None and os.path.exists(args.data):
         with open(args.data, "r", encoding="UTF-8") as stream:
             data_config = yaml.safe_load(stream)
-        stream.close()
 
     # The command's args are overridden and use first
     if "data_root" in args and args.data_root:

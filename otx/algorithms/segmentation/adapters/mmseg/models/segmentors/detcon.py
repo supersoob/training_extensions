@@ -463,7 +463,7 @@ class DetConB(nn.Module):
 
 # pylint: disable=too-many-locals
 @SEGMENTORS.register_module()
-class SupConDetConB(ClassIncrEncoderDecoder):
+class SupConDetConB(ClassIncrEncoderDecoder):  # pylint: disable=too-many-ancestors
     """Apply DetConB as a contrastive part of `Supervised Contrastive Learning` (https://arxiv.org/abs/2004.11362).
 
     SupCon with DetConB uses ground truth masks instead of pseudo masks to organize features among the same classes.
@@ -485,7 +485,7 @@ class SupConDetConB(ClassIncrEncoderDecoder):
         num_samples: int = 16,
         downsample: int = 32,
         input_transform: str = "resize_concat",
-        in_index: List[int] = [0],
+        in_index: Union[List[int], int] = [0],
         align_corners: bool = False,
         loss_cfg: Optional[Dict[str, Any]] = None,
         train_cfg: Optional[Dict[str, Any]] = None,

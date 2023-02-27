@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import warnings
+from collections import defaultdict
 from glob import glob
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
@@ -19,12 +20,18 @@ from pkg_resources import Requirement
 from setuptools import Extension, find_packages, setup
 
 try:
-    from torch.utils.cpp_extension import CppExtension, BuildExtension
+    from torch.utils.cpp_extension import BuildExtension
 
     cmd_class = {"build_ext": BuildExtension}
 except ModuleNotFoundError:
     cmd_class = {}
     print("Skip building ext ops due to the absence of torch.")
+
+
+def readme():
+    with open('README.md', encoding='utf-8') as f:
+        content = f.read()
+    return content
 
 
 def load_module(name: str = "otx/__init__.py"):
@@ -82,9 +89,7 @@ def get_requirements(requirement_files: Union[str, List[str]]) -> List[str]:
 
     requirements: List[str] = []
     for requirement_file in requirement_files:
-        with open(
-            f"requirements/{requirement_file}.txt", "r", encoding="UTF-8"
-        ) as file:
+        with open(f"requirements/{requirement_file}.txt", "r", encoding="UTF-8") as file:
             for line in file:
                 package = line.strip()
                 if package and not package.startswith(("#", "-f")):
@@ -120,18 +125,31 @@ def get_extensions():
     return extensions
 
 
-REQUIRED_PACKAGES = get_requirements(requirement_files=["base", "dev", "openvino"])
+REQUIRED_PACKAGES = get_requirements(requirement_files="api")
 EXTRAS_REQUIRE = {
-    "action": get_requirements(requirement_files="action"),
-    "anomaly": get_requirements(requirement_files="anomaly"),
-    "classification": get_requirements(requirement_files="classification"),
-    "detection": get_requirements(requirement_files="detection"),
-    "segmentation": get_requirements(requirement_files="segmentation"),
-    "mpa": get_requirements(
-        requirement_files=["classification", "detection", "segmentation", "action"]
+    "action": get_requirements(requirement_files=[
+            "base", "openvino", "action",
+        ]
     ),
-    "full": get_requirements(
-        requirement_files=[
+    "anomaly": get_requirements(requirement_files=[
+            "base", "openvino", "anomaly",
+        ]
+    ),
+    "classification": get_requirements(requirement_files=[
+            "base", "openvino", "classification",
+        ]
+    ),
+    "detection": get_requirements(requirement_files=[
+            "base", "openvino", "detection",
+        ]
+    ),
+    "segmentation": get_requirements(requirement_files=[
+            "base", "openvino", "segmentation",
+        ]
+    ),
+    "full": get_requirements(requirement_files=[
+            "base",
+            "openvino",
             "anomaly",
             "classification",
             "detection",
@@ -142,13 +160,43 @@ EXTRAS_REQUIRE = {
 }
 
 
+def find_yaml_recipes():
+    """Find YAML recipe files in the package."""
+    results = defaultdict(list)
+
+    for root, _, files in os.walk("otx"):
+        module = ".".join(root.split(os.sep))
+        for file in files:
+            _, ext = os.path.splitext(file)
+            if ext in [".yaml", ".json"]:
+                results[module] += [file]
+
+    return results
+
+
+package_data = {"": ["requirements.txt", "README.md", "LICENSE"]}  # Needed for exportable code
+package_data.update(find_yaml_recipes())
+
 setup(
     name="otx",
     version=get_otx_version(),
+    description="OpenVINO™ Training Extensions: "
+    "Train, Evaluate, Optimize, Deploy Computer Vision Models via OpenVINO™",
+    long_description=readme(),
+    long_description_content_type="text/markdown",
+    author="OpenVINO™ Training Extensions Contributors",
+    url="https://github.com/openvinotoolkit/training_extensions",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Cython",
+    ],
+    license="Apache License 2.0",
     packages=find_packages(exclude=("tests",)),
-    package_data={
-        "": ["requirements.txt", "README.md", "LICENSE"]
-    },  # Needed for exportable code
+    package_data=package_data,
     ext_modules=get_extensions(),
     cmdclass=cmd_class,
     install_requires=REQUIRED_PACKAGES,

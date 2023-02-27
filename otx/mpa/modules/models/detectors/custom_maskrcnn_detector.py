@@ -260,10 +260,15 @@ if is_mmdeploy_enabled():
         tile_prob = self.tile_classifier.simple_test(img)
 
         x = self.extract_feat(img)
-        feature_vector = FeatureVectorHook.func(x)
-        saliency_map = ActivationMapHook.func(x[-1])
         if proposals is None:
             proposals, _ = self.rpn_head.simple_test_rpn(x, img_metas)
         out = self.roi_head.simple_test(x, proposals, img_metas, rescale=False)
+
+        if ctx.cfg["dump_features"]:
+            feature_vector = FeatureVectorHook.func(x)
+            saliency_map = ActivationMapHook.func(x[-1])
+            return (*out, feature_vector, saliency_map)
+
         # NOTE: tile_prob should not returned but it is required for model tracing
-        return (*out, feature_vector, saliency_map, tile_prob)
+        return (*out, tile_prob)
+

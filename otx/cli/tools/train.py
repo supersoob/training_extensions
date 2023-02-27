@@ -119,37 +119,44 @@ def get_args():
         default=0,
         help="Total number of workers in a worker group.",
     )
+    parser.add_argument(
+        "--data",
+        type=str,
+        default=None,
+        help="The data.yaml path want to use in train task.",
+    )
 
     sub_parser = add_hyper_parameters_sub_parser(parser, hyper_parameters, return_sub_parser=True)
     # TODO: Temporary solution for cases where there is no template input
+    override_param = [f"params.{param[2:].split('=')[0]}" for param in params if param.startswith("--")]
     if not hyper_parameters and "params" in params:
-        params = params[params.index("params") :]
-        for param in params:
-            if param.startswith("--"):
-                sub_parser.add_argument(
-                    f"{param}",
-                    dest=f"params.{param[2:]}",
-                )
-    return parser.parse_args()
+        if "params" in params:
+            params = params[params.index("params") :]
+            for param in params:
+                if param == "--help":
+                    print("Without template configuration, hparams information is unknown.")
+                elif param.startswith("--"):
+                    sub_parser.add_argument(
+                        f"{param}",
+                        dest=f"params.{param[2:]}",
+                    )
+    return parser.parse_args(), override_param
 
 
 def main():  # pylint: disable=too-many-branches
     """Main function that is used for model training."""
-    args = get_args()
+    args, override_param = get_args()
 
     config_manager = ConfigManager(args, workspace_root=args.work_dir, mode="train")
     # Auto-Configuration for model template
     config_manager.configure_template()
 
     # Creates a workspace if it doesn't exist.
-    # FIXME: Anomaly currently does not support workspace and auto-config.
-    is_anomaly_task = "anomaly" in args.template if args.template else False
-    if not config_manager.check_workspace() and is_anomaly_task is False:
+    if not config_manager.check_workspace():
         config_manager.build_workspace(new_workspace_path=args.work_dir)
 
     # Auto-Configuration for Dataset configuration
-    update_data_yaml = not is_anomaly_task
-    config_manager.configure_data_config(update_data_yaml=update_data_yaml)
+    config_manager.configure_data_config(update_data_yaml=config_manager.check_workspace())
     dataset_config = config_manager.get_dataset_config(subsets=["train", "val", "unlabeled"])
     dataset_adapter = get_dataset_adapter(**dataset_config)
     dataset, label_schema = dataset_adapter.get_otx_dataset(), dataset_adapter.get_label_schema()
@@ -159,7 +166,7 @@ def main():  # pylint: disable=too-many-branches
     task_class = get_impl_class(template.entrypoints.base)
 
     # Update Hyper Parameter Configs
-    hyper_parameters = config_manager.get_hyparams_config()
+    hyper_parameters = config_manager.get_hyparams_config(override_param=override_param)
 
     environment = TaskEnvironment(
         model=None,
