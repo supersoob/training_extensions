@@ -22,10 +22,10 @@
                 
                 "otx/algorithms/detection/configs/instance_segmentation/resnet50_maskrcnn/template.yaml",
                 "--data", "data.yaml",
-                "--save-model-to", "/home/eugene/otx/demo/vitens-coliform-resnet50",
+                "--save-model-to", "otx/demo/vitens-coliform-resnet50",
                 "params",
                 "--learning_parameters.num_iters", 
-                "2",
+                "1",
                 "--learning_parameters.batch_size", 
                 "4", 
                 "--tiling_parameters.enable_tiling",
