@@ -39,8 +39,7 @@ def get_args():
     parser, hyper_parameters, params = get_parser_and_hprams_data()
 
     parser.add_argument(
-        "--data-root",
-        required=required,
+        "--data",
         help="Comma-separated paths to test annotation file.",
     )
     parser.add_argument(
