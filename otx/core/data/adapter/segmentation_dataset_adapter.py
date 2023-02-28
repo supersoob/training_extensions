@@ -54,6 +54,7 @@ class SegmentationDatasetAdapter(BaseDatasetAdapter):
         """Convert DatumaroDataset to DatasetEntity for Segmentation."""
         # Prepare label information
         label_information = self._prepare_label_information(self.dataset)
+        print(label_information)
         self.label_entities = label_information["label_entities"]
 
         dataset_items: List[DatasetItemEntity] = []
