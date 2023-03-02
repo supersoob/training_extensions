@@ -195,7 +195,7 @@ if is_mmdeploy_enabled():
         FeatureVectorHook,
     )
 
-    @mark("tile_classifier", inputs=["img"], outputs=["prob"])
+    @mark("tile_classifier", inputs=["image"], outputs=["prob"])
     def tile_classifier__simple_test_impl(ctx, self, img):
         """ Tile Classifier Simple Test Impl with added mmdeploy marking for model partitioning
 
@@ -222,7 +222,6 @@ if is_mmdeploy_enabled():
             _type_: _description_
         """
         return tile_classifier__simple_test_impl(ctx, self, img)
-
 
     @mark("custom_maskrcnn_forward", inputs=["input"], outputs=["dets", "labels", "masks", "feats", "saliencies"])
     def __forward_impl(ctx, self, img, img_metas, **kwargs):
