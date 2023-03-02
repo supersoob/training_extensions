@@ -39,7 +39,8 @@ model = dict(
         type="CustomRoIHead",  # Use CustomROIHead for Ignore mode
         bbox_roi_extractor=dict(
             type="SingleRoIExtractor",
-            roi_layer=dict(type="RoIAlign", output_size=7, sampling_ratio=0),
+            roi_layer=dict(type="RoIAlign", output_size=7, sampling_ratio=0, use_torchvision=True),
+            # roi_layer=dict(type="RoIAlign", output_size=7, sampling_ratio=0),
             out_channels=80,
             featmap_strides=[4, 8, 16, 32],
         ),
@@ -58,7 +59,8 @@ model = dict(
         ),
         mask_roi_extractor=dict(
             type="SingleRoIExtractor",
-            roi_layer=dict(type="RoIAlign", output_size=14, sampling_ratio=0),
+            roi_layer=dict(type="RoIAlign", output_size=14, sampling_ratio=0, use_torchvision=True),
+            # roi_layer=dict(type="RoIAlign", output_size=14, sampling_ratio=0),
             out_channels=80,
             featmap_strides=[4, 8, 16, 32],
         ),
