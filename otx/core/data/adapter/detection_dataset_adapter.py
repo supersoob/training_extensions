@@ -38,7 +38,6 @@ class DetectionDatasetAdapter(BaseDatasetAdapter):
                     for ann in datumaro_item.annotations:
                         if (
                             self.task_type in (TaskType.INSTANCE_SEGMENTATION, TaskType.ROTATED_DETECTION)
-                            and ann.type == AnnotationType.polygon
                         ):
                             if self._is_normal_polygon(ann):
                                 shapes.append(self._get_polygon_entity(ann, image.width, image.height))

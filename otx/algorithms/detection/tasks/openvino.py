@@ -157,7 +157,20 @@ class BaseInferencerWithConverter(BaseInferencer):
             features: list including saliency map and feature vector
         """
         segm = isinstance(self.converter, (MaskToAnnotationConverter, RotatedRectToAnnotationConverter))
-        tiler = Tiler(tile_size=tile_size, overlap=overlap, max_number=max_number, model=self.model, segm=segm)
+        # TODO[EUGENE]:
+        adapter = OpenvinoAdapter(
+            create_core(),
+            "/home/yuchunli/git/otx/demo/aerial-efficientnet-optimised/exported/classifier.xml",
+            "/home/yuchunli/git/otx/demo/aerial-efficientnet-optimised/exported/classifier.bin",
+            device="CPU",
+            max_num_requests=1,
+        )
+        tile_classifier = Model(model_adapter=adapter, preload=True)
+
+        # tile_classifier = None
+
+        tiler = Tiler(tile_size=tile_size, overlap=overlap, max_number=max_number, model=self.model, segm=segm,
+                      tile_classifier=tile_classifier)
         detections, features = tiler.predict(image)
         detections = self.converter.convert_to_annotation(detections, metadata={"original_shape": image.shape})
         return detections, features

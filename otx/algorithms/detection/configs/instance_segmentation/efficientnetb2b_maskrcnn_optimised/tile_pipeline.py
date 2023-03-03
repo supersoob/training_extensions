@@ -99,5 +99,5 @@ test_dataset = dict(
 
 
 data = dict(
-    samples_per_gpu=__samples_per_gpu, workers_per_gpu=4, train=train_dataset, val=val_dataset, test=test_dataset
+    samples_per_gpu=__samples_per_gpu, workers_per_gpu=2, train=train_dataset, val=val_dataset, test=test_dataset
 )

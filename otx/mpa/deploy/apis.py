@@ -166,12 +166,11 @@ if is_mmdeploy_enabled():
     from mmdeploy.apis import (
         build_task_processor,
         extract_model,
-        get_predefined_partition_cfg,
         torch2onnx,
     )
     from mmdeploy.apis.openvino import get_input_info_from_cfg, get_mo_options_from_cfg
-    from mmdeploy.core import FUNCTION_REWRITER
-    from mmdeploy.utils import get_backend_config, get_ir_config, get_partition_config
+    from mmdeploy.core import reset_mark_function_count
+    from mmdeploy.utils import get_ir_config, get_partition_config
 
     class MMdeployExporter:
         @staticmethod
@@ -238,6 +237,33 @@ if is_mmdeploy_enabled():
                     onnx_path,
                     deploy_cfg_,
                 )
+
+            if deploy_cfg.get("partition_config", False):
+                deploy_cfg['partition_config']['apply_marks'] = True
+                partition_cfgs = get_partition_config(deploy_cfg)
+                if partition_cfgs:
+                    reset_mark_function_count()
+                    partition_onnx_path = MMdeployExporter.torch2onnx(
+                        output_dir,
+                        input_data,
+                        cfg,
+                        deploy_cfg,
+                        model_name=model_name,
+                    )
+
+                    partition_path = MMdeployExporter.partition_onnx(
+                            output_dir,
+                            partition_onnx_path,
+                            partition_cfgs['partition_cfg'],
+                    )
+
+                    deploy_cfg_ = deepcopy(deploy_cfg)
+                    update_deploy_cfg(partition_path[0], deploy_cfg_)
+                    MMdeployExporter.onnx2openvino(
+                        output_dir,
+                        partition_path[0],
+                        deploy_cfg_,
+                    )
 
         @staticmethod
         def torch2onnx(
