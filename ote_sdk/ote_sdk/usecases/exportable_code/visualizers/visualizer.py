@@ -12,8 +12,8 @@ from typing import Optional
 import cv2
 import numpy as np
 
-from ote_sdk.entities.annotation import AnnotationSceneEntity
-from ote_sdk.utils.shape_drawer import ShapeDrawer
+from otx.api.entities.annotation import AnnotationSceneEntity
+from otx.api.utils.shape_drawer import ShapeDrawer
 
 
 class IVisualizer(metaclass=abc.ABCMeta):

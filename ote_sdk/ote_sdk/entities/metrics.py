@@ -13,7 +13,7 @@ from typing import Generic, List, Optional, Sequence, TypeVar, Union
 
 import numpy as np
 
-from ote_sdk.utils.time_utils import now
+from otx.api.utils.time_utils import now
 
 
 class MetricEntity(metaclass=abc.ABCMeta):
@@ -178,7 +178,7 @@ class DurationMetric(MetricEntity):
 
         :example: Duration string of 1 hour 1 minute and 1.50 seconds.
 
-        >>> from ote_sdk.entities.metrics import DurationMetric
+        >>> from otx.api.entities.metrics import DurationMetric
         >>> dur_met = DurationMetric("test", 1, 1, 1.5)  # 1 hour 1 minute and 1.5 seconds
         >>> dur_met.get_duration_string()
         '1 hour 1 minute 1.50 seconds'
@@ -202,7 +202,7 @@ class DurationMetric(MetricEntity):
 
         :example: Converting 70 seconds to duration metric.
 
-        >>> from ote_sdk.entities.metrics import DurationMetric
+        >>> from otx.api.entities.metrics import DurationMetric
         >>> dur_met = DurationMetric.from_seconds("test", 70)  # 1 hour 1 minute and 1.5 seconds
         >>> dur_met.get_duration_string()
         '1 minute 10.00 seconds'

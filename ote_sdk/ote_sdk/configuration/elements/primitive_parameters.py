@@ -12,8 +12,8 @@ from typing import List, Optional, TypeVar, Union
 
 import attr
 
-from ote_sdk.configuration.enums import AutoHPOState, ConfigElementType, ModelLifecycle
-from ote_sdk.configuration.ui_rules import NullUIRules, UIRules
+from otx.api.configuration.enums import AutoHPOState, ConfigElementType, ModelLifecycle
+from otx.api.configuration.ui_rules import NullUIRules, UIRules
 
 from .configurable_enum import ConfigurableEnum
 from .metadata_keys import (

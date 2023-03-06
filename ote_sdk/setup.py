@@ -19,8 +19,8 @@ with open("requirements.txt", "r", encoding="UTF-8") as f:
 setup(
     name="OTE SDK",
     version="1.0",
-    packages=find_packages(include=["ote_sdk", "ote_sdk.*"]),
-    package_data={"ote_sdk": ["py.typed", "usecases/exportable_code/demo/*"]},
+    packages=find_packages(),
+    package_data={"otx.api": ["py.typed", "usecases/exportable_code/demo/*"]},
     url="",
     license="Copyright (c) 2021-2022 Intel Corporation. "
     "SPDX-License-Identifier: Apache-2.0",

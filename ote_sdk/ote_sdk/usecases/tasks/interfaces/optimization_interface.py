@@ -9,9 +9,9 @@ import abc
 from enum import Enum, auto
 from typing import Optional
 
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.optimization_parameters import OptimizationParameters
 
 
 class OptimizationType(Enum):

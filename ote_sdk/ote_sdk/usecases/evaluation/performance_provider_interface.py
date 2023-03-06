@@ -7,7 +7,7 @@
 
 import abc
 
-from ote_sdk.entities.metrics import Performance
+from otx.api.entities.metrics import Performance
 
 
 class IPerformanceProvider(metaclass=abc.ABCMeta):

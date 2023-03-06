@@ -5,7 +5,7 @@
 import os.path as osp
 from typing import Union
 
-from ote_sdk.entities.metrics import Performance, ScoreMetric
+from otx.api.entities.metrics import Performance, ScoreMetric
 
 # This string constant will be used as a special constant for a config field
 # value to point that the field should be filled in tests' code by some default

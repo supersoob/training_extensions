@@ -23,8 +23,8 @@ import cv2
 import numpy as np
 from bson import ObjectId
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.configuration.elements import (
     ParameterGroup,
     add_parameter_group,
     configurable_boolean,
@@ -32,16 +32,16 @@ from ote_sdk.configuration.elements import (
     configurable_integer,
     string_attribute,
 )
-from ote_sdk.configuration.model_lifecycle import ModelLifecycle
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchemaEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.configuration.model_lifecycle import ModelLifecycle
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import LabelGroup, LabelGroupType, LabelSchemaEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
 
 logger = logging.getLogger(__name__)
 

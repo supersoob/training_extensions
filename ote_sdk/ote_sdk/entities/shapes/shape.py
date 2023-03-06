@@ -14,7 +14,7 @@ from shapely.errors import PredicateError, TopologicalError
 from shapely.geometry import Polygon as shapely_polygon
 
 if TYPE_CHECKING:
-    from ote_sdk.entities.shapes.rectangle import Rectangle
+    from otx.api.entities.shapes.rectangle import Rectangle
 
 
 class GeometryException(ValueError):

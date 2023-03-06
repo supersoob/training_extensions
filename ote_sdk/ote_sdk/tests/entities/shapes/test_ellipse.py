@@ -15,14 +15,14 @@
 import pytest
 from shapely.geometry.polygon import Polygon
 
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestEllipse:
     modification_date = now()
 

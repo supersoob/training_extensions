@@ -10,9 +10,9 @@ from typing import Optional, Tuple
 import cv2
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.media import IMedia2DEntity
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.media import IMedia2DEntity
+from otx.api.entities.shapes.rectangle import Rectangle
 
 
 class Image(IMedia2DEntity):

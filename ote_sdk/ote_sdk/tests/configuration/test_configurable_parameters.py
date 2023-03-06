@@ -5,17 +5,17 @@ import copy
 
 import pytest
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import metadata_keys
-from ote_sdk.configuration.enums import AutoHPOState
-from ote_sdk.configuration.enums.config_element_type import ConfigElementType
-from ote_sdk.entities.id import ID
-from ote_sdk.tests.configuration.dummy_config import DatasetManagerConfig
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import metadata_keys
+from otx.api.configuration.enums import AutoHPOState
+from otx.api.configuration.enums.config_element_type import ConfigElementType
+from otx.api.entities.id import ID
+from otx.api.tests.configuration.dummy_config import DatasetManagerConfig
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestConfigurableParameters:
     @pytest.mark.priority_medium
     @pytest.mark.unit

@@ -14,11 +14,11 @@ from typing import Iterator, List, Optional, Sequence, Union, overload
 
 from bson.objectid import ObjectId
 
-from ote_sdk.entities.annotation import AnnotationSceneEntity, AnnotationSceneKind
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.subset import Subset
+from otx.api.entities.annotation import AnnotationSceneEntity, AnnotationSceneKind
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.id import ID
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.subset import Subset
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +78,9 @@ class DatasetEntity:
 
     This way assumes the dataset item entities are constructed before the dataset entity is made.
 
-    >>> from ote_sdk.entities.image import Image
-    >>> from ote_sdk.entities.annotation import NullAnnotationSceneEntity
-    >>> from ote_sdk.entities.dataset_item import DatasetItemEntity
+    >>> from otx.api.entities.image import Image
+    >>> from otx.api.entities.annotation import NullAnnotationSceneEntity
+    >>> from otx.api.entities.dataset_item import DatasetItemEntity
     >>> item = DatasetItemEntity(media=Image(file_path="image.jpg"), annotation_scene=NullAnnotationSceneEntity())
     >>> dataset = DatasetEntity(items=[item])
 
@@ -263,7 +263,7 @@ class DatasetEntity:
 
         Later, we can pass this prediction_dataset to the task analysis function.
         By pairing the labeled_dataset and the prediction_dataset, the resultset can then be constructed.
-        Refer to :class:`~ote_sdk.entities.resultset.ResultSetEntity` for more info.
+        Refer to :class:`~otx.api.entities.resultset.ResultSetEntity` for more info.
 
         :param annotation_kind: Sets the empty annotation to this kind. Default value: AnnotationSceneKind.PREDICTION
         :return: a new dataset containing the same items, with empty annotation objects.
@@ -327,9 +327,9 @@ class DatasetEntity:
 
         :example: Appending a dataset item to a dataset
 
-        >>> from ote_sdk.entities.image import Image
-        >>> from ote_sdk.entities.annotation import NullAnnotationSceneEntity
-        >>> from ote_sdk.entities.dataset_item import DatasetItemEntity
+        >>> from otx.api.entities.image import Image
+        >>> from otx.api.entities.annotation import NullAnnotationSceneEntity
+        >>> from otx.api.entities.dataset_item import DatasetItemEntity
         >>> dataset = DatasetEntity()
         >>> media = Image(file_path='image.jpg')
         >>> annotation = NullAnnotationSceneEntity()

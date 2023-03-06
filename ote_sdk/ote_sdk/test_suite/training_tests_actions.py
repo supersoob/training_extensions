@@ -16,19 +16,19 @@ if TYPE_CHECKING:
 
 import pytest
 
-from ote_sdk.configuration.helper import create as ote_sdk_configuration_helper_create
-from ote_sdk.entities.inference_parameters import InferenceParameters
-from ote_sdk.entities.model import ModelEntity, ModelFormat, ModelOptimizationType
-from ote_sdk.entities.model_template import parse_model_template
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
-from ote_sdk.usecases.adapters.model_adapter import ModelAdapter
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import OptimizationType
-from ote_sdk.utils.importing import get_impl_class
+from otx.api.configuration.helper import create as otx.api_configuration_helper_create
+from otx.api.entities.inference_parameters import InferenceParameters
+from otx.api.entities.model import ModelEntity, ModelFormat, ModelOptimizationType
+from otx.api.entities.model_template import parse_model_template
+from otx.api.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
+from otx.api.usecases.adapters.model_adapter import ModelAdapter
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType
+from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
+from otx.api.utils.importing import get_impl_class
 
 from .e2e_test_system import DataCollector
 from .logging import get_logger
@@ -144,7 +144,7 @@ class OTETestTrainingAction(BaseOTETestAction):
         self.model_template = parse_model_template(self.template_path)
 
         logger.debug("Set hyperparameters")
-        params = ote_sdk_configuration_helper_create(
+        params = otx.api_configuration_helper_create(
             self.model_template.hyper_parameters.data
         )
         if self.num_training_iters != KEEP_CONFIG_FIELD_VALUE:
@@ -641,7 +641,7 @@ class OTETestNNCFGraphAction(BaseOTETestAction):
                     f"To generate reference graph set the global variable {self._VAR_REGEN_DOT}."
                 )
 
-        params = ote_sdk_configuration_helper_create(
+        params = otx.api_configuration_helper_create(
             model_template.hyper_parameters.data
         )
         environment, task = create_environment_and_task(

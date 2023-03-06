@@ -7,18 +7,18 @@ from pathlib import Path
 import pytest
 from omegaconf import OmegaConf
 
-from ote_sdk.configuration import ote_config_helper
-from ote_sdk.configuration.elements import metadata_keys
-from ote_sdk.configuration.enums import AutoHPOState, ModelLifecycle
-from ote_sdk.tests.configuration.dummy_config import (
+from otx.api.configuration import ote_config_helper
+from otx.api.configuration.elements import metadata_keys
+from otx.api.configuration.enums import AutoHPOState, ModelLifecycle
+from otx.api.tests.configuration.dummy_config import (
     DatasetManagerConfig,
     SomeEnumSelectable,
 )
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestConfigurationHelper:
     @staticmethod
     def __get_path_to_file(filename: str):

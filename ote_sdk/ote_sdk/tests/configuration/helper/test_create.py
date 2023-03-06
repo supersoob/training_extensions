@@ -6,13 +6,13 @@ import pytest
 from attr import _make
 from omegaconf import DictConfig
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import ConfigurableEnum
-from ote_sdk.configuration.elements.parameter_group import ParameterGroup
-from ote_sdk.configuration.enums.config_element_type import ConfigElementType
-from ote_sdk.configuration.enums.model_lifecycle import ModelLifecycle
-from ote_sdk.configuration.helper.config_element_mapping import GroupElementMapping
-from ote_sdk.configuration.helper.create import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import ConfigurableEnum
+from otx.api.configuration.elements.parameter_group import ParameterGroup
+from otx.api.configuration.enums.config_element_type import ConfigElementType
+from otx.api.configuration.enums.model_lifecycle import ModelLifecycle
+from otx.api.configuration.helper.config_element_mapping import GroupElementMapping
+from otx.api.configuration.helper.create import (
     construct_attrib_from_dict,
     construct_ui_rules_from_dict,
     contains_parameter_groups,
@@ -22,14 +22,14 @@ from ote_sdk.configuration.helper.create import (
     from_dict_attr,
     gather_parameter_arguments_and_values_from_dict,
 )
-from ote_sdk.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
-from ote_sdk.configuration.ui_rules.types import Action, Operator
-from ote_sdk.tests.configuration.dummy_config import SomeEnumSelectable
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
+from otx.api.configuration.ui_rules.types import Action, Operator
+from otx.api.tests.configuration.dummy_config import SomeEnumSelectable
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestCreateFunctions:
     @staticmethod
     def int_rule_dict():

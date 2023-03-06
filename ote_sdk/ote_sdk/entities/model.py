@@ -7,22 +7,22 @@ import datetime
 from enum import IntEnum, auto
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.metrics import NullPerformance, Performance
-from ote_sdk.entities.model_template import TargetDevice
-from ote_sdk.entities.url import URL
-from ote_sdk.usecases.adapters.model_adapter import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.entities.id import ID
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.metrics import NullPerformance, Performance
+from otx.api.entities.model_template import TargetDevice
+from otx.api.entities.url import URL
+from otx.api.usecases.adapters.model_adapter import (
     ExportableCodeAdapter,
     IDataSource,
     ModelAdapter,
 )
-from ote_sdk.utils.time_utils import now
+from otx.api.utils.time_utils import now
 
 if TYPE_CHECKING:
     # pylint: disable=ungrouped-imports
-    from ote_sdk.entities.datasets import DatasetEntity
+    from otx.api.entities.datasets import DatasetEntity
 
 
 class ModelPrecision(IntEnum):

@@ -15,9 +15,9 @@ from typing import Any, List, Tuple, Type, Union
 import yaml
 from omegaconf import DictConfig, OmegaConf
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.enums.utils import get_enum_names
-from ote_sdk.entities.id import ID
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.enums.utils import get_enum_names
+from otx.api.entities.id import ID
 
 from .config_element_mapping import (
     GroupElementMapping,

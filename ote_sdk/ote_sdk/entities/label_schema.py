@@ -12,10 +12,10 @@ from typing import Dict, List, Optional, Sequence
 import numpy as np
 from bson import ObjectId
 
-from ote_sdk.entities.graph import Graph, MultiDiGraph
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
+from otx.api.entities.graph import Graph, MultiDiGraph
+from otx.api.entities.id import ID
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
 
 logger = logging.getLogger(__name__)
 

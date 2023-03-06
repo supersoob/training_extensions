@@ -73,7 +73,7 @@ class ConfigElementType(Enum):
     def category(self) -> ElementCategory:
         """
         Returns the element category which the ConfigElementType belongs to. Categories are instances of the
-        `ote_sdk.configuration.configuration_types.ElementCategory` Enum.
+        `otx.api.configuration.configuration_types.ElementCategory` Enum.
         """
         return self._category_
 

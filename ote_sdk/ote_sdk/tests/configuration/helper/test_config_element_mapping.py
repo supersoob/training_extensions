@@ -6,8 +6,8 @@ from functools import partial
 
 import pytest
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import (
     ParameterGroup,
     configurable_boolean,
     configurable_float,
@@ -15,17 +15,17 @@ from ote_sdk.configuration.elements import (
     float_selectable,
     selectable,
 )
-from ote_sdk.configuration.helper.config_element_mapping import (
+from otx.api.configuration.helper.config_element_mapping import (
     GroupElementMapping,
     PrimitiveElementMapping,
     RuleElementMapping,
 )
-from ote_sdk.configuration.ui_rules.rules import Rule, UIRules
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.ui_rules.rules import Rule, UIRules
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestPrimitiveElementMapping:
     @staticmethod
     def check_primitive_element(
@@ -86,7 +86,7 @@ def check_mapping_element(mapping_element, expected_name, expected_value):
     assert str(mapping_element) == expected_name
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestGroupElementMapping:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -113,7 +113,7 @@ class TestGroupElementMapping:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestRuleElementMapping:
     @pytest.mark.priority_medium
     @pytest.mark.unit

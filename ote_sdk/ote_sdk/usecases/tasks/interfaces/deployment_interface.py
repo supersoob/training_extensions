@@ -6,7 +6,7 @@
 
 import abc
 
-from ote_sdk.entities.model import ModelEntity
+from otx.api.entities.model import ModelEntity
 
 
 class IDeploymentTask(metaclass=abc.ABCMeta):

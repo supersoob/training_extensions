@@ -9,12 +9,12 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model_template import TaskType, task_type_to_label_domain
-from ote_sdk.usecases.exportable_code.prediction_to_annotation_converter import (
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model_template import TaskType, task_type_to_label_domain
+from otx.api.usecases.exportable_code.prediction_to_annotation_converter import (
     create_converter,
 )
-from ote_sdk.usecases.exportable_code.visualizers import Visualizer
+from otx.api.usecases.exportable_code.visualizers import Visualizer
 
 
 def get_model_path(path: Optional[Path]) -> Path:

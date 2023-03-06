@@ -18,20 +18,20 @@ from typing import cast
 import numpy as np
 import pytest
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.entities.annotation import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup, LabelSchemaEntity
-from ote_sdk.entities.metrics import (
+from otx.api.entities.color import Color
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.image import Image
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import LabelGroup, LabelSchemaEntity
+from otx.api.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -44,14 +44,14 @@ from ote_sdk.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
-from ote_sdk.entities.model import ModelConfiguration, ModelEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.usecases.evaluation.f_measure import (
+from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.usecases.evaluation.f_measure import (
     FMeasure,
     _AggregatedResults,
     _FMeasureCalculator,
@@ -65,7 +65,7 @@ from ote_sdk.usecases.evaluation.f_measure import (
 )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestFMeasureFunctions:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -189,7 +189,7 @@ class TestFMeasureFunctions:
         assert get_n_false_negatives(iou_matrix, 0.09) == 2
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestMetrics:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -215,7 +215,7 @@ class TestMetrics:
         assert metrics.recall == recall
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestResultCounters:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -309,7 +309,7 @@ class TestResultCounters:
         check_calculated_f_measure(f_measure, 0.0, 1.0)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAggregatedResults:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -360,7 +360,7 @@ class TestAggregatedResults:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestOverallResults:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -395,7 +395,7 @@ class TestOverallResults:
         assert overall_results.best_f_measure == best_f_measure
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestFMeasureCalculator:
     @staticmethod
     def ground_truth_boxes_per_image():
@@ -1187,7 +1187,7 @@ class TestFMeasureCalculator:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestFMeasure:
     color = Color(0, 255, 0)
     creation_date = datetime.datetime(year=2021, month=12, day=23)

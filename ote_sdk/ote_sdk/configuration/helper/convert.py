@@ -13,8 +13,8 @@ from typing import Type, TypeVar
 import yaml
 from omegaconf import DictConfig, OmegaConf
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import (
     ConfigurableEnum,
     ParameterGroup,
     metadata_keys,

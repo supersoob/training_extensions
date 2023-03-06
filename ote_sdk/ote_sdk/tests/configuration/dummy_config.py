@@ -7,14 +7,14 @@ Dummy configurable parameter class to test configuration functionality
 
 import attr
 
-from ote_sdk.configuration import (
+from otx.api.configuration import (
     ConfigurableParameters,
     ModelLifecycle,
     Operator,
     Rule,
     UIRules,
 )
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.elements import (
     ConfigurableEnum,
     ParameterGroup,
     add_parameter_group,
@@ -25,8 +25,8 @@ from ote_sdk.configuration.elements import (
     selectable,
     string_attribute,
 )
-from ote_sdk.configuration.enums import AutoHPOState
-from ote_sdk.configuration.ui_rules import Action
+from otx.api.configuration.enums import AutoHPOState
+from otx.api.configuration.ui_rules import Action
 
 
 class SomeEnumSelectable(ConfigurableEnum):

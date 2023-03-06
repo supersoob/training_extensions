@@ -9,22 +9,22 @@ import cv2
 import numpy as np
 import pytest
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.coordinate import Coordinate
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.shape_drawer import DrawerEntity, Helpers, ShapeDrawer
+from otx.api.entities.color import Color
+from otx.api.entities.coordinate import Coordinate
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.shape_drawer import DrawerEntity, Helpers, ShapeDrawer
 
 RANDOM_IMAGE = (np.random.randint(low=0, high=255, size=(1024, 1280, 3))).astype(
     "uint8"
@@ -73,7 +73,7 @@ class CommonMethods:
         return [ScoredLabel(classification_label), ScoredLabel(anomaly_detection_label)]
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestDrawerEntity:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -95,7 +95,7 @@ class TestDrawerEntity:
             DrawerEntity().draw(RANDOM_IMAGE, entity, labels)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestHelpers:
     @staticmethod
     def generate_expected_image_with_text(
@@ -712,7 +712,7 @@ class ShapeDrawerParams:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestShapeDrawer:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -821,7 +821,7 @@ class TestShapeDrawer:
             assert np.array_equal(actual_image, expected_image)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestTopLeftDrawer:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -965,7 +965,7 @@ class TestTopLeftDrawer:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestRectangleDrawer:
     @staticmethod
     def draw_rectangle_labels(
@@ -1079,7 +1079,7 @@ class TestRectangleDrawer:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestEllipseDrawer:
     @staticmethod
     def draw_ellipse_labels(
@@ -1235,7 +1235,7 @@ class TestEllipseDrawer:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestPolygonDrawer:
     @staticmethod
     def draw_polygon_labels(

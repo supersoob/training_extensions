@@ -7,10 +7,10 @@ from typing import Optional
 
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation, AnnotationSceneEntity
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.metadata import IMetadata
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.entities.annotation import Annotation, AnnotationSceneEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.metadata import IMetadata
+from otx.api.entities.shapes.rectangle import Rectangle
 
 
 # pylint: disable=too-many-instance-attributes; Requires refactor
@@ -22,8 +22,8 @@ class ResultMediaEntity(IMetadata):
     classification task.
 
     The result media contains media data, which is associated with a
-    :class:`~ote_sdk.entities.annotation.AnnotationSceneEntity` and
-    related to an optional :class:`~ote_sdk.entities.label.LabelEntity`.
+    :class:`~otx.api.entities.annotation.AnnotationSceneEntity` and
+    related to an optional :class:`~otx.api.entities.label.LabelEntity`.
 
     :param name: Name.
     :param type: The type of data (e.g. Attention map). This type is descriptive.

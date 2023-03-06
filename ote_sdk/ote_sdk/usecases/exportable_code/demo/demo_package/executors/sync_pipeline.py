@@ -9,21 +9,21 @@ from typing import List, Tuple, Union
 
 import numpy as np
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.usecases.exportable_code.demo.demo_package.model_container import (
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.usecases.exportable_code.demo.demo_package.model_container import (
     ModelContainer,
 )
-from ote_sdk.usecases.exportable_code.demo.demo_package.utils import (
+from otx.api.usecases.exportable_code.demo.demo_package.utils import (
     create_output_converter,
 )
-from ote_sdk.usecases.exportable_code.streamer import get_streamer
-from ote_sdk.usecases.exportable_code.visualizers import IVisualizer
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.usecases.exportable_code.streamer import get_streamer
+from otx.api.usecases.exportable_code.visualizers import IVisualizer
+from otx.api.utils.shape_factory import ShapeFactory
 
 
 class ChainExecutor:

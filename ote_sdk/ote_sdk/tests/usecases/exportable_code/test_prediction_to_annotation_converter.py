@@ -8,20 +8,20 @@ import numpy as np
 import pytest
 from openvino.model_zoo.model_api.models.utils import Detection
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Color, Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup, LabelSchemaEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.usecases.exportable_code.prediction_to_annotation_converter import (
+from otx.api.entities.id import ID
+from otx.api.entities.label import Color, Domain, LabelEntity
+from otx.api.entities.label_schema import LabelGroup, LabelSchemaEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.usecases.exportable_code.prediction_to_annotation_converter import (
     AnomalyClassificationToAnnotationConverter,
     AnomalyDetectionToAnnotationConverter,
     AnomalySegmentationToAnnotationConverter,
@@ -32,10 +32,10 @@ from ote_sdk.usecases.exportable_code.prediction_to_annotation_converter import 
     SegmentationToAnnotationConverter,
     create_converter,
 )
-from ote_sdk.utils.time_utils import now
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestDetectionToAnnotationConverter:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -171,14 +171,14 @@ class TestDetectionToAnnotationConverter:
             converter.convert_to_annotation(np.ndarray((3, 8)))
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIPredictionToAnnotation:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
         (
-            "ote_sdk.usecases.exportable_code.prediction_to_annotation_converter."
+            "otx.api.usecases.exportable_code.prediction_to_annotation_converter."
             "IPredictionToAnnotationConverter.__abstractmethods__"
         ),
         set(),
@@ -202,7 +202,7 @@ class TestIPredictionToAnnotation:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestCreateConverter:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -357,7 +357,7 @@ def check_annotation_scene(
     assert len(annotation_scene.annotations) == expected_length
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestDetectionBoxToAnnotation:
     color = Color(red=180, green=230, blue=30)
     creation_date = now()
@@ -506,7 +506,7 @@ class TestDetectionBoxToAnnotation:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestSegmentationToAnnotation:
     color = Color(red=180, green=230, blue=30)
     creation_date = now()
@@ -701,7 +701,7 @@ class TestSegmentationToAnnotation:
             ],
         )
 
-    @pytest.mark.components(OteSdkComponent.OTE_SDK)
+    @pytest.mark.components(OtxApiComponent.OTX_API)
     class TestClassificationToAnnotation:
         @pytest.mark.priority_medium
         @pytest.mark.unit
@@ -928,7 +928,7 @@ class TestSegmentationToAnnotation:
                 expected_labels=[ScoredLabel(label=label_0_2, probability=0.9)],
             )
 
-    @pytest.mark.components(OteSdkComponent.OTE_SDK)
+    @pytest.mark.components(OtxApiComponent.OTX_API)
     class TestAnomalyClassificationToAnnotation:
         @pytest.mark.priority_medium
         @pytest.mark.unit

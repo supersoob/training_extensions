@@ -14,8 +14,8 @@ from typing import Optional
 import numpy as np
 from shapely.geometry import Polygon as shapely_polygon
 
-from ote_sdk.entities.shapes.shape import Shape, ShapeEntity, ShapeType
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.shapes.shape import Shape, ShapeEntity, ShapeType
+from otx.api.utils.time_utils import now
 
 # pylint: disable=invalid-name
 
@@ -114,7 +114,7 @@ class Rectangle(Shape):
         quarter of the normalized coordinate space. This function returns rectangle
         `b1` expressed in the normalized coordinate space.
 
-            >>> from ote_sdk.entities.annotation import Annotation
+            >>> from otx.api.entities.annotation import Annotation
             >>> b1 = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=0.5)
             >>> roi = Rectangle(x1=0.0, x2=0.5, y1=0.0, y2=0.5)
             >>> normalized = b1.normalize_wrt_roi_shape(roi_shape)
@@ -148,7 +148,7 @@ class Rectangle(Shape):
         `b1` expressed in the coordinate space of `roi`. (should return top-half)
         Box denormalized to a rectangle as ROI
 
-            >>> from ote_sdk.entities.annotation import Annotation
+            >>> from otx.api.entities.annotation import Annotation
             >>> b1 = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=0.5)
             # the top-right
             >>> roi = Annotation(Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=1.0))

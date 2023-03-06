@@ -12,9 +12,9 @@ from typing import Any, Dict, List, Type, TypeVar, Union
 
 import attr
 
-from ote_sdk.configuration.elements import metadata_keys
-from ote_sdk.configuration.enums import AutoHPOState
-from ote_sdk.configuration.enums.config_element_type import (
+from otx.api.configuration.elements import metadata_keys
+from otx.api.configuration.enums import AutoHPOState
+from otx.api.configuration.enums.config_element_type import (
     ConfigElementType,
     ElementCategory,
 )

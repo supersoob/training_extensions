@@ -7,13 +7,13 @@ from datetime import datetime
 
 import pytest
 
-from ote_sdk.serialization.datetime_mapper import DatetimeMapper
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.serialization.datetime_mapper import DatetimeMapper
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestDatetimeMapper:
     @pytest.mark.priority_medium
     @pytest.mark.unit

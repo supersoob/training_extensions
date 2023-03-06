@@ -17,25 +17,25 @@ from typing import List
 
 import pytest
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
     NullAnnotationSceneEntity,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAnnotation:
 
     rectangle = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=0.5)
@@ -287,7 +287,7 @@ class TestAnnotation:
         assert "name=car" not in str(annotation.get_labels())  # car_label is empty
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAnnotationSceneKind:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -319,7 +319,7 @@ class TestAnnotationSceneKind:
         assert str(annotation_scene_kind(5)) == "TASK_PREDICTION"
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAnnotationSceneEntity:
 
     creation_date = now()
@@ -589,7 +589,7 @@ class TestAnnotationSceneEntity:
         assert annotation_scene_entity.get_label_ids() == {ID(), ID(123456789)}
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestNullAnnotationSceneEntity:
     @pytest.mark.priority_medium
     @pytest.mark.unit

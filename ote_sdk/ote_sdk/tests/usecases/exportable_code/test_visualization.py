@@ -6,25 +6,25 @@ import cv2
 import numpy as np
 import pytest
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.usecases.exportable_code.visualizers import Visualizer
-from ote_sdk.utils.shape_drawer import ShapeDrawer
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.usecases.exportable_code.visualizers import Visualizer
+from otx.api.utils.shape_drawer import ShapeDrawer
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestVisualizer:
     image = np.random.randint(low=0, high=255, size=(480, 640, 3)).astype(np.float32)
 

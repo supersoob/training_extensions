@@ -14,8 +14,8 @@ from typing import Callable, List, Optional, Union
 
 from attr import asdict, attrib, attrs, setters
 
-from ote_sdk.configuration.elements.utils import attr_enum_to_str_serializer
-from ote_sdk.configuration.enums.config_element_type import ConfigElementType
+from otx.api.configuration.elements.utils import attr_enum_to_str_serializer
+from otx.api.configuration.enums.config_element_type import ConfigElementType
 
 from .types import Action, Operator
 from .utils import attr_convert_action, attr_convert_operator

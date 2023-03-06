@@ -7,8 +7,8 @@ This module contains a default set of configurable parameters for a model
 
 from attr import attrib, attrs
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import (
     ParameterGroup,
     add_parameter_group,
     boolean_attribute,
@@ -16,7 +16,7 @@ from ote_sdk.configuration.elements import (
     configurable_integer,
     string_attribute,
 )
-from ote_sdk.configuration.enums.model_lifecycle import ModelLifecycle
+from otx.api.configuration.enums.model_lifecycle import ModelLifecycle
 
 
 @attrs

@@ -11,7 +11,7 @@ from typing import Optional
 import cv2
 import numpy as np
 
-from ote_sdk.entities.annotation import AnnotationSceneEntity
+from otx.api.entities.annotation import AnnotationSceneEntity
 
 from .visualizer import Visualizer
 

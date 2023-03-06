@@ -14,9 +14,9 @@ from typing import Optional, Sequence, Union
 
 from omegaconf import DictConfig
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import ParameterGroup, metadata_keys
-from ote_sdk.configuration.enums import ModelLifecycle
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import ParameterGroup, metadata_keys
+from otx.api.configuration.enums import ModelLifecycle
 
 from .convert import convert
 from .create import input_to_config_dict

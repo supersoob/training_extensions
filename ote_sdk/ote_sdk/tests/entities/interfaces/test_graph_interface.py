@@ -5,18 +5,18 @@ from unittest.mock import patch
 
 import pytest
 
-from ote_sdk.entities.interfaces.graph_interface import IGraph
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.interfaces.graph_interface import IGraph
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIGraph:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.entities.interfaces.graph_interface.IGraph.__abstractmethods__", set()
+        "otx.api.entities.interfaces.graph_interface.IGraph.__abstractmethods__", set()
     )
     def test_i_graph(self):
         """

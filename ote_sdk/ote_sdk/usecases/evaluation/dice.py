@@ -7,8 +7,8 @@
 
 from typing import Dict, List, Optional, Tuple
 
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.metrics import (
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -16,16 +16,16 @@ from ote_sdk.entities.metrics import (
     Performance,
     ScoreMetric,
 )
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
-from ote_sdk.usecases.evaluation.basic_operations import (
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.usecases.evaluation.averaging import MetricAverageMethod
+from otx.api.usecases.evaluation.basic_operations import (
     get_intersections_and_cardinalities,
 )
-from ote_sdk.usecases.evaluation.performance_provider_interface import (
+from otx.api.usecases.evaluation.performance_provider_interface import (
     IPerformanceProvider,
 )
-from ote_sdk.utils.segmentation_utils import mask_from_dataset_item
-from ote_sdk.utils.time_utils import timeit
+from otx.api.utils.segmentation_utils import mask_from_dataset_item
+from otx.api.utils.time_utils import timeit
 
 
 class DiceAverage(IPerformanceProvider):

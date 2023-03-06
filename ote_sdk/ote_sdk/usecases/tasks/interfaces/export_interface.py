@@ -7,7 +7,7 @@
 import abc
 from enum import Enum, auto
 
-from ote_sdk.entities.model import ModelEntity
+from otx.api.entities.model import ModelEntity
 
 
 class ExportType(Enum):

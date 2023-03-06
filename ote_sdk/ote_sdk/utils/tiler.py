@@ -12,8 +12,8 @@ from typing import Any, List, Tuple, Union
 
 import numpy as np
 
-from ote_sdk.utils.detection_utils import detection2array
-from ote_sdk.utils.nms import multiclass_nms
+from otx.api.utils.detection_utils import detection2array
+from otx.api.utils.nms import multiclass_nms
 
 
 class Tiler:

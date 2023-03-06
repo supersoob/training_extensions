@@ -1,19 +1,19 @@
 """
 Entities containing shapes
 
-.. automodule:: ote_sdk.entities.shapes.rectangle
+.. automodule:: otx.api.entities.shapes.rectangle
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.entities.shapes.circle
+.. automodule:: otx.api.entities.shapes.circle
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.entities.shapes.polygon
+.. automodule:: otx.api.entities.shapes.polygon
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.entities.shapes.shape
+.. automodule:: otx.api.entities.shapes.shape
    :members:
    :undoc-members:
 """

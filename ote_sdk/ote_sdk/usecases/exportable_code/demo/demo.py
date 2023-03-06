@@ -10,7 +10,7 @@ from argparse import SUPPRESS, ArgumentParser
 from pathlib import Path
 
 # pylint: disable=no-name-in-module, import-error
-from ote_sdk.usecases.exportable_code.demo.demo_package import (
+from otx.api.usecases.exportable_code.demo.demo_package import (
     AsyncExecutor,
     ChainExecutor,
     ModelContainer,

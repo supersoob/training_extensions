@@ -8,29 +8,29 @@ from typing import List
 import numpy as np
 import pytest
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.entities.annotation import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.metadata import MetadataItemEntity
-from ote_sdk.entities.model import ModelConfiguration, ModelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.tensor import TensorEntity
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.color import Color
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.image import Image
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.metadata import MetadataItemEntity
+from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.subset import Subset
+from otx.api.entities.tensor import TensorEntity
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
 class DatasetItemParameters:
@@ -149,7 +149,7 @@ class DatasetItemParameters:
         )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestDatasetItemEntity:
     @staticmethod
     def compare_denormalized_annotations(

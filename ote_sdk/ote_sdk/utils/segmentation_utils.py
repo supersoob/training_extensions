@@ -14,13 +14,13 @@ import cv2
 import numpy as np
 from bson import ObjectId
 
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.id import ID
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.utils.shape_factory import ShapeFactory
 
 
 def mask_from_dataset_item(

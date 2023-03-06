@@ -14,9 +14,9 @@ import numpy as np
 from scipy import optimize, special
 from shapely.geometry import Polygon as shapely_polygon
 
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import Shape, ShapeType
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import Shape, ShapeType
+from otx.api.utils.time_utils import now
 
 # pylint: disable=invalid-name
 
@@ -167,9 +167,9 @@ class Ellipse(Shape):
             The 2D space where `c1` lives in is an `roi` living in the top-left quarter of the normalized coordinate
             space. This function returns Ellipse `c1` expressed in the normalized coordinate space.
 
-            >>> from ote_sdk.entities.annotation import Annotation
-            >>> from ote_sdk.entities.shapes.rectangle import Rectangle
-            >>> from ote_sdk.entities.shapes.ellipse import Ellipse
+            >>> from otx.api.entities.annotation import Annotation
+            >>> from otx.api.entities.shapes.rectangle import Rectangle
+            >>> from otx.api.entities.shapes.ellipse import Ellipse
             >>> c1 = Ellipse(x1=0.5, y1=0.5, x2=0.6, y2=0.6)
             >>> roi = Rectangle(x1=0.0, x2=0.5, y1=0.0, y2=0.5)
             >>> normalized = c1.normalize_wrt_roi_shape(roi_shape)
@@ -203,8 +203,8 @@ class Ellipse(Shape):
 
             Ellipse denormalized to a rectangle as ROI
 
-            >>> from ote_sdk.entities.annotation import Annotation
-            >>> from ote_sdk.entities.shapes.ellipse import Ellipse
+            >>> from otx.api.entities.annotation import Annotation
+            >>> from otx.api.entities.shapes.ellipse import Ellipse
             >>> c1 = Ellipse(x1=0.5, x2=1.0, y1=0.0, y2=0.5)  # An ellipse in the top right
             >>> roi = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=1.0)  # the half-right
             >>> normalized = c1.denormalize_wrt_roi_shape(roi_shape)  # should return top half

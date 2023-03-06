@@ -9,8 +9,8 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.shapes.rectangle import Rectangle
 
 #: Dictionary storing a number for each label. The ``None`` key represents "all labels"
 NumberPerLabel = Dict[Optional[LabelEntity], int]

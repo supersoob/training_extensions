@@ -8,10 +8,10 @@ from typing import Dict, List
 import cv2
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.rectangle import Rectangle
 
 
 def create_detection_annotation_from_anomaly_heatmap(

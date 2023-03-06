@@ -17,9 +17,9 @@ except ImportError:
         """
 
 
-class OteSdkComponent(MarkMeta):
+class OtxApiComponent(MarkMeta):
     """
     OTE SDK Component marker.
     """
 
-    OTE_SDK = "ote_sdk"
+    OTX_API = "otx.api"

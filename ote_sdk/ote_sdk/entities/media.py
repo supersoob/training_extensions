@@ -9,7 +9,7 @@ from typing import Optional
 
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation
+from otx.api.entities.annotation import Annotation
 
 
 class IMediaEntity(metaclass=abc.ABCMeta):

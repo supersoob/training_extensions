@@ -10,11 +10,11 @@ from typing import Dict, List, Optional, Set
 
 from bson import ObjectId
 
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.shape import ShapeEntity
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.id import ID
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.shape import ShapeEntity
+from otx.api.utils.time_utils import now
 
 
 class Annotation(metaclass=abc.ABCMeta):
@@ -150,8 +150,8 @@ class AnnotationSceneEntity(metaclass=abc.ABCMeta):
 
     :example: Creating an annotation:
 
-    >>> from ote_sdk.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
-    >>> from ote_sdk.entities.shapes.rectangle import Rectangle
+    >>> from otx.api.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
+    >>> from otx.api.entities.shapes.rectangle import Rectangle
     >>> box = Rectangle(x1=0.0, y1=0.0, x2=0.5, y2=0.5)  # Box covering top-left quart of image
     >>> AnnotationSceneEntity(annotations=[Annotation(shape=box, labels=[])], kind=AnnotationSceneKind.ANNOTATION)
 

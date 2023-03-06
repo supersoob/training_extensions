@@ -8,15 +8,15 @@ from time import sleep
 
 import pytest
 
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.tests.test_helpers import (
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.tests.test_helpers import (
     generate_random_image_folder,
     generate_random_single_image,
     generate_random_single_video,
     generate_random_video_folder,
 )
-from ote_sdk.usecases.exportable_code.streamer import (
+from otx.api.usecases.exportable_code.streamer import (
     CameraStreamer,
     DirStreamer,
     ImageStreamer,
@@ -27,7 +27,7 @@ from ote_sdk.usecases.exportable_code.streamer import (
 )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestStreamer:
     @staticmethod
     def assert_streamer_element(streamer):

@@ -19,18 +19,18 @@ import re
 
 import pytest
 
-from ote_sdk.entities.metadata import (
+from otx.api.entities.metadata import (
     FloatMetadata,
     FloatType,
     IMetadata,
     MetadataItemEntity,
 )
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.model import ModelEntity
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIMetadata:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -62,7 +62,7 @@ class TestIMetadata:
         assert test_instance.name == "String"
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestFloatType:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -136,7 +136,7 @@ class TestFloatType:
             str(test_instance(6))
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestMetadataItemEntity:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -181,13 +181,13 @@ class TestMetadataItemEntity:
         assert test_instance0 == test_instance1 != test_instance2
         __repr = repr(test_instance0)
         repr_pattern = (
-            r"MetadataItemEntity\(model=\<ote_sdk.entities.model.ModelEntity object at"
+            r"MetadataItemEntity\(model=\<otx.api.entities.model.ModelEntity object at"
             r" 0x[a-fA-F0-9]{10,32}\>\, data\=default_i_metadata\)"
         )
         assert re.match(repr_pattern, __repr)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestFloatMetadata:
     @pytest.mark.priority_medium
     @pytest.mark.unit

@@ -7,20 +7,20 @@
 from abc import ABC
 from typing import List, Optional
 
-from ote_sdk.entities.metrics import (
+from otx.api.entities.metrics import (
     MetricsGroup,
     MultiScorePerformance,
     Performance,
     ScoreMetric,
 )
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
-from ote_sdk.usecases.evaluation.dice import DiceAverage
-from ote_sdk.usecases.evaluation.f_measure import FMeasure
-from ote_sdk.usecases.evaluation.performance_provider_interface import (
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.usecases.evaluation.averaging import MetricAverageMethod
+from otx.api.usecases.evaluation.dice import DiceAverage
+from otx.api.usecases.evaluation.f_measure import FMeasure
+from otx.api.usecases.evaluation.performance_provider_interface import (
     IPerformanceProvider,
 )
-from ote_sdk.utils.dataset_utils import (
+from otx.api.utils.dataset_utils import (
     contains_anomalous_images,
     split_local_global_resultset,
 )

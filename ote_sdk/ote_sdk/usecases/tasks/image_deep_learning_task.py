@@ -7,9 +7,9 @@
 
 import abc
 
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
-from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
 
 
 class ImageDeepLearningTask(

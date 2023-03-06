@@ -8,7 +8,7 @@ General fixtures.
 
 import pytest
 
-from ote_sdk.tests.test_helpers import LabelSchemaExample
+from otx.api.tests.test_helpers import LabelSchemaExample
 
 
 @pytest.fixture(scope="session")

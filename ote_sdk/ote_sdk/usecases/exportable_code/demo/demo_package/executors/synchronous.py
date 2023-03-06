@@ -7,14 +7,14 @@ Sync Executor based on ModelAPI
 
 from typing import Union
 
-from ote_sdk.usecases.exportable_code.demo.demo_package.model_container import (
+from otx.api.usecases.exportable_code.demo.demo_package.model_container import (
     ModelContainer,
 )
-from ote_sdk.usecases.exportable_code.demo.demo_package.utils import (
+from otx.api.usecases.exportable_code.demo.demo_package.utils import (
     create_output_converter,
 )
-from ote_sdk.usecases.exportable_code.streamer import get_streamer
-from ote_sdk.usecases.exportable_code.visualizers import IVisualizer
+from otx.api.usecases.exportable_code.streamer import get_streamer
+from otx.api.usecases.exportable_code.visualizers import IVisualizer
 
 
 class SyncExecutor:

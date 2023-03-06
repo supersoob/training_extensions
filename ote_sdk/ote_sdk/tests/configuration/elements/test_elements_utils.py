@@ -7,9 +7,9 @@ from types import FunctionType
 import pytest
 from attr import fields
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.configuration.elements.parameter_group import ParameterGroup
-from ote_sdk.configuration.elements.utils import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.configuration.elements.parameter_group import ParameterGroup
+from otx.api.configuration.elements.utils import (
     _convert_enum_selectable_value,
     _validate_and_convert_float,
     attr_enum_to_str_serializer,
@@ -22,14 +22,14 @@ from ote_sdk.configuration.elements.utils import (
     construct_attr_value_validator,
     convert_string_to_id,
 )
-from ote_sdk.configuration.enums.config_element_type import ElementCategory
-from ote_sdk.entities.id import ID
-from ote_sdk.tests.configuration.dummy_config import SomeEnumSelectable
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.enums.config_element_type import ElementCategory
+from otx.api.entities.id import ID
+from otx.api.tests.configuration.dummy_config import SomeEnumSelectable
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestUtilsFunctions:
     parameter_group = ParameterGroup(header="test header")
     attribute = fields(ConfigurableParameters)

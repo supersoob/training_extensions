@@ -13,11 +13,11 @@ import numpy as np
 from openvino.model_zoo.model_api.adapters import OpenvinoAdapter, create_core
 from openvino.model_zoo.model_api.models import Model
 
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model_template import TaskType
-from ote_sdk.serialization.label_mapper import LabelSchemaMapper
-from ote_sdk.utils import Tiler
-from ote_sdk.utils.detection_utils import detection2array
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model_template import TaskType
+from otx.api.serialization.label_mapper import LabelSchemaMapper
+from otx.api.utils import Tiler
+from otx.api.utils.detection_utils import detection2array
 
 from .utils import get_model_path, get_parameters
 

@@ -14,15 +14,15 @@ from typing import List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation, AnnotationSceneEntity
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.media import IMedia2DEntity
-from ote_sdk.entities.metadata import IMetadata, MetadataItemEntity
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.subset import Subset
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.entities.annotation import Annotation, AnnotationSceneEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.media import IMedia2DEntity
+from otx.api.entities.metadata import IMetadata, MetadataItemEntity
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.subset import Subset
+from otx.api.utils.shape_factory import ShapeFactory
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class DatasetItemEntity(metaclass=abc.ABCMeta):
 
     This returns the numpy data for the assigned ROI. But it is possible to extract any arbitrary region.
 
-    >>> from ote_sdk.entities.shapes.rectangle import Rectangle
+    >>> from otx.api.entities.shapes.rectangle import Rectangle
     >>> top_left_quart_roi = Annotation(Rectangle(x1=0.0, y1=0.0, x2=0.5, y2=0.5), labels=[])
     >>> top_left_quart_numpy = dataset_item.roi_numpy(roi=top_left_quart_roi)
 
@@ -463,8 +463,8 @@ class DatasetItemEntity(metaclass=abc.ABCMeta):
 
         .. rubric:: Adding visualization heatmap (ResultMediaEntity) to DatasetItemEntity
 
-        >>> from ote_sdk.entities.image import Image
-        >>> from ote_sdk.entities.result_media import ResultMediaEntity
+        >>> from otx.api.entities.image import Image
+        >>> from otx.api.entities.result_media import ResultMediaEntity
         >>> media = Image(file_path='image.jpeg')
         >>> annotation = NullAnnotationSceneEntity()
         >>> dataset_item = DatasetItem(media=media, annotation_scene=annotation)
@@ -477,7 +477,7 @@ class DatasetItemEntity(metaclass=abc.ABCMeta):
 
         .. rubric:: Representation vector for active learning
 
-        >>> from ote_sdk.entities.tensor import TensorEntity
+        >>> from otx.api.entities.tensor import TensorEntity
         >>> tensor = TensorEntity(name="representation_vector", numpy=data)
         >>> dataset_item.append_metadata_item(data=tensor, model=model)
 

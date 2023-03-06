@@ -13,21 +13,21 @@ import cv2
 import numpy as np
 from openvino.model_zoo.model_api.models import utils
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.utils.anomaly_utils import create_detection_annotation_from_anomaly_heatmap
-from ote_sdk.utils.labels_utils import get_empty_label
-from ote_sdk.utils.segmentation_utils import create_annotation_from_segmentation_map
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.utils.anomaly_utils import create_detection_annotation_from_anomaly_heatmap
+from otx.api.utils.labels_utils import get_empty_label
+from otx.api.utils.segmentation_utils import create_annotation_from_segmentation_map
+from otx.api.utils.time_utils import now
 
 
 class IPredictionToAnnotationConverter(metaclass=abc.ABCMeta):

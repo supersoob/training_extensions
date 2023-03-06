@@ -8,7 +8,7 @@
 import datetime
 from typing import Union
 
-from ote_sdk.utils.time_utils import now
+from otx.api.utils.time_utils import now
 
 
 class DatetimeMapper:

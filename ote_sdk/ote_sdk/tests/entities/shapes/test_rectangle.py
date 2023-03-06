@@ -20,18 +20,18 @@ import numpy as np
 import pytest
 from shapely.geometry.polygon import Polygon
 
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import Domain, ScoredLabel
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import ShapeType
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import Domain, ScoredLabel
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import ShapeType
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestRectangle:
     modification_date = now()
 

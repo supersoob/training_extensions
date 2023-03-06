@@ -8,10 +8,10 @@
 import json
 from typing import Dict, Union, cast
 
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import (
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import (
     LabelGraph,
     LabelGroup,
     LabelGroupType,

@@ -12,11 +12,11 @@ from typing import List, Set, Tuple
 import numpy as np
 from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
 
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup
-from ote_sdk.entities.metrics import (
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.label_schema import LabelGroup
+from otx.api.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -27,13 +27,13 @@ from ote_sdk.entities.metrics import (
     Performance,
     ScoreMetric,
 )
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
-from ote_sdk.usecases.evaluation.basic_operations import (
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.usecases.evaluation.averaging import MetricAverageMethod
+from otx.api.usecases.evaluation.basic_operations import (
     precision_per_class,
     recall_per_class,
 )
-from ote_sdk.usecases.evaluation.performance_provider_interface import (
+from otx.api.usecases.evaluation.performance_provider_interface import (
     IPerformanceProvider,
 )
 

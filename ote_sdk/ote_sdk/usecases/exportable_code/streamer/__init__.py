@@ -5,7 +5,7 @@ Initialization of streamer
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from ote_sdk.usecases.exportable_code.streamer.streamer import (
+from otx.api.usecases.exportable_code.streamer.streamer import (
     CameraStreamer,
     DirStreamer,
     ImageStreamer,

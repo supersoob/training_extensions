@@ -9,9 +9,9 @@ import math
 from dataclasses import dataclass
 from typing import Optional
 
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
 
 
 @dataclass

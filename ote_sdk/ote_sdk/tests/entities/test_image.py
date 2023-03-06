@@ -22,15 +22,15 @@ import cv2
 import numpy as np
 import pytest
 
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.image import Image
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestImage:
     @pytest.mark.priority_medium
     @pytest.mark.unit

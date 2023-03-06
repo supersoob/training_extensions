@@ -6,10 +6,10 @@ This module implements helpers for converting shape entities
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import ShapeEntity
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import ShapeEntity
 
 
 class ShapeFactory:
@@ -28,9 +28,9 @@ class ShapeFactory:
 
         To obtain the shapes inside the full annotation as rectangles, one could call:
 
-        >>> from ote_sdk.entities.dataset_item import DatasetItem
-        >>> from ote_sdk.entities.image import NullImage
-        >>> from ote_sdk.entities.annotation_scene import NullAnnotationScene
+        >>> from otx.api.entities.dataset_item import DatasetItem
+        >>> from otx.api.entities.image import NullImage
+        >>> from otx.api.entities.annotation_scene import NullAnnotationScene
         >>> dataset_item = DatasetItem(media=NullImage(),
         >>>     annotation=NullAnnotationScene())
         >>> rectangles = [ShapeFactory.shape_as_rectangle(shape,

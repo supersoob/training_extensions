@@ -9,7 +9,7 @@ This module contains utility functions for use in defining ui rules
 
 from typing import Union
 
-from ote_sdk.configuration.ui_rules.types import Action, Operator
+from otx.api.configuration.ui_rules.types import Action, Operator
 
 
 def attr_convert_operator(operator: Union[str, Operator]) -> Operator:

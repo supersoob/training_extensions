@@ -14,9 +14,9 @@ from typing import List, Optional
 
 from shapely.geometry import Polygon as shapely_polygon
 
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import Shape, ShapeType
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import Shape, ShapeType
+from otx.api.utils.time_utils import now
 
 
 class Point:
@@ -140,8 +140,8 @@ class Polygon(Shape):
             The 2D space where `p1` lives in is an `roi` living in the top-left quarter of the normalized coordinate
             space. This function returns Polygon `p1` expressed in the normalized coordinate space.
 
-            >>> from ote_sdk.entities.annotation import Annotation
-            >>> from ote_sdk.entities.shapes.rectangle import Rectangle
+            >>> from otx.api.entities.annotation import Annotation
+            >>> from otx.api.entities.shapes.rectangle import Rectangle
             >>> p1 = Polygon(points=[Point(x=0.5, y=0.0), Point(x=0.75, y=0.2), Point(x=0.6, y=0.1)])
             >>> roi = Rectangle(x1=0.0, x2=0.5, y1=0.0, y2=0.5)
             >>> normalized = p1.normalize_wrt_roi_shape(roi_shape)
@@ -170,8 +170,8 @@ class Polygon(Shape):
 
             Polygon denormalized to a rectangle as ROI
 
-            >>> from ote_sdk.entities.shapes.rectangle import Rectangle
-            >>> from ote_sdk.entities.annotation import Annotation
+            >>> from otx.api.entities.shapes.rectangle import Rectangle
+            >>> from otx.api.entities.annotation import Annotation
             >>> p1 = Polygon(points=[Point(x=0.5, y=0.0), Point(x=0.75, y=0.2), Point(x=0.6, y=0.1)])
             >>> roi = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=1.0)  # the half-right
             >>> normalized = p1.denormalize_wrt_roi_shape(roi_shape)

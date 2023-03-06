@@ -22,7 +22,7 @@ from typing import Callable, Dict, Optional
 import pytest
 import yaml
 
-from ote_sdk.entities.model_template import parse_model_template
+from otx.api.entities.model_template import parse_model_template
 
 from .e2e_test_system import DataCollector
 from .logging import get_logger, set_log_level

@@ -11,10 +11,10 @@ from typing import Dict, List, NamedTuple, Optional, Sequence, Union, cast
 
 from omegaconf import DictConfig, ListConfig, OmegaConf
 
-from ote_sdk.configuration.elements import metadata_keys
-from ote_sdk.configuration.enums import AutoHPOState
-from ote_sdk.configuration.helper.utils import search_in_config_dict
-from ote_sdk.entities.label import Domain
+from otx.api.configuration.elements import metadata_keys
+from otx.api.configuration.enums import AutoHPOState
+from otx.api.configuration.helper.utils import search_in_config_dict
+from otx.api.entities.label import Domain
 
 
 class TargetDevice(IntEnum):

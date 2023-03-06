@@ -13,8 +13,8 @@ different ui exposure logic classes
 from enum import Enum
 from functools import partial
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import (
     ParameterGroup,
     configurable_boolean,
     configurable_float,
@@ -22,7 +22,7 @@ from ote_sdk.configuration.elements import (
     float_selectable,
     selectable,
 )
-from ote_sdk.configuration.ui_rules.rules import Rule, UIRules
+from otx.api.configuration.ui_rules.rules import Rule, UIRules
 
 
 class PrimitiveElementMapping(Enum):

@@ -6,15 +6,15 @@ algorithm implementers to obtain the metrices """
 #
 
 
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.usecases.evaluation.accuracy import Accuracy
-from ote_sdk.usecases.evaluation.anomaly_metrics import (
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.usecases.evaluation.accuracy import Accuracy
+from otx.api.usecases.evaluation.anomaly_metrics import (
     AnomalyDetectionScores,
     AnomalySegmentationScores,
 )
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
-from ote_sdk.usecases.evaluation.dice import DiceAverage
-from ote_sdk.usecases.evaluation.f_measure import FMeasure
+from otx.api.usecases.evaluation.averaging import MetricAverageMethod
+from otx.api.usecases.evaluation.dice import DiceAverage
+from otx.api.usecases.evaluation.f_measure import FMeasure
 
 
 class MetricsHelper:

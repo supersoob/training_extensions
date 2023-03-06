@@ -17,19 +17,19 @@ from typing import Dict, List, TypeVar, Union
 import attr
 from omegaconf import DictConfig, OmegaConf
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.elements import (
     ConfigurableEnum,
     ParameterGroup,
     metadata_keys,
 )
-from ote_sdk.configuration.enums import AutoHPOState, ModelLifecycle
-from ote_sdk.configuration.enums.config_element_type import (
+from otx.api.configuration.enums import AutoHPOState, ModelLifecycle
+from otx.api.configuration.enums.config_element_type import (
     ConfigElementType,
     ElementCategory,
 )
-from ote_sdk.configuration.enums.utils import get_enum_names
-from ote_sdk.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
+from otx.api.configuration.enums.utils import get_enum_names
+from otx.api.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
 
 from .config_element_mapping import (
     GroupElementMapping,

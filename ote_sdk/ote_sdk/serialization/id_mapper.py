@@ -5,7 +5,7 @@
 
 """ This module contains the mapper for ID entities """
 
-from ote_sdk.entities.id import ID
+from otx.api.entities.id import ID
 
 
 class IDMapper:

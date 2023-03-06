@@ -7,7 +7,7 @@ from typing import Union
 
 import networkx as nx
 
-from ote_sdk.entities.interfaces.graph_interface import IGraph
+from otx.api.entities.interfaces.graph_interface import IGraph
 
 
 class Graph(IGraph):

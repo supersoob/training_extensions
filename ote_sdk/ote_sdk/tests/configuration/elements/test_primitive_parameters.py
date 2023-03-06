@@ -5,8 +5,8 @@
 import pytest
 from attr import _make, validators
 
-from ote_sdk.configuration.elements.configurable_enum import ConfigurableEnum
-from ote_sdk.configuration.elements.primitive_parameters import (
+from otx.api.configuration.elements.configurable_enum import ConfigurableEnum
+from otx.api.configuration.elements.primitive_parameters import (
     boolean_attribute,
     configurable_boolean,
     configurable_float,
@@ -16,14 +16,14 @@ from ote_sdk.configuration.elements.primitive_parameters import (
     set_common_metadata,
     string_attribute,
 )
-from ote_sdk.configuration.enums import AutoHPOState, ConfigElementType, ModelLifecycle
-from ote_sdk.configuration.ui_rules import NullUIRules, Rule, UIRules
-from ote_sdk.tests.configuration.dummy_config import SomeEnumSelectable
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.enums import AutoHPOState, ConfigElementType, ModelLifecycle
+from otx.api.configuration.ui_rules import NullUIRules, Rule, UIRules
+from otx.api.tests.configuration.dummy_config import SomeEnumSelectable
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestPrimitiveParameters:
     ui_rules = UIRules(rules=[Rule(parameter="rule parameter", value=1)])
 

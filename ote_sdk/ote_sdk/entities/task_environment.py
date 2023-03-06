@@ -6,11 +6,11 @@
 
 from typing import List, Optional, Type, TypeVar
 
-from ote_sdk.configuration import ConfigurableParameters, ote_config_helper
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model import ModelConfiguration, ModelEntity
-from ote_sdk.entities.model_template import ModelTemplate
+from otx.api.configuration import ConfigurableParameters, ote_config_helper
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.model_template import ModelTemplate
 
 TypeVariable = TypeVar("TypeVariable", bound=ConfigurableParameters)
 

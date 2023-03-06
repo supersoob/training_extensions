@@ -15,12 +15,12 @@
 
 import pytest
 
-from ote_sdk.entities.coordinate import Coordinate
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.coordinate import Coordinate
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestCoordinate:
     @pytest.mark.priority_medium
     @pytest.mark.unit

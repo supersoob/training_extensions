@@ -8,8 +8,8 @@ This module implements utilities for labels
 
 from typing import Optional
 
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
 
 
 def get_empty_label(label_schema: LabelSchemaEntity) -> Optional[LabelEntity]:

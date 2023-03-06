@@ -8,7 +8,7 @@
 import abc
 from typing import Optional
 
-from ote_sdk.entities.resultset import ResultSetEntity
+from otx.api.entities.resultset import ResultSetEntity
 
 
 class IEvaluationTask(metaclass=abc.ABCMeta):

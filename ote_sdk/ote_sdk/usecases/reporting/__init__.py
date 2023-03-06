@@ -1,11 +1,11 @@
 """
 Training reporting.
 
-.. automodule:: ote_sdk.usecases.reporting.callback
+.. automodule:: otx.api.usecases.reporting.callback
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.reporting.time_monitor_callback
+.. automodule:: otx.api.usecases.reporting.time_monitor_callback
    :members:
    :undoc-members:
 

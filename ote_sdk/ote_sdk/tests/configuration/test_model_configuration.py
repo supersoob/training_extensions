@@ -4,12 +4,12 @@
 
 import pytest
 
-from ote_sdk.configuration.default_model_parameters import DefaultModelParameters
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.default_model_parameters import DefaultModelParameters
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestModelConfiguration:
     @pytest.mark.priority_medium
     @pytest.mark.unit

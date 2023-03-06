@@ -8,9 +8,9 @@ import datetime
 from enum import Enum, auto
 from typing import Optional
 
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.utils.time_utils import now
 
 
 class Domain(Enum):

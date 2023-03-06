@@ -6,7 +6,7 @@ import abc
 from enum import Enum, auto
 from typing import Optional
 
-from ote_sdk.entities.model import ModelEntity
+from otx.api.entities.model import ModelEntity
 
 
 class IMetadata(metaclass=abc.ABCMeta):

@@ -4,12 +4,12 @@
 
 import pytest
 
-from ote_sdk.configuration.enums.model_lifecycle import ModelLifecycle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.configuration.enums.model_lifecycle import ModelLifecycle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestModelLifecycle:
     @pytest.mark.priority_medium
     @pytest.mark.unit

@@ -18,20 +18,20 @@ from datetime import datetime
 
 import pytest
 
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import (
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import (
     GeometryException,
     Shape,
     ShapeEntity,
     ShapeType,
 )
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestShapeType:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -50,7 +50,7 @@ class TestShapeType:
         assert ShapeType.POLYGON.value == 3
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestShapeEntity:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -89,7 +89,7 @@ class TestShapeEntity:
                 ShapeEntity._as_shapely_polygon(shape)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestShape:
     @staticmethod
     def fully_covering_rectangle() -> Rectangle:

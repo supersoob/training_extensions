@@ -25,18 +25,18 @@ from typing import (
 import cv2
 import numpy as np
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     NullAnnotationSceneEntity,
 )
-from ote_sdk.entities.coordinate import Coordinate
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.ellipse import Ellipse
-from ote_sdk.entities.shapes.polygon import Polygon
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.shapes.shape import ShapeEntity
+from otx.api.entities.coordinate import Coordinate
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.ellipse import Ellipse
+from otx.api.entities.shapes.polygon import Polygon
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.shapes.shape import ShapeEntity
 
 CvTextSize = NewType("CvTextSize", Tuple[Tuple[int, int], int])
 

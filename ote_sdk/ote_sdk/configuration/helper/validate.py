@@ -11,7 +11,7 @@ configuration are within their allowed bounds or options.
 
 import attr
 
-from ote_sdk.configuration.elements import ParameterGroup
+from otx.api.configuration.elements import ParameterGroup
 
 
 def _validate_inner(config: ParameterGroup):

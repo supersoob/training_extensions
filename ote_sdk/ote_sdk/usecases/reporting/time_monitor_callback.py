@@ -13,8 +13,8 @@ import math
 import time
 from typing import List, Optional
 
-from ote_sdk.entities.train_parameters import UpdateProgressCallback
-from ote_sdk.usecases.reporting.callback import Callback
+from otx.api.entities.train_parameters import UpdateProgressCallback
+from otx.api.usecases.reporting.callback import Callback
 
 logger = logging.getLogger(__name__)
 

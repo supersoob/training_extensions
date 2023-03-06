@@ -10,10 +10,10 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
-from ote_sdk.entities.annotation import Annotation
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.entities.metrics import (
+from otx.api.entities.annotation import Annotation
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -27,12 +27,12 @@ from ote_sdk.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.usecases.evaluation.performance_provider_interface import (
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.usecases.evaluation.performance_provider_interface import (
     IPerformanceProvider,
 )
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.utils.shape_factory import ShapeFactory
 
 logger = logging.getLogger(__name__)
 ALL_CLASSES_NAME = "All Classes"

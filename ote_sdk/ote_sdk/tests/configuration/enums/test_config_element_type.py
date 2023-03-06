@@ -4,15 +4,15 @@
 
 import pytest
 
-from ote_sdk.configuration.enums.config_element_type import (
+from otx.api.configuration.enums.config_element_type import (
     ConfigElementType,
     ElementCategory,
 )
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestElementCategory:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -38,7 +38,7 @@ class TestElementCategory:
         assert str(ElementCategory.RULES) == "RULES"
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestConfigElementType:
     @pytest.mark.priority_medium
     @pytest.mark.unit

@@ -8,20 +8,20 @@ from datetime import datetime
 import numpy as np
 import pytest
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.entities.annotation import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup, LabelSchemaEntity
-from ote_sdk.entities.metrics import (
+from otx.api.entities.color import Color
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.image import Image
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import LabelGroup, LabelSchemaEntity
+from otx.api.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -30,19 +30,19 @@ from ote_sdk.entities.metrics import (
     ScoreMetric,
     VisualizationType,
 )
-from ote_sdk.entities.model import ModelConfiguration, ModelEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.usecases.evaluation.accuracy import (
+from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.usecases.evaluation.accuracy import (
     Accuracy,
     compute_unnormalized_confusion_matrices_from_resultset,
     precision_metrics_group,
     recall_metrics_group,
 )
-from ote_sdk.usecases.evaluation.averaging import MetricAverageMethod
+from otx.api.usecases.evaluation.averaging import MetricAverageMethod
 
 
 class CommonActions:
@@ -271,7 +271,7 @@ class CommonActions:
         assert np.array_equal(matrix.matrix_values, expected_matrix)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAccuracyFunctions:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -481,7 +481,7 @@ class TestAccuracyFunctions:
             compute_unnormalized_confusion_matrices_from_resultset(result_set)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestAccuracy:
     @pytest.mark.priority_medium
     @pytest.mark.unit

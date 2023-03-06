@@ -8,7 +8,7 @@ from typing import Tuple
 
 import numpy as np
 
-from ote_sdk.entities.metadata import IMetadata
+from otx.api.entities.metadata import IMetadata
 
 
 class TensorEntity(IMetadata):

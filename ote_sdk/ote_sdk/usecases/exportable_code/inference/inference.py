@@ -20,8 +20,8 @@ import numpy as np
 from openvino.inference_engine import ExecutableNetwork, IECore, InferRequest
 from openvino.inference_engine.constants import OK, RESULT_NOT_READY
 
-from ote_sdk.entities.annotation import AnnotationSceneEntity
-from ote_sdk.usecases.exportable_code.streamer.streamer import BaseStreamer
+from otx.api.entities.annotation import AnnotationSceneEntity
+from otx.api.usecases.exportable_code.streamer.streamer import BaseStreamer
 
 __all__ = [
     "AsyncOpenVINOTask",

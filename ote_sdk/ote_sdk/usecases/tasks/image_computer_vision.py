@@ -7,7 +7,7 @@
 
 import abc
 
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
 
 
 class ImageComputerVisionTask(IInferenceTask, metaclass=abc.ABCMeta):

@@ -5,37 +5,37 @@ from unittest.mock import patch
 
 import pytest
 
-from ote_sdk.configuration import ConfigurableParameters
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.inference_parameters import InferenceParameters
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model import ModelConfiguration, ModelEntity
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType, IExportTask
-from ote_sdk.usecases.tasks.interfaces.inference_interface import (
+from otx.api.configuration import ConfigurableParameters
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.inference_parameters import InferenceParameters
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model import ModelConfiguration, ModelEntity
+from otx.api.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType, IExportTask
+from otx.api.usecases.tasks.interfaces.inference_interface import (
     IInferenceTask,
     IRawInference,
 )
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import (
+from otx.api.usecases.tasks.interfaces.optimization_interface import (
     IOptimizationTask,
     OptimizationType,
 )
-from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
-from ote_sdk.usecases.tasks.interfaces.unload_interface import IUnload
+from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
+from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIEvaluationTask:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.evaluate_interface.IEvaluationTask.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.evaluate_interface.IEvaluationTask.__abstractmethods__",
         set(),
     )
     def test_evaluate_interface(self):
@@ -65,13 +65,13 @@ class TestIEvaluationTask:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIInferenceTask:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.inference_interface.IInferenceTask.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.inference_interface.IInferenceTask.__abstractmethods__",
         set(),
     )
     def test_i_inference_task(self):
@@ -93,13 +93,13 @@ class TestIInferenceTask:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIRawInference:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.inference_interface.IRawInference.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.inference_interface.IRawInference.__abstractmethods__",
         set(),
     )
     def test_i_raw_inference(self):
@@ -117,7 +117,7 @@ class TestIRawInference:
             IRawInference().raw_infer(input_tensors={}, output_tensors={})
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestOptimizationType:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -136,13 +136,13 @@ class TestOptimizationType:
         assert OptimizationType.NNCF.value == 2
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIOptimizationTask:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.optimization_interface.IOptimizationTask.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.optimization_interface.IOptimizationTask.__abstractmethods__",
         set(),
     )
     def test_optimization_interface(self):
@@ -172,13 +172,13 @@ class TestIOptimizationTask:
             )
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestITrainingTask:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.training_interface.ITrainingTask.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.training_interface.ITrainingTask.__abstractmethods__",
         set(),
     )
     def test_training_interface(self):
@@ -213,13 +213,13 @@ class TestITrainingTask:
             i_training_task.cancel_training()
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIUnload:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.unload_interface.IUnload.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.unload_interface.IUnload.__abstractmethods__",
         set(),
     )
     def test_unload_interface(self):
@@ -237,7 +237,7 @@ class TestIUnload:
             IUnload().unload()
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestExportType:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -255,13 +255,13 @@ class TestExportType:
         assert ExportType.OPENVINO.value == 1
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestIExportTask:
     @pytest.mark.priority_medium
     @pytest.mark.unit
     @pytest.mark.reqids(Requirements.REQ_1)
     @patch(
-        "ote_sdk.usecases.tasks.interfaces.export_interface.IExportTask.__abstractmethods__",
+        "otx.api.usecases.tasks.interfaces.export_interface.IExportTask.__abstractmethods__",
         set(),
     )
     def test_export_interface(self):

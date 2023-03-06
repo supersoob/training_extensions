@@ -10,8 +10,8 @@ from typing import Dict
 
 import numpy as np
 
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.inference_parameters import InferenceParameters
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.inference_parameters import InferenceParameters
 
 
 class IInferenceTask(metaclass=abc.ABCMeta):

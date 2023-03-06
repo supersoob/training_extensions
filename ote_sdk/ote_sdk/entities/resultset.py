@@ -10,11 +10,11 @@ import datetime
 from enum import Enum
 from typing import Optional
 
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.metrics import NullPerformance, Performance
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.metrics import NullPerformance, Performance
+from otx.api.entities.model import ModelEntity
+from otx.api.utils.time_utils import now
 
 
 class ResultsetPurpose(Enum):

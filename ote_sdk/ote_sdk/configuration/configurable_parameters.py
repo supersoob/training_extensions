@@ -6,7 +6,7 @@ This module contains the base class to define ConfigurableParameters within OTE
 #
 from attr import attrib, attrs, setters
 
-from ote_sdk.entities.id import ID
+from otx.api.entities.id import ID
 
 from .elements.parameter_group import ParameterGroup
 from .elements.utils import convert_string_to_id

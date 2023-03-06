@@ -9,17 +9,17 @@ from random import randint
 
 import pytest
 
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Color, Domain, LabelEntity
-from ote_sdk.entities.label_schema import (
+from otx.api.entities.id import ID
+from otx.api.entities.label import Color, Domain, LabelEntity
+from otx.api.entities.label_schema import (
     LabelGraph,
     LabelGroup,
     LabelGroupType,
     LabelSchemaEntity,
     LabelTree,
 )
-from ote_sdk.serialization.datetime_mapper import DatetimeMapper
-from ote_sdk.serialization.label_mapper import (
+from otx.api.serialization.datetime_mapper import DatetimeMapper
+from otx.api.serialization.label_mapper import (
     ColorMapper,
     LabelGraphMapper,
     LabelGroupMapper,
@@ -27,12 +27,12 @@ from ote_sdk.serialization.label_mapper import (
     LabelSchemaMapper,
     label_schema_to_bytes,
 )
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestColorMapper:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -55,7 +55,7 @@ class TestColorMapper:
         assert color == deserialized
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestLabelEntityMapper:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -98,7 +98,7 @@ class TestLabelEntityMapper:
         assert label == deserialized
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestLabelSchemaEntityMapper:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -186,7 +186,7 @@ class TestLabelSchemaEntityMapper:
         assert actual_label_schema_to_bytes == expected_label_schema_to_bytes
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestLabelGroupMapper:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -224,7 +224,7 @@ class TestLabelGroupMapper:
         assert deserialized == label_group
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestLabelGraphMapper:
     label_0 = LabelEntity(name="label_0", domain=Domain.SEGMENTATION, id=ID("0"))
     label_0_1 = LabelEntity(name="label_0_1", domain=Domain.SEGMENTATION, id=ID("0_1"))

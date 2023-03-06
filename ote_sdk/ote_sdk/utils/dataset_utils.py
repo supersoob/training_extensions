@@ -18,11 +18,11 @@ Dataset utils
 
 from typing import List, Optional, Tuple
 
-from ote_sdk.entities.annotation import AnnotationSceneEntity
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.shapes.rectangle import Rectangle
+from otx.api.entities.annotation import AnnotationSceneEntity
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.shapes.rectangle import Rectangle
 
 
 def get_fully_annotated_idx(dataset: DatasetEntity) -> List[int]:

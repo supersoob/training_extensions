@@ -1,27 +1,27 @@
 """
 Evaluation metrics
 
-.. automodule:: ote_sdk.usecases.evaluation.accuracy
+.. automodule:: otx.api.usecases.evaluation.accuracy
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.evaluation.basic_operations
+.. automodule:: otx.api.usecases.evaluation.basic_operations
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.evaluation.dice
+.. automodule:: otx.api.usecases.evaluation.dice
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.evaluation.f_measure
+.. automodule:: otx.api.usecases.evaluation.f_measure
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.evaluation.get_performance_interface
+.. automodule:: otx.api.usecases.evaluation.get_performance_interface
    :members:
    :undoc-members:
 
-.. automodule:: ote_sdk.usecases.evaluation.metrics_helper
+.. automodule:: otx.api.usecases.evaluation.metrics_helper
    :members:
    :undoc-members:
 

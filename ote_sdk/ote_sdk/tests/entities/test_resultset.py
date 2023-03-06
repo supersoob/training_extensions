@@ -16,15 +16,15 @@ import datetime
 
 import pytest
 
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.metrics import NullPerformance
-from ote_sdk.entities.resultset import ResultSetEntity, ResultsetPurpose
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
-from ote_sdk.utils.time_utils import now
+from otx.api.entities.id import ID
+from otx.api.entities.metrics import NullPerformance
+from otx.api.entities.resultset import ResultSetEntity, ResultsetPurpose
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
+from otx.api.utils.time_utils import now
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestResultset:
     creation_date = now()
 

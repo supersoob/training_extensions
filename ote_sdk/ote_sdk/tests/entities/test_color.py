@@ -14,9 +14,9 @@
 
 import pytest
 
-from ote_sdk.entities.color import Color, ColorEntity
-from ote_sdk.tests.constants.ote_sdk_components import OteSdkComponent
-from ote_sdk.tests.constants.requirements import Requirements
+from otx.api.entities.color import Color, ColorEntity
+from otx.api.tests.constants.otx.api_components import OtxApiComponent
+from otx.api.tests.constants.requirements import Requirements
 
 red = 40
 red_hex = "28"
@@ -31,7 +31,7 @@ color_hex = f"{red_hex}{green_hex}{blue_hex}"
 color = Color.from_hex_str(color_hex)
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestColor:
     @pytest.mark.priority_medium
     @pytest.mark.unit
@@ -66,7 +66,7 @@ class TestColor:
         assert color.hex_str == "#44362000"
 
 
-@pytest.mark.components(OteSdkComponent.OTE_SDK)
+@pytest.mark.components(OtxApiComponent.OTX_API)
 class TestColorEntity:
     @pytest.mark.priority_medium
     @pytest.mark.unit

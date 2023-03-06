@@ -13,9 +13,9 @@ from typing import Callable, List, Optional, Type, TypeVar, Union
 
 from attr import Attribute
 
-from ote_sdk.configuration.elements.configurable_enum import ConfigurableEnum
-from ote_sdk.configuration.elements.parameter_group import ParameterGroup
-from ote_sdk.entities.id import ID
+from otx.api.configuration.elements.configurable_enum import ConfigurableEnum
+from otx.api.configuration.elements.parameter_group import ParameterGroup
+from otx.api.entities.id import ID
 
 NumericTypeVar = TypeVar("NumericTypeVar", int, float)
 SelectableTypeVar = TypeVar("SelectableTypeVar", float, str)
