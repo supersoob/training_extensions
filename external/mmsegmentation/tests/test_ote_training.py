@@ -20,19 +20,19 @@ from pprint import pformat
 from typing import Any, Callable, Dict, List, Optional
 
 import pytest
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.subset import Subset
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.subset import Subset
 
 from segmentation_tasks.extension.datasets.mmdataset import load_dataset_items
 
-from ote_sdk.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
-from ote_sdk.test_suite.training_tests_common import (make_path_be_abs,
+from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
+from otx.api.test_suite.training_tests_common import (make_path_be_abs,
                                                       make_paths_be_abs,
                                                       KEEP_CONFIG_FIELD_VALUE,
                                                       REALLIFE_USECASE_CONSTANT,
                                                       ROOT_PATH_KEY)
-from ote_sdk.test_suite.training_tests_helper import (OTETestHelper,
+from otx.api.test_suite.training_tests_helper import (OTETestHelper,
                                                       DefaultOTETestCreationParametersInterface,
                                                       OTETrainingTestInterface)
 

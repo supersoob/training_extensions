@@ -17,7 +17,7 @@
 from attr import attrs
 from configs.base.configuration import BaseAnomalyConfig
 from configs.base.configuration_enums import ModelBackbone
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.elements import (
     add_parameter_group,
     selectable,
     string_attribute,

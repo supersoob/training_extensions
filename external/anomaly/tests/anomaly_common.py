@@ -24,10 +24,10 @@ if TYPE_CHECKING:
     from nncf.torch.nncf_network import NNCFNetwork
 
 from adapters.anomalib.data.mvtec import OteMvtecDataset
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model_template import TaskType
-from ote_sdk.test_suite.training_tests_actions import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model_template import TaskType
+from otx.api.test_suite.training_tests_actions import (
     BaseOTETestAction,
     OTETestExportAction,
     OTETestExportEvaluationAction,
@@ -41,7 +41,7 @@ from ote_sdk.test_suite.training_tests_actions import (
     OTETestTrainingAction,
     OTETestTrainingEvaluationAction,
 )
-from ote_sdk.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
+from otx.api.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
 from tasks import NNCFTask
 
 logger = logging.getLogger(__name__)

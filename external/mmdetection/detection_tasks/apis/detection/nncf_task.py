@@ -20,24 +20,24 @@ from typing import Optional
 
 import torch
 from mmcv.runner import load_state_dict
-from ote_sdk.configuration import cfg_helper
-from ote_sdk.configuration.helper.utils import ids_to_strings
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.model import (
+from otx.api.configuration import cfg_helper
+from otx.api.configuration.helper.utils import ids_to_strings
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.model import (
     ModelEntity,
     ModelFormat,
     ModelOptimizationType,
     ModelPrecision,
     OptimizationMethod,
 )
-from ote_sdk.entities.optimization_parameters import default_progress_callback, OptimizationParameters
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.serialization.label_mapper import label_schema_to_bytes
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import IOptimizationTask
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import OptimizationType
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.optimization_parameters import default_progress_callback, OptimizationParameters
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.serialization.label_mapper import label_schema_to_bytes
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType
+from otx.api.usecases.tasks.interfaces.optimization_interface import IOptimizationTask
+from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     check_input_parameters_type,
 )

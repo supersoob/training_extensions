@@ -22,7 +22,7 @@ from mmcv.runner.utils import get_host_info
 from mmcv.runner import RUNNERS, EpochBasedRunner, IterBasedRunner, IterLoader, get_dist_info
 from torch.utils.data.dataloader import DataLoader
 
-from ote_sdk.utils.argument_checks import check_input_parameters_type
+from otx.api.utils.argument_checks import check_input_parameters_type
 
 
 @RUNNERS.register_module()

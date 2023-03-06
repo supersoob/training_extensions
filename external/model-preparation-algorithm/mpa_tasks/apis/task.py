@@ -17,10 +17,10 @@ from mpa.modules.hooks.cancel_interface_hook import CancelInterfaceHook
 from mpa.stage import Stage
 from mpa.utils.config_utils import remove_custom_hook, update_or_add_custom_hook
 from mpa.utils.logger import get_logger
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.model import ModelEntity, ModelPrecision
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.serialization.label_mapper import LabelSchemaMapper
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.model import ModelEntity, ModelPrecision
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.serialization.label_mapper import LabelSchemaMapper
 
 logger = get_logger()
 DEFAULT_META_KEYS = (

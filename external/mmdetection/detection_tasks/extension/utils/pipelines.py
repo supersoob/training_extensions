@@ -17,8 +17,8 @@ import copy
 from typing import Dict, Any, Optional
 import numpy as np
 
-from ote_sdk.entities.label import Domain
-from ote_sdk.utils.argument_checks import check_input_parameters_type
+from otx.api.entities.label import Domain
+from otx.api.utils.argument_checks import check_input_parameters_type
 
 from mmdet.datasets.builder import PIPELINES
 

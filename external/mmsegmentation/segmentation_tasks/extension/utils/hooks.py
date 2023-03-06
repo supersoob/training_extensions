@@ -22,8 +22,8 @@ from mmcv.runner.hooks import HOOKS, Hook, LoggerHook
 from mmcv.runner import BaseRunner, EpochBasedRunner
 from mmcv.runner.dist_utils import master_only
 
-from ote_sdk.utils.argument_checks import check_input_parameters_type
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.utils.argument_checks import check_input_parameters_type
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
 
 
 logger = logging.getLogger(__name__)

@@ -16,14 +16,14 @@ from copy import copy
 from typing import Any, Dict, List, Sequence
 
 import numpy as np
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     check_input_parameters_type,
 )
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.utils.shape_factory import ShapeFactory
 
 from mmdet.core import PolygonMasks
 from mmdet.datasets.builder import DATASETS

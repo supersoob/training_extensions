@@ -5,15 +5,15 @@
 from sys import maxsize
 
 from attr import attrs
-from ote_sdk.configuration import ConfigurableEnum, ConfigurableParameters
-from ote_sdk.configuration.elements import (
+from otx.api.configuration import ConfigurableEnum, ConfigurableParameters
+from otx.api.configuration.elements import (
     ParameterGroup,
     configurable_boolean,
     configurable_float,
     configurable_integer,
     selectable,
 )
-from ote_sdk.configuration.model_lifecycle import ModelLifecycle
+from otx.api.configuration.model_lifecycle import ModelLifecycle
 
 
 class TrainType(ConfigurableEnum):

@@ -21,7 +21,7 @@ import os
 import os.path as osp
 import torch
 from mmcv.parallel import MMDataParallel
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_api
+from otx.api.test_suite.e2e_test_system import e2e_pytest_api
 from subprocess import run  # nosec
 
 from mmdet.apis import init_detector, single_gpu_test

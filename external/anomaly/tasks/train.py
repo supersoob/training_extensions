@@ -26,10 +26,10 @@ from anomalib.utils.callbacks import (
     MetricsConfigurationCallback,
     MinMaxNormalizationCallback,
 )
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
 from pytorch_lightning import Trainer, seed_everything
 
 from .inference import InferenceTask

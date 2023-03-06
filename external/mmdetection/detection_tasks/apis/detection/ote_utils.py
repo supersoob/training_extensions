@@ -20,13 +20,13 @@ from typing import Callable, Optional, Sequence, Union
 
 import numpy as np
 import yaml
-from ote_sdk.entities.color import Color
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchemaEntity
-from ote_sdk.entities.train_parameters import UpdateProgressCallback
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.color import Color
+from otx.api.entities.id import ID
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.label_schema import LabelGroup, LabelGroupType, LabelSchemaEntity
+from otx.api.entities.train_parameters import UpdateProgressCallback
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.utils.argument_checks import (
     YamlFilePathCheck,
     check_input_parameters_type,
 )

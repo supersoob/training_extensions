@@ -13,28 +13,28 @@ import numpy as np
 from bson import ObjectId
 from detection_tasks.apis.detection.ote_utils import generate_label_schema
 from mpa_tasks.apis.detection import DetectionInferenceTask, DetectionTrainTask
-from ote_sdk.configuration.helper import create
-from ote_sdk.entities.annotation import (
+from otx.api.configuration.helper import create
+from otx.api.entities.annotation import (
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.inference_parameters import InferenceParameters
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.model_template import (
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.image import Image
+from otx.api.entities.inference_parameters import InferenceParameters
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.model_template import (
     TaskType,
     parse_model_template,
     task_type_to_label_domain,
 )
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_api
-from ote_sdk.tests.test_helpers import generate_random_annotated_image
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.test_suite.e2e_test_system import e2e_pytest_api
+from otx.api.tests.test_helpers import generate_random_annotated_image
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType
+from otx.api.utils.shape_factory import ShapeFactory
 
 from tests.mpa_common import eval
 

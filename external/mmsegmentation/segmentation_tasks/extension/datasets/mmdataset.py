@@ -18,17 +18,17 @@ from typing import Any, Dict, List, Optional, Sequence
 
 import cv2
 import numpy as np
-from ote_sdk.utils.segmentation_utils import mask_from_dataset_item
-from ote_sdk.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import LabelEntity, Domain
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.polygon import Point, Polygon
-from ote_sdk.entities.subset import Subset
-from ote_sdk.utils.argument_checks import (
+from otx.api.utils.segmentation_utils import mask_from_dataset_item
+from otx.api.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.image import Image
+from otx.api.entities.label import LabelEntity, Domain
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.polygon import Point, Polygon
+from otx.api.entities.subset import Subset
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     DirectoryPathCheck,
     JsonFilePathCheck,

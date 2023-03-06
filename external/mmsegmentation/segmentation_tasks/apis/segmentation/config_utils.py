@@ -23,10 +23,10 @@ from collections import defaultdict
 from typing import List, Optional, Sequence, Union
 
 from mmcv import Config, ConfigDict
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import LabelEntity
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import LabelEntity
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     DirectoryPathCheck,
     check_input_parameters_type,

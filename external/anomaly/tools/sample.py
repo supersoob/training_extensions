@@ -30,21 +30,21 @@ from adapters.anomalib.data.dataset import (
     AnomalySegmentationDataset,
 )
 from adapters.anomalib.logger import get_logger
-from ote_sdk.configuration.helper import create as create_hyper_parameters
-from ote_sdk.entities.inference_parameters import InferenceParameters
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.model_template import TaskType, parse_model_template
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.usecases.adapters.model_adapter import ModelAdapter
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import OptimizationType
+from otx.api.configuration.helper import create as create_hyper_parameters
+from otx.api.entities.inference_parameters import InferenceParameters
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.model_template import TaskType, parse_model_template
+from otx.api.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.usecases.adapters.model_adapter import ModelAdapter
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
 from tasks import NNCFTask, OpenVINOTask
 
 logger = get_logger(__name__)

@@ -8,7 +8,7 @@
 
 import torch.distributed as dist
 from mmcv.runner import RUNNERS, EpochBasedRunner, get_dist_info
-from ote_sdk.utils.argument_checks import check_input_parameters_type
+from otx.api.utils.argument_checks import check_input_parameters_type
 from torch.utils.data.dataloader import DataLoader
 
 

@@ -18,9 +18,9 @@ Config Helpers for OTE Training
 
 from typing import Tuple
 
-from ote_sdk.configuration.configurable_parameters import ConfigurableParameters
-from ote_sdk.configuration.helper import create
-from ote_sdk.entities.model_template import ModelTemplate, parse_model_template
+from otx.api.configuration.configurable_parameters import ConfigurableParameters
+from otx.api.configuration.helper import create
+from otx.api.entities.model_template import ModelTemplate, parse_model_template
 
 
 def get_config_and_task_name(template_file_path: str) -> Tuple[ConfigurableParameters, str]:

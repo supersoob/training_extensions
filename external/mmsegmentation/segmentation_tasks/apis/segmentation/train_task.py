@@ -20,18 +20,18 @@ from collections import defaultdict
 from typing import List, Optional
 
 import torch
-from ote_sdk.configuration import cfg_helper
-from ote_sdk.configuration.helper.utils import ids_to_strings
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.metrics import (CurveMetric, InfoMetric, LineChartInfo, MetricsGroup, Performance, ScoreMetric,
+from otx.api.configuration import cfg_helper
+from otx.api.configuration.helper.utils import ids_to_strings
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.metrics import (CurveMetric, InfoMetric, LineChartInfo, MetricsGroup, Performance, ScoreMetric,
                                       VisualizationInfo, VisualizationType)
-from ote_sdk.entities.model import ModelEntity, ModelPrecision
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.entities.train_parameters import default_progress_callback as default_train_progress_callback
-from ote_sdk.serialization.label_mapper import label_schema_to_bytes
-from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.model import ModelEntity, ModelPrecision
+from otx.api.entities.subset import Subset
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.entities.train_parameters import default_progress_callback as default_train_progress_callback
+from otx.api.serialization.label_mapper import label_schema_to_bytes
+from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     check_input_parameters_type,
 )

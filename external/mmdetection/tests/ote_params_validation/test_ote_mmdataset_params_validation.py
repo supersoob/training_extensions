@@ -9,19 +9,19 @@ from detection_tasks.extension.datasets.mmdataset import (
     get_annotation_mmdet_format,
 )
 
-from ote_sdk.entities.annotation import (
+from otx.api.entities.annotation import (
     Annotation,
     AnnotationSceneEntity,
     AnnotationSceneKind,
 )
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_unit
-from ote_sdk.tests.parameters_validation.validation_helper import (
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.image import Image
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.test_suite.e2e_test_system import e2e_pytest_unit
+from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
 

@@ -9,7 +9,7 @@ from ote_cli.utils.tests import (
     get_some_vars,
 )
 
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_component
+from otx.api.test_suite.e2e_test_system import e2e_pytest_component
 
 
 TT_STABILITY_TESTS = os.environ.get("TT_STABILITY_TESTS", False)

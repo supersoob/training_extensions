@@ -9,18 +9,18 @@ from pprint import pformat
 from typing import Any, Callable, Dict, List, Optional, Type
 
 import pytest
-from ote_sdk.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
-from ote_sdk.test_suite.training_test_case import (
+from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
+from otx.api.test_suite.training_test_case import (
     OTETestCaseInterface,
     generate_ote_integration_test_case_class,
 )
-from ote_sdk.test_suite.training_tests_common import (
+from otx.api.test_suite.training_tests_common import (
     KEEP_CONFIG_FIELD_VALUE,
     REALLIFE_USECASE_CONSTANT,
     ROOT_PATH_KEY,
     make_path_be_abs,
 )
-from ote_sdk.test_suite.training_tests_helper import (
+from otx.api.test_suite.training_tests_helper import (
     DefaultOTETestCreationParametersInterface,
     OTETestHelper,
     OTETrainingTestInterface,

@@ -19,9 +19,9 @@ Model deployment tool.
 import argparse
 import os
 
-from ote_sdk.configuration.helper import create
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.task_environment import TaskEnvironment
+from otx.api.configuration.helper import create
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.task_environment import TaskEnvironment
 
 from ote_cli.registry import find_and_parse_model_template
 from ote_cli.utils.importing import get_impl_class

@@ -24,8 +24,8 @@ from mmcv.runner import BaseRunner, EpochBasedRunner
 from mmcv.runner.dist_utils import master_only
 from mmcv.utils import print_log
 
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
-from ote_sdk.utils.argument_checks import check_input_parameters_type
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.utils.argument_checks import check_input_parameters_type
 from mmdet.utils.logger import get_root_logger
 
 

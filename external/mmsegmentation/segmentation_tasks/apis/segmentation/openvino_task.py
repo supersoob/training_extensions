@@ -24,32 +24,32 @@ from zipfile import ZipFile
 
 import numpy as np
 
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.annotation import AnnotationSceneEntity
-from ote_sdk.entities.inference_parameters import InferenceParameters, default_progress_callback
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.annotation import AnnotationSceneEntity
+from otx.api.entities.inference_parameters import InferenceParameters, default_progress_callback
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model import (
     ModelEntity,
     ModelFormat,
     ModelOptimizationType,
     ModelPrecision,
     OptimizationMethod
 )
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
-from ote_sdk.entities.tensor import TensorEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.result_media import ResultMediaEntity
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.usecases.evaluation.metrics_helper import MetricsHelper
-from ote_sdk.usecases.exportable_code.inference import BaseInferencer
-from ote_sdk.usecases.exportable_code.prediction_to_annotation_converter import SegmentationToAnnotationConverter
-from ote_sdk.usecases.exportable_code import demo
-from ote_sdk.usecases.tasks.interfaces.deployment_interface import IDeploymentTask
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import IOptimizationTask, OptimizationType
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.tensor import TensorEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.result_media import ResultMediaEntity
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
+from otx.api.usecases.exportable_code.inference import BaseInferencer
+from otx.api.usecases.exportable_code.prediction_to_annotation_converter import SegmentationToAnnotationConverter
+from otx.api.usecases.exportable_code import demo
+from otx.api.usecases.tasks.interfaces.deployment_interface import IDeploymentTask
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.optimization_interface import IOptimizationTask, OptimizationType
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     check_input_parameters_type,
 )
@@ -59,7 +59,7 @@ from compression.engines.ie_engine import IEEngine
 from compression.graph import load_model, save_model
 from compression.graph.model_utils import compress_model_weights, get_nodes_by_type
 from compression.pipeline.initializer import create_pipeline
-from ote_sdk.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
+from otx.api.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
 
 from .configuration import OTESegmentationConfig
 from openvino.model_zoo.model_api.models import Model

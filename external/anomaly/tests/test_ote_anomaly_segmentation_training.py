@@ -20,30 +20,30 @@ from pprint import pformat
 from typing import Any, Callable, Dict, List, Optional, Type
 
 import pytest
-from ote_sdk.configuration.helper import create as ote_sdk_configuration_helper_create
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.model_template import TaskType, parse_model_template
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.train_parameters import TrainParameters
-from ote_sdk.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
-from ote_sdk.test_suite.training_test_case import (
+from otx.api.configuration.helper import create as ote_sdk_configuration_helper_create
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.model_template import TaskType, parse_model_template
+from otx.api.entities.subset import Subset
+from otx.api.entities.train_parameters import TrainParameters
+from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
+from otx.api.test_suite.training_test_case import (
     OTETestCaseInterface,
     generate_ote_integration_test_case_class,
 )
-from ote_sdk.test_suite.training_tests_actions import (
+from otx.api.test_suite.training_tests_actions import (
     OTETestTrainingAction,
     create_environment_and_task,
 )
-from ote_sdk.test_suite.training_tests_common import (
+from otx.api.test_suite.training_tests_common import (
     KEEP_CONFIG_FIELD_VALUE,
     REALLIFE_USECASE_CONSTANT,
     ROOT_PATH_KEY,
     make_path_be_abs,
     performance_to_score_name_value,
 )
-from ote_sdk.test_suite.training_tests_helper import (
+from otx.api.test_suite.training_tests_helper import (
     DefaultOTETestCreationParametersInterface,
     OTETestHelper,
     OTETrainingTestInterface,

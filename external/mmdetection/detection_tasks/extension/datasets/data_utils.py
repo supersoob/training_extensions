@@ -7,24 +7,24 @@ import os.path as osp
 from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
-from ote_sdk.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
-from ote_sdk.entities.dataset_item import DatasetItemEntity
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.id import ID
-from ote_sdk.entities.image import Image
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.shapes.polygon import Polygon, Point
-from ote_sdk.entities.shapes.rectangle import Rectangle
-from ote_sdk.entities.subset import Subset
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.annotation import Annotation, AnnotationSceneEntity, AnnotationSceneKind
+from otx.api.entities.dataset_item import DatasetItemEntity
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.id import ID
+from otx.api.entities.image import Image
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.shapes.polygon import Polygon, Point
+from otx.api.entities.shapes.rectangle import Rectangle
+from otx.api.entities.subset import Subset
+from otx.api.utils.argument_checks import (
     DatasetParamTypeCheck,
     DirectoryPathCheck,
     OptionalDirectoryPathCheck,
     JsonFilePathCheck,
     check_input_parameters_type,
 )
-from ote_sdk.utils.shape_factory import ShapeFactory
+from otx.api.utils.shape_factory import ShapeFactory
 from pycocotools.coco import COCO
 from .mmdataset import get_annotation_mmdet_format
 

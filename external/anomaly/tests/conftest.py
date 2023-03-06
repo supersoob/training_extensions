@@ -25,13 +25,13 @@ except ImportError:
     _e2e_pytest_addoption = None
     pass
 import pytest
-from ote_sdk.test_suite.pytest_insertions import (
+from otx.api.test_suite.pytest_insertions import (
     get_pytest_plugins_from_ote,
     ote_conftest_insertion,
     ote_pytest_generate_tests_insertion,
     ote_pytest_addoption_insertion,
 )
-from ote_sdk.test_suite.training_tests_common import REALLIFE_USECASE_CONSTANT
+from otx.api.test_suite.training_tests_common import REALLIFE_USECASE_CONSTANT
 
 pytest_plugins = get_pytest_plugins_from_ote()
 

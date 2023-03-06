@@ -15,7 +15,7 @@
 import os
 import pytest
 
-from ote_sdk.test_suite.pytest_insertions import *  # noqa #pylint: disable=unused-import
+from otx.api.test_suite.pytest_insertions import *  # noqa #pylint: disable=unused-import
 
 pytest_plugins = get_pytest_plugins_from_ote()
 

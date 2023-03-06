@@ -20,15 +20,15 @@ import numpy as np
 from adapters.anomalib.logger import get_logger
 from anomalib.pre_processing import PreProcessor
 from omegaconf import DictConfig, ListConfig
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.model_template import TaskType
-from ote_sdk.entities.shapes.polygon import Polygon
-from ote_sdk.entities.subset import Subset
-from ote_sdk.utils.dataset_utils import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.model_template import TaskType
+from otx.api.entities.shapes.polygon import Polygon
+from otx.api.entities.subset import Subset
+from otx.api.utils.dataset_utils import (
     contains_anomalous_images,
     split_local_global_dataset,
 )
-from ote_sdk.utils.segmentation_utils import mask_from_dataset_item
+from otx.api.utils.segmentation_utils import mask_from_dataset_item
 from pytorch_lightning.core.datamodule import LightningDataModule
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset

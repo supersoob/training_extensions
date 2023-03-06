@@ -11,14 +11,14 @@ from typing import List, Type
 
 from detection_tasks.extension.datasets.data_utils import load_dataset_items_coco_format
 from mpa_tasks.apis import BaseTask
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import Domain
-from ote_sdk.entities.label_schema import LabelSchemaEntity
-from ote_sdk.entities.metrics import Performance
-from ote_sdk.entities.model import ModelEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.subset import Subset
-from ote_sdk.test_suite.training_tests_actions import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import Domain
+from otx.api.entities.label_schema import LabelSchemaEntity
+from otx.api.entities.metrics import Performance
+from otx.api.entities.model import ModelEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.subset import Subset
+from otx.api.test_suite.training_tests_actions import (
     BaseOTETestAction,
     OTETestExportAction,
     OTETestExportEvaluationAction,
@@ -32,7 +32,7 @@ from ote_sdk.test_suite.training_tests_actions import (
     # OTETestNNCFExportEvaluationAction,
     # OTETestNNCFGraphAction,
 )
-from ote_sdk.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
+from otx.api.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
 from segmentation_tasks.extension.datasets.mmdataset import load_dataset_items
 from torchreid_tasks.utils import ClassificationDatasetAdapter
 

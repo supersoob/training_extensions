@@ -21,9 +21,9 @@ import time
 
 import numpy as np
 
-from ote_sdk.entities.train_parameters import UpdateProgressCallback
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
-from ote_sdk.utils.argument_checks import (
+from otx.api.entities.train_parameters import UpdateProgressCallback
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.utils.argument_checks import (
     YamlFilePathCheck,
     check_input_parameters_type,
 )

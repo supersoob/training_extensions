@@ -15,15 +15,15 @@ from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.segmentation import SegmentationConfig
-from ote_sdk.configuration import cfg_helper
-from ote_sdk.configuration.helper.utils import ids_to_strings
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.inference_parameters import InferenceParameters
-from ote_sdk.entities.inference_parameters import (
+from otx.api.configuration import cfg_helper
+from otx.api.configuration.helper.utils import ids_to_strings
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.inference_parameters import InferenceParameters
+from otx.api.entities.inference_parameters import (
     default_progress_callback as default_infer_progress_callback,
 )
-from ote_sdk.entities.label import Domain
-from ote_sdk.entities.metrics import (
+from otx.api.entities.label import Domain
+from otx.api.entities.metrics import (
     CurveMetric,
     InfoMetric,
     LineChartInfo,
@@ -33,28 +33,28 @@ from ote_sdk.entities.metrics import (
     VisualizationInfo,
     VisualizationType,
 )
-from ote_sdk.entities.model import (
+from otx.api.entities.model import (
     ModelEntity,
     ModelFormat,
     ModelOptimizationType,
     ModelPrecision,
 )
-from ote_sdk.entities.model_template import parse_model_template
-from ote_sdk.entities.result_media import ResultMediaEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.subset import Subset
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.entities.tensor import TensorEntity
-from ote_sdk.entities.train_parameters import TrainParameters, default_progress_callback
-from ote_sdk.serialization.label_mapper import label_schema_to_bytes
-from ote_sdk.usecases.evaluation.metrics_helper import MetricsHelper
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.export_interface import ExportType, IExportTask
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
-from ote_sdk.usecases.tasks.interfaces.training_interface import ITrainingTask
-from ote_sdk.usecases.tasks.interfaces.unload_interface import IUnload
-from ote_sdk.utils.argument_checks import check_input_parameters_type
-from ote_sdk.utils.segmentation_utils import (
+from otx.api.entities.model_template import parse_model_template
+from otx.api.entities.result_media import ResultMediaEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.subset import Subset
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.entities.tensor import TensorEntity
+from otx.api.entities.train_parameters import TrainParameters, default_progress_callback
+from otx.api.serialization.label_mapper import label_schema_to_bytes
+from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.export_interface import ExportType, IExportTask
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
+from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
+from otx.api.utils.argument_checks import check_input_parameters_type
+from otx.api.utils.segmentation_utils import (
     create_annotation_from_segmentation_map,
     create_hard_prediction_from_soft_prediction,
 )

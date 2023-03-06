@@ -7,7 +7,7 @@
 from attr import attrs
 from configs.base.configuration import BaseAnomalyConfig
 from configs.base.configuration_enums import EarlyStoppingMetrics
-from ote_sdk.configuration.elements import (
+from otx.api.configuration.elements import (
     ParameterGroup,
     add_parameter_group,
     configurable_float,
@@ -15,7 +15,7 @@ from ote_sdk.configuration.elements import (
     selectable,
     string_attribute,
 )
-from ote_sdk.configuration.model_lifecycle import ModelLifecycle
+from otx.api.configuration.model_lifecycle import ModelLifecycle
 
 
 @attrs

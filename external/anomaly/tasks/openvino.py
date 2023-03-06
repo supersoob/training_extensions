@@ -34,36 +34,36 @@ from compression.graph import load_model, save_model
 from compression.graph.model_utils import compress_model_weights, get_nodes_by_type
 from compression.pipeline.initializer import create_pipeline
 from omegaconf import OmegaConf
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.inference_parameters import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.inference_parameters import (
     InferenceParameters,
     default_progress_callback,
 )
-from ote_sdk.entities.model import (
+from otx.api.entities.model import (
     ModelEntity,
     ModelFormat,
     ModelOptimizationType,
     ModelPrecision,
     OptimizationMethod,
 )
-from ote_sdk.entities.model_template import TaskType
-from ote_sdk.entities.optimization_parameters import OptimizationParameters
-from ote_sdk.entities.result_media import ResultMediaEntity
-from ote_sdk.entities.resultset import ResultSetEntity
-from ote_sdk.entities.scored_label import ScoredLabel
-from ote_sdk.entities.task_environment import TaskEnvironment
-from ote_sdk.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
-from ote_sdk.usecases.evaluation.metrics_helper import MetricsHelper
-from ote_sdk.usecases.exportable_code import demo
-from ote_sdk.usecases.tasks.interfaces.deployment_interface import IDeploymentTask
-from ote_sdk.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
-from ote_sdk.usecases.tasks.interfaces.inference_interface import IInferenceTask
-from ote_sdk.usecases.tasks.interfaces.optimization_interface import (
+from otx.api.entities.model_template import TaskType
+from otx.api.entities.optimization_parameters import OptimizationParameters
+from otx.api.entities.result_media import ResultMediaEntity
+from otx.api.entities.resultset import ResultSetEntity
+from otx.api.entities.scored_label import ScoredLabel
+from otx.api.entities.task_environment import TaskEnvironment
+from otx.api.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
+from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
+from otx.api.usecases.exportable_code import demo
+from otx.api.usecases.tasks.interfaces.deployment_interface import IDeploymentTask
+from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
+from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
+from otx.api.usecases.tasks.interfaces.optimization_interface import (
     IOptimizationTask,
     OptimizationType,
 )
-from ote_sdk.utils.anomaly_utils import create_detection_annotation_from_anomaly_heatmap
-from ote_sdk.utils.segmentation_utils import create_annotation_from_segmentation_map
+from otx.api.utils.anomaly_utils import create_detection_annotation_from_anomaly_heatmap
+from otx.api.utils.segmentation_utils import create_annotation_from_segmentation_map
 
 logger = get_logger(__name__)
 

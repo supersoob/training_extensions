@@ -6,8 +6,8 @@
 import os
 import pytest
 
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_component
-from ote_sdk.entities.model_template import parse_model_template
+from otx.api.test_suite.e2e_test_system import e2e_pytest_component
+from otx.api.entities.model_template import parse_model_template
 
 from ote_cli.registry import Registry
 from ote_cli.utils.tests import (

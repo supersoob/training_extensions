@@ -15,7 +15,7 @@
 import numpy as np
 from typing import Dict, Any
 
-from ote_sdk.utils.argument_checks import check_input_parameters_type
+from otx.api.utils.argument_checks import check_input_parameters_type
 
 from mmseg.datasets.builder import PIPELINES
 from ..datasets import get_annotation_mmseg_format

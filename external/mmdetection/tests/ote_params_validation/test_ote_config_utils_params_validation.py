@@ -24,13 +24,13 @@ from detection_tasks.apis.detection.config_utils import (
 )
 from detection_tasks.apis.detection.configuration import OTEDetectionConfig
 from mmcv import Config
-from ote_sdk.entities.datasets import DatasetEntity
-from ote_sdk.entities.label import Domain, LabelEntity
-from ote_sdk.test_suite.e2e_test_system import e2e_pytest_unit
-from ote_sdk.tests.parameters_validation.validation_helper import (
+from otx.api.entities.datasets import DatasetEntity
+from otx.api.entities.label import Domain, LabelEntity
+from otx.api.test_suite.e2e_test_system import e2e_pytest_unit
+from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
-from ote_sdk.usecases.reporting.time_monitor_callback import TimeMonitorCallback
+from otx.api.usecases.reporting.time_monitor_callback import TimeMonitorCallback
 
 
 class TestConfigUtilsInputParamsValidation:
