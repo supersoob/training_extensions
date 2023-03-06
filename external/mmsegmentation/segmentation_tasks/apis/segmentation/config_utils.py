@@ -32,7 +32,7 @@ from otx.api.utils.argument_checks import (
     check_input_parameters_type,
 )
 
-from .configuration import OTESegmentationConfig
+from .configuration import OTXSegmentationConfig
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ def patch_config(config: Config,
     remove_from_config(config, 'train_pipeline')
     remove_from_config(config, 'test_pipeline')
 
-    # Patch data pipeline, making it OTE-compatible.
+    # Patch data pipeline, making it OTX-compatible.
     patch_datasets(config)
 
     if 'log_config' not in config:
@@ -119,7 +119,7 @@ def patch_config(config: Config,
 
 
 @check_input_parameters_type()
-def set_hyperparams(config: Config, hyperparams: OTESegmentationConfig):
+def set_hyperparams(config: Config, hyperparams: OTXSegmentationConfig):
     config.data.samples_per_gpu = int(hyperparams.learning_parameters.batch_size)
     config.data.workers_per_gpu = int(hyperparams.learning_parameters.num_workers)
     config.optimizer.lr = float(hyperparams.learning_parameters.learning_rate)
@@ -238,8 +238,8 @@ def prepare_for_training(config: Config, train_dataset: DatasetEntity, val_datas
     train_num_samples = len(train_dataset)
     patch_adaptive_repeat_dataset(config, train_num_samples)
 
-    config.custom_hooks.append({'type': 'OTEProgressHook', 'time_monitor': time_monitor, 'verbose': True})
-    config.log_config.hooks.append({'type': 'OTELoggerHook', 'curves': learning_curves})
+    config.custom_hooks.append({'type': 'OTXProgressHook', 'time_monitor': time_monitor, 'verbose': True})
+    config.log_config.hooks.append({'type': 'OTXLoggerHook', 'curves': learning_curves})
 
     return config
 
@@ -364,7 +364,7 @@ def set_num_classes(config: Config, num_classes: int):
 
 @check_input_parameters_type()
 def patch_color_conversion(pipeline: Sequence[dict]):
-    # Default data format for OTE is RGB, while mmseg uses BGR, so negate the color conversion flag.
+    # Default data format for OTX is RGB, while mmseg uses BGR, so negate the color conversion flag.
     for pipeline_step in pipeline:
         if pipeline_step.type == 'Normalize':
             to_rgb = False
@@ -384,7 +384,7 @@ def patch_datasets(config: Config):
         if cfg.type == 'RepeatDataset':
             cfg = cfg.dataset
 
-        cfg.type = 'OTEDataset'
+        cfg.type = 'OTXDataset'
         cfg.ote_dataset = None
 
         remove_from_config(cfg, 'ann_dir')

@@ -44,7 +44,7 @@ DEFAULT_DET_TEMPLATE_DIR = osp.join("configs", "detection", "mobilenetv2_atss_cl
 
 class TestMPADetAPI:
     """
-    Collection of tests for OTE API and OTE Model Templates
+    Collection of tests for OTX API and OTX Model Templates
     """
 
     @e2e_pytest_api

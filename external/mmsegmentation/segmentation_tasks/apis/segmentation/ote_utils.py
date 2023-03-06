@@ -119,7 +119,7 @@ class OptimizationProgressCallback(TrainingProgressCallback):
 
     def on_train_begin(self, logs=None):
         super().on_train_begin(logs)
-        # Callback initialization takes place here after OTEProgressHook.before_run() is called
+        # Callback initialization takes place here after OTXProgressHook.before_run() is called
         train_percentage = 100 - self.loading_stage_progress_percentage - self.initialization_stage_progress_percentage
         loading_stage_steps = self.total_steps * self.loading_stage_progress_percentage / train_percentage
         initialization_stage_steps = self.total_steps * self.initialization_stage_progress_percentage / train_percentage

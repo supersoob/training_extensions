@@ -30,7 +30,7 @@ from .configuration_enums import POTQuantizationPreset, Models
 
 
 @attrs
-class OTESegmentationConfig(ConfigurableParameters):
+class OTXSegmentationConfig(ConfigurableParameters):
     header = string_attribute("Configuration for an semantic segmentation task")
     description = header
 

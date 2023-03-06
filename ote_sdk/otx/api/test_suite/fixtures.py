@@ -38,7 +38,7 @@ logger = get_logger()
 def otx_templates_root_dir_fx():
     """
     The fixture returns an absolute path to the folder where (in the subfolders)
-    the reallife training tests will look OTE template files (the files 'template.yaml').
+    the reallife training tests will look OTX template files (the files 'template.yaml').
 
     The fixture MUST be overriden in algo backend's conftest.py file.
     """
@@ -51,7 +51,7 @@ def otx_templates_root_dir_fx():
 def otx_reference_root_dir_fx():
     """
     The fixture returns an absolute path to the folder where reference files
-    for OTE models are stored.
+    for OTX models are stored.
     """
     raise NotImplementedError(
         "The fixture otx_reference_root_dir_fx should be overriden in algo backend"
@@ -182,7 +182,7 @@ def expected_metrics_all_tests_fx(request):
     Return expected metrics for reallife tests read from a YAML file passed as the parameter --expected-metrics-file.
     Note that the structure of expected metrics should be a dict that maps tests to the expected metric numbers.
     The keys of the dict are the parameters' part of the test id-s -- see the function
-    OTETestHelper._generate_test_id, also see the fixture current_test_parameters_string_fx below.
+    OTXTestHelper._generate_test_id, also see the fixture current_test_parameters_string_fx below.
 
     The value for each key is a structure that stores a requirement on some metric.
     The requirement can be either a target value (probably, with max size of quality drop)

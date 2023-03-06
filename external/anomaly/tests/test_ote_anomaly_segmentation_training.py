@@ -29,11 +29,11 @@ from otx.api.entities.subset import Subset
 from otx.api.entities.train_parameters import TrainParameters
 from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
 from otx.api.test_suite.training_test_case import (
-    OTETestCaseInterface,
+    OTXTestCaseInterface,
     generate_ote_integration_test_case_class,
 )
 from otx.api.test_suite.training_tests_actions import (
-    OTETestTrainingAction,
+    OTXTestTrainingAction,
     create_environment_and_task,
 )
 from otx.api.test_suite.training_tests_common import (
@@ -45,8 +45,8 @@ from otx.api.test_suite.training_tests_common import (
 )
 from otx.api.test_suite.training_tests_helper import (
     DefaultOTETestCreationParametersInterface,
-    OTETestHelper,
-    OTETrainingTestInterface,
+    OTXTestHelper,
+    OTXTrainingTestInterface,
 )
 
 from tests.anomaly_common import (
@@ -65,7 +65,7 @@ def ote_test_domain_fx():
 
 
 class AnomalySegmentationTrainingTestParameters(DefaultOTETestCreationParametersInterface):
-    def test_case_class(self) -> Type[OTETestCaseInterface]:
+    def test_case_class(self) -> Type[OTXTestCaseInterface]:
         return generate_ote_integration_test_case_class(
             get_anomaly_domain_test_action_classes(AnomalySegmentationTestTrainingAction)
         )
@@ -264,7 +264,7 @@ class AnomalySegmentationTrainingTestParameters(DefaultOTETestCreationParameters
         return deepcopy(DEFAULT_TEST_PARAMETERS)
 
 
-class AnomalySegmentationTestTrainingAction(OTETestTrainingAction):
+class AnomalySegmentationTestTrainingAction(OTXTestTrainingAction):
     _name = "training"
 
     def __init__(
@@ -353,13 +353,13 @@ class AnomalySegmentationTestTrainingAction(OTETestTrainingAction):
         return results
 
 
-class TestOTEReallifeAnomalySegmentation(OTETrainingTestInterface):
+class TestOTEReallifeAnomalySegmentation(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
 
     PERFORMANCE_RESULTS = None  # it is required for e2e system
-    helper = OTETestHelper(AnomalySegmentationTrainingTestParameters())
+    helper = OTXTestHelper(AnomalySegmentationTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -447,7 +447,7 @@ class TestOTEReallifeAnomalySegmentation(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,

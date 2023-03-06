@@ -38,8 +38,8 @@ from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.entities.train_parameters import TrainParameters
 from otx.api.configuration.helper import convert, create
 
-from torchreid_tasks.parameters import OTEClassificationParameters
-from torchreid_tasks.train_task import OTEClassificationTrainingTask
+from torchreid_tasks.parameters import OTXClassificationParameters
+from torchreid_tasks.train_task import OTXClassificationTrainingTask
 from torchreid_tasks.utils import generate_label_schema
 
 
@@ -61,7 +61,7 @@ def test_reading_mobilenet_v3_large_075():
 @e2e_pytest_api
 @pytest.mark.skip(reason="This test case will be deprecated soon")
 def test_configuration_yaml():
-    configuration = OTEClassificationParameters()
+    configuration = OTXClassificationParameters()
     configuration_yaml_str = convert(configuration, str)
     configuration_yaml_converted = create(configuration_yaml_str)
     configuration_yaml_loaded = create(osp.join('torchreid_tasks', 'configuration.yaml'))
@@ -123,7 +123,7 @@ def init_environment(params, model_template, number_of_images=10):
 def default_task_setup():
     hyper_parameters, model_template = setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, max_num_epochs=5)
     task_environment, dataset = init_environment(hyper_parameters, model_template, 20)
-    task = OTEClassificationTrainingTask(task_environment=task_environment)
+    task = OTXClassificationTrainingTask(task_environment=task_environment)
 
     yield (task, task_environment, dataset)
 

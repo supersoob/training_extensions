@@ -1,4 +1,4 @@
-"""Inference Callbacks for OTE inference."""
+"""Inference Callbacks for OTX inference."""
 
 # Copyright (C) 2021 Intel Corporation
 #
@@ -34,7 +34,7 @@ logger = get_logger(__name__)
 
 
 class AnomalyInferenceCallback(Callback):
-    """Callback that updates the OTE dataset during inference."""
+    """Callback that updates the OTX dataset during inference."""
 
     def __init__(self, ote_dataset: DatasetEntity, labels: List[LabelEntity], task_type: TaskType):
         self.ote_dataset = ote_dataset

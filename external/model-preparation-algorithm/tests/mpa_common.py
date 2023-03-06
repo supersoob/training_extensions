@@ -20,17 +20,17 @@ from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.subset import Subset
 from otx.api.test_suite.training_tests_actions import (
     BaseOTETestAction,
-    OTETestExportAction,
-    OTETestExportEvaluationAction,
-    OTETestPotAction,
-    OTETestPotEvaluationAction,
-    OTETestTrainingAction,
-    OTETestTrainingEvaluationAction,
-    # OTETestNNCFAction,
-    # OTETestNNCFEvaluationAction,
-    # OTETestNNCFExportAction,
-    # OTETestNNCFExportEvaluationAction,
-    # OTETestNNCFGraphAction,
+    OTXTestExportAction,
+    OTXTestExportEvaluationAction,
+    OTXTestPotAction,
+    OTXTestPotEvaluationAction,
+    OTXTestTrainingAction,
+    OTXTestTrainingEvaluationAction,
+    # OTXTestNNCFAction,
+    # OTXTestNNCFEvaluationAction,
+    # OTXTestNNCFExportAction,
+    # OTXTestNNCFExportEvaluationAction,
+    # OTXTestNNCFGraphAction,
 )
 from otx.api.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
 from segmentation_tasks.extension.datasets.mmdataset import load_dataset_items
@@ -41,17 +41,17 @@ logger = logging.getLogger(__name__)
 
 def get_test_action_classes() -> List[Type[BaseOTETestAction]]:
     return [
-        OTETestTrainingAction,
-        OTETestTrainingEvaluationAction,
-        OTETestExportAction,
-        OTETestExportEvaluationAction,
-        OTETestPotAction,
-        OTETestPotEvaluationAction,
-        # OTETestNNCFAction,
-        # OTETestNNCFEvaluationAction,
-        # OTETestNNCFExportAction,
-        # OTETestNNCFExportEvaluationAction,
-        # OTETestNNCFGraphAction,
+        OTXTestTrainingAction,
+        OTXTestTrainingEvaluationAction,
+        OTXTestExportAction,
+        OTXTestExportEvaluationAction,
+        OTXTestPotAction,
+        OTXTestPotEvaluationAction,
+        # OTXTestNNCFAction,
+        # OTXTestNNCFEvaluationAction,
+        # OTXTestNNCFExportAction,
+        # OTXTestNNCFExportEvaluationAction,
+        # OTXTestNNCFGraphAction,
     ]
 
 

@@ -1,5 +1,5 @@
 """
-OTE parameters validation tests helpers
+OTX parameters validation tests helpers
 """
 
 import numpy as np

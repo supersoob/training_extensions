@@ -11,14 +11,14 @@ import cv2
 import numpy as np
 import pycocotools.mask as mask_util
 import torch
-from detection_tasks.apis.detection import OTEDetectionNNCFTask
+from detection_tasks.apis.detection import OTXDetectionNNCFTask
 from detection_tasks.apis.detection.config_utils import remove_from_config
 from detection_tasks.apis.detection.ote_utils import (
     InferenceProgressCallback,
     TrainingProgressCallback,
 )
 from detection_tasks.extension.datasets import adaptive_tile_params
-from detection_tasks.extension.utils.hooks import OTELoggerHook
+from detection_tasks.extension.utils.hooks import OTXLoggerHook
 from mmcv.utils import ConfigDict
 from mpa import MPAConstants
 from mpa.utils.config_utils import MPAConfig
@@ -168,7 +168,7 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         self.finalize()
 
     def export(self, export_type: ExportType, output_model: ModelEntity):
-        # copied from OTE inference_task.py
+        # copied from OTX inference_task.py
         logger.info("Exporting the model")
         if export_type != ExportType.OPENVINO:
             raise RuntimeError(f"not supported export type {export_type}")
@@ -258,8 +258,8 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
         self._patch_data_pipeline()
-        self._patch_datasets(self._recipe_cfg, self._task_type.domain)  # for OTE compatibility
-        self._patch_evaluation(self._recipe_cfg)  # for OTE compatibility
+        self._patch_datasets(self._recipe_cfg, self._task_type.domain)  # for OTX compatibility
+        self._patch_evaluation(self._recipe_cfg)  # for OTX compatibility
         logger.info(f"initialized recipe = {recipe}")
 
     def _init_model_cfg(self):
@@ -285,7 +285,7 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         return data_cfg
 
     def _add_predictions_to_dataset(self, prediction_results, dataset, confidence_threshold=0.0):
-        """Loop over dataset again to assign predictions. Convert from MMDetection format to OTE format."""
+        """Loop over dataset again to assign predictions. Convert from MMDetection format to OTX format."""
         for dataset_item, (all_results, feature_vector, saliency_map) in zip(dataset, prediction_results):
             width = dataset_item.width
             height = dataset_item.height
@@ -359,7 +359,7 @@ class DetectionInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvaluationT
         # Added 'unlabeled' data support
 
         def patch_color_conversion(pipeline):
-            # Default data format for OTE is RGB, while mmdet uses BGR, so negate the color conversion flag.
+            # Default data format for OTX is RGB, while mmdet uses BGR, so negate the color conversion flag.
             for pipeline_step in pipeline:
                 if pipeline_step.type == "Normalize":
                     to_rgb = False
@@ -536,12 +536,12 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
             self._is_training = False
             return
 
-        # Set OTE LoggerHook & Time Monitor
+        # Set OTX LoggerHook & Time Monitor
         update_progress_callback = default_progress_callback
         if train_parameters is not None:
             update_progress_callback = train_parameters.update_progress
         self._time_monitor = TrainingProgressCallback(update_progress_callback)
-        self._learning_curves = defaultdict(OTELoggerHook.Curve)
+        self._learning_curves = defaultdict(OTXLoggerHook.Curve)
 
         stage_module = "DetectionTrainer"
         self._data_cfg = self._init_train_data_cfg(dataset)
@@ -686,7 +686,7 @@ class DetectionTrainTask(DetectionInferenceTask, ITrainingTask):
                     tiling_parameters.__setattr__(key, value)
 
 
-class DetectionNNCFTask(OTEDetectionNNCFTask):
+class DetectionNNCFTask(OTXDetectionNNCFTask):
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         """ "

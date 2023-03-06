@@ -4,14 +4,14 @@
 
 import numpy as np
 import pytest
-from detection_tasks.apis.detection.configuration import OTEDetectionConfig
+from detection_tasks.apis.detection.configuration import OTXDetectionConfig
 from detection_tasks.apis.detection.openvino_task import (
     BaseInferencerWithConverter,
     OpenVINODetectionInferencer,
     OpenVINODetectionTask,
     OpenVINOMaskInferencer,
     OpenVINORotatedRectInferencer,
-    OTEOpenVinoDataLoader,
+    OTXOpenVinoDataLoader,
 )
 from openvino.model_zoo.model_api.models import Model
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
@@ -189,7 +189,7 @@ class TestOpenVINODetectionInferencerInputParamsValidation:
         OpenVINODetectionInferencer object initialization parameter
         """
         correct_values_dict = {
-            "hparams": OTEDetectionConfig("test header"),
+            "hparams": OTXDetectionConfig("test header"),
             "label_schema": LabelSchemaEntity(),
             "model_file": "model data",
         }
@@ -232,7 +232,7 @@ class TestOpenVINOMaskInferencerInputParamsValidation:
         OpenVINOMaskInferencer object initialization parameter
         """
         correct_values_dict = {
-            "hparams": OTEDetectionConfig("test header"),
+            "hparams": OTXDetectionConfig("test header"),
             "label_schema": LabelSchemaEntity(),
             "model_file": "model data",
         }
@@ -275,7 +275,7 @@ class TestOpenVINORotatedRectInferencerInputParamsValidation:
         OpenVINORotatedRectInferencer object initialization parameter
         """
         correct_values_dict = {
-            "hparams": OTEDetectionConfig("test header"),
+            "hparams": OTXDetectionConfig("test header"),
             "label_schema": LabelSchemaEntity(),
             "model_file": "model data",
         }
@@ -311,14 +311,14 @@ class TestOTEOpenVinoDataLoaderInputParamsValidation:
     def test_openvino_data_loader_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEOpenVinoDataLoader object initialization parameters validation
+        Check OTXOpenVinoDataLoader object initialization parameters validation
 
         <b>Input data:</b>
-        OTEOpenVinoDataLoader object initialization parameters with unexpected type
+        OTXOpenVinoDataLoader object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEOpenVinoDataLoader object initialization parameter
+        OTXOpenVinoDataLoader object initialization parameter
         """
         correct_values_dict = {
             "dataset": DatasetEntity(),
@@ -335,23 +335,23 @@ class TestOTEOpenVinoDataLoaderInputParamsValidation:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTEOpenVinoDataLoader,
+            class_or_function=OTXOpenVinoDataLoader,
         )
 
     @e2e_pytest_unit
     def test_openvino_data_loader_getitem_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEOpenVinoDataLoader object "__getitem__" method input parameters validation
+        Check OTXOpenVinoDataLoader object "__getitem__" method input parameters validation
 
         <b>Input data:</b>
-        OTEOpenVinoDataLoader object. "__getitem__" method unexpected-type input parameters
+        OTXOpenVinoDataLoader object. "__getitem__" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
         input parameter for "__getitem__" method
         """
-        data_loader = OTEOpenVinoDataLoader(
+        data_loader = OTXOpenVinoDataLoader(
             dataset=DatasetEntity(), inferencer=MockDetectionInferencer()
         )
         with pytest.raises(ValueError):

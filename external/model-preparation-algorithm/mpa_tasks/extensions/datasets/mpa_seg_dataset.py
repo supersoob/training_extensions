@@ -5,13 +5,13 @@
 from mmseg.datasets.builder import DATASETS
 from mpa.utils.logger import get_logger
 from mpa_tasks.utils.data_utils import get_old_new_img_indices
-from segmentation_tasks.extension.datasets import OTEDataset
+from segmentation_tasks.extension.datasets import OTXDataset
 
 logger = get_logger()
 
 
 @DATASETS.register_module()
-class MPASegIncrDataset(OTEDataset):
+class MPASegIncrDataset(OTXDataset):
     def __init__(self, **kwargs):
         pipeline = []
         test_mode = kwargs.get("test_mode", False)

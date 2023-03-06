@@ -30,7 +30,7 @@ from .configuration_enums import POTQuantizationPreset
 
 
 @attrs
-class OTEDetectionConfig(ConfigurableParameters):
+class OTXDetectionConfig(ConfigurableParameters):
     header = string_attribute("Configuration for an object detection task")
     description = header
 

@@ -1,5 +1,5 @@
 """
-OTE CLI entry point.
+OTX CLI entry point.
 """
 
 # Copyright (C) 2021 Intel Corporation
@@ -53,7 +53,7 @@ def parse_args():
 
 def main():
     """
-    This function is a single entry point for all OTE CLI related operations:
+    This function is a single entry point for all OTX CLI related operations:
       - demo
       - deploy
       - eval

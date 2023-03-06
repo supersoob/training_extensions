@@ -106,7 +106,7 @@ def create_environment_and_task(
     return environment, task
 
 
-class OTETestTrainingAction(BaseOTETestAction):
+class OTXTestTrainingAction(BaseOTETestAction):
     _name = "training"
 
     def __init__(
@@ -254,7 +254,7 @@ def run_evaluation(dataset, task, model):
     return score_name, score_value
 
 
-class OTETestTrainingEvaluationAction(BaseOTETestAction):
+class OTXTestTrainingEvaluationAction(BaseOTETestAction):
     _name = "training_evaluation"
     _with_validation = True
     _depends_stages_names = ["training"]
@@ -322,7 +322,7 @@ def run_export(environment, dataset, task, action_name, expected_optimization_ty
     return environment_for_export, exported_model
 
 
-class OTETestExportAction(BaseOTETestAction):
+class OTXTestExportAction(BaseOTETestAction):
     _name = "export"
     _depends_stages_names = ["training"]
 
@@ -360,7 +360,7 @@ def create_openvino_task(model_template, environment):
     return openvino_task
 
 
-class OTETestExportEvaluationAction(BaseOTETestAction):
+class OTXTestExportEvaluationAction(BaseOTETestAction):
     _name = "export_evaluation"
     _with_validation = True
     _depends_stages_names = ["training", "export", "training_evaluation"]
@@ -406,7 +406,7 @@ class OTETestExportEvaluationAction(BaseOTETestAction):
         return results
 
 
-class OTETestPotAction(BaseOTETestAction):
+class OTXTestPotAction(BaseOTETestAction):
     _name = "pot"
     _depends_stages_names = ["export"]
 
@@ -460,7 +460,7 @@ class OTETestPotAction(BaseOTETestAction):
         return results
 
 
-class OTETestPotEvaluationAction(BaseOTETestAction):
+class OTXTestPotEvaluationAction(BaseOTETestAction):
     _name = "pot_evaluation"
     _with_validation = True
     _depends_stages_names = ["training", "pot", "export_evaluation"]
@@ -495,7 +495,7 @@ class OTETestPotEvaluationAction(BaseOTETestAction):
         return results
 
 
-class OTETestNNCFAction(BaseOTETestAction):
+class OTXTestNNCFAction(BaseOTETestAction):
     _name = "nncf"
     _depends_stages_names = ["training"]
 
@@ -603,7 +603,7 @@ def check_nncf_model_graph(
     )
 
 
-class OTETestNNCFGraphAction(BaseOTETestAction):
+class OTXTestNNCFGraphAction(BaseOTETestAction):
     _name = "nncf_graph"
     _VAR_REGEN_DOT = "NNCF_TEST_REGEN_DOT"
 
@@ -693,7 +693,7 @@ class OTETestNNCFGraphAction(BaseOTETestAction):
         return {}
 
 
-class OTETestNNCFEvaluationAction(BaseOTETestAction):
+class OTXTestNNCFEvaluationAction(BaseOTETestAction):
     _name = "nncf_evaluation"
     _with_validation = True
     _depends_stages_names = ["training", "nncf", "training_evaluation"]
@@ -728,7 +728,7 @@ class OTETestNNCFEvaluationAction(BaseOTETestAction):
         return results
 
 
-class OTETestNNCFExportAction(BaseOTETestAction):
+class OTXTestNNCFExportAction(BaseOTETestAction):
     _name = "nncf_export"
     _depends_stages_names = ["training", "nncf"]
 
@@ -765,7 +765,7 @@ class OTETestNNCFExportAction(BaseOTETestAction):
         return results
 
 
-class OTETestNNCFExportEvaluationAction(BaseOTETestAction):
+class OTXTestNNCFExportEvaluationAction(BaseOTETestAction):
     _name = "nncf_export_evaluation"
     _with_validation = True
     _depends_stages_names = ["training", "nncf_export", "nncf_evaluation"]
@@ -815,15 +815,15 @@ class OTETestNNCFExportEvaluationAction(BaseOTETestAction):
 
 def get_default_test_action_classes() -> List[Type[BaseOTETestAction]]:
     return [
-        OTETestTrainingAction,
-        OTETestTrainingEvaluationAction,
-        OTETestExportAction,
-        OTETestExportEvaluationAction,
-        OTETestPotAction,
-        OTETestPotEvaluationAction,
-        OTETestNNCFAction,
-        OTETestNNCFEvaluationAction,
-        OTETestNNCFExportAction,
-        OTETestNNCFExportEvaluationAction,
-        OTETestNNCFGraphAction,
+        OTXTestTrainingAction,
+        OTXTestTrainingEvaluationAction,
+        OTXTestExportAction,
+        OTXTestExportEvaluationAction,
+        OTXTestPotAction,
+        OTXTestPotEvaluationAction,
+        OTXTestNNCFAction,
+        OTXTestNNCFEvaluationAction,
+        OTXTestNNCFExportAction,
+        OTXTestNNCFExportEvaluationAction,
+        OTXTestNNCFGraphAction,
     ]

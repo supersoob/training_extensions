@@ -1,4 +1,4 @@
-"""Configurable parameter conversion between OTE and Anomalib."""
+"""Configurable parameter conversion between OTX and Anomalib."""
 
 # Copyright (C) 2021 Intel Corporation
 #
@@ -27,10 +27,10 @@ def get_anomalib_config(task_name: str, ote_config: ConfigurableParameters) -> U
     """Get anomalib configuration.
 
     Create an anomalib config object that matches the values specified in the
-    OTE config.
+    OTX config.
 
     Args:
-        ote_config: ConfigurableParameters: OTE config object parsed from
+        ote_config: ConfigurableParameters: OTX config object parsed from
             configuration.yaml file
 
     Returns:
@@ -55,7 +55,7 @@ def _anomalib_config_mapper(anomalib_config: Union[DictConfig, ListConfig], ote_
 
     Args:
         anomalib_config: DictConfig: Anomalib config object
-        ote_config: ConfigurableParameters: OTE config object parsed from configuration.yaml file
+        ote_config: ConfigurableParameters: OTX config object parsed from configuration.yaml file
     """
     parameters = ote_config.parameters
     groups = ote_config.groups
@@ -77,12 +77,12 @@ def update_anomalib_config(anomalib_config: Union[DictConfig, ListConfig], ote_c
     """Update anomalib configuration.
 
     Overwrite the default parameter values in the anomalib config with the
-    values specified in the OTE config. The function is recursively called for
-    each parameter group present in the OTE config.
+    values specified in the OTX config. The function is recursively called for
+    each parameter group present in the OTX config.
 
     Args:
         anomalib_config: DictConfig: Anomalib config object
-        ote_config: ConfigurableParameters: OTE config object parsed from
+        ote_config: ConfigurableParameters: OTX config object parsed from
             configuration.yaml file
     """
     for param in ote_config.parameters:
@@ -91,7 +91,7 @@ def update_anomalib_config(anomalib_config: Union[DictConfig, ListConfig], ote_c
         sc_value = sc_value.value if hasattr(sc_value, "value") else sc_value
         anomalib_config[param] = sc_value
     for group in ote_config.groups:
-        # Since pot_parameters and nncf_optimization are specific to OTE
+        # Since pot_parameters and nncf_optimization are specific to OTX
         if group == "learning_parameters":
             _anomalib_config_mapper(anomalib_config, getattr(ote_config, "learning_parameters"))
         elif group not in ["pot_parameters", "nncf_optimization"]:

@@ -4,7 +4,7 @@
 
 import pytest
 
-from detection_tasks.apis.detection.inference_task import OTEDetectionInferenceTask
+from detection_tasks.apis.detection.inference_task import OTXDetectionInferenceTask
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.inference_parameters import InferenceParameters
@@ -18,7 +18,7 @@ from otx.api.tests.parameters_validation.validation_helper import (
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 
 
-class MockDetectionInferenceTask(OTEDetectionInferenceTask):
+class MockDetectionInferenceTask(OTXDetectionInferenceTask):
     def __init__(self):
         pass
 
@@ -40,26 +40,26 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_detection_inference_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionInferenceTask object initialization parameters validation
+        Check OTXDetectionInferenceTask object initialization parameters validation
 
         <b>Input data:</b>
         "task_environment" non-TaskEnvironment object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEDetectionInferenceTask object initialization parameter
+        OTXDetectionInferenceTask object initialization parameter
         """
         with pytest.raises(ValueError):
-            OTEDetectionInferenceTask(task_environment="unexpected string")  # type: ignore
+            OTXDetectionInferenceTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_ote_detection_inference_task_infer_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionInferenceTask object "infer" method input parameters validation
+        Check OTXDetectionInferenceTask object "infer" method input parameters validation
 
         <b>Input data:</b>
-        OTEDetectionInferenceTask object. "infer" method unexpected-type input parameters
+        OTXDetectionInferenceTask object. "infer" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -88,10 +88,10 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_detection_inference_task_evaluate_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionInferenceTask object "evaluate" method input parameters validation
+        Check OTXDetectionInferenceTask object "evaluate" method input parameters validation
 
         <b>Input data:</b>
-        OTEDetectionInferenceTask object. "evaluate" method unexpected-type input parameters
+        OTXDetectionInferenceTask object. "evaluate" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -126,10 +126,10 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_detection_inference_task_export_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionInferenceTask object "export" method input parameters validation
+        Check OTXDetectionInferenceTask object "export" method input parameters validation
 
         <b>Input data:</b>
-        OTEDetectionInferenceTask object. "export" method unexpected-type input parameters
+        OTXDetectionInferenceTask object. "export" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

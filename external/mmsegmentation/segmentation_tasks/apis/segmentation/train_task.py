@@ -39,14 +39,14 @@ from otx.api.utils.argument_checks import (
 from mmseg.apis import train_segmentor
 from segmentation_tasks.apis.segmentation.config_utils import prepare_for_training, set_hyperparams
 from segmentation_tasks.apis.segmentation.ote_utils import TrainingProgressCallback
-from segmentation_tasks.extension.utils.hooks import OTELoggerHook
+from segmentation_tasks.extension.utils.hooks import OTXLoggerHook
 from mmseg.datasets import build_dataset
-from segmentation_tasks.apis.segmentation import OTESegmentationInferenceTask
+from segmentation_tasks.apis.segmentation import OTXSegmentationInferenceTask
 
 logger = logging.getLogger(__name__)
 
 
-class OTESegmentationTrainingTask(OTESegmentationInferenceTask, ITrainingTask):
+class OTXSegmentationTrainingTask(OTXSegmentationInferenceTask, ITrainingTask):
 
     @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
     def train(self, dataset: DatasetEntity,
@@ -79,7 +79,7 @@ class OTESegmentationTrainingTask(OTESegmentationInferenceTask, ITrainingTask):
         else:
             update_progress_callback = default_train_progress_callback
         time_monitor = TrainingProgressCallback(update_progress_callback)
-        learning_curves = defaultdict(OTELoggerHook.Curve)
+        learning_curves = defaultdict(OTXLoggerHook.Curve)
         training_config = prepare_for_training(config, train_dataset, val_dataset, time_monitor, learning_curves)
         self._training_work_dir = training_config.work_dir
         mm_train_dataset = build_dataset(training_config.data.train)

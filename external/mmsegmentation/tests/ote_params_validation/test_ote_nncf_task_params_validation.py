@@ -14,10 +14,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
 )
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
-from segmentation_tasks.apis.segmentation.nncf_task import OTESegmentationNNCFTask
+from segmentation_tasks.apis.segmentation.nncf_task import OTXSegmentationNNCFTask
 
 
-class MockNNCFTask(OTESegmentationNNCFTask):
+class MockNNCFTask(OTXSegmentationNNCFTask):
     def __init__(self):
         pass
 
@@ -39,26 +39,26 @@ class TestNNCFTaskInputParamsValidation:
     def test_nncf_segmentation_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationNNCFTask object initialization parameters validation
+        Check OTXSegmentationNNCFTask object initialization parameters validation
 
         <b>Input data:</b>
-        OTESegmentationNNCFTask object initialization parameter with unexpected type
+        OTXSegmentationNNCFTask object initialization parameter with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTESegmentationNNCFTask object initialization parameter
+        OTXSegmentationNNCFTask object initialization parameter
         """
         with pytest.raises(ValueError):
-            OTESegmentationNNCFTask(task_environment="unexpected string")  # type: ignore
+            OTXSegmentationNNCFTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_nncf_segmentation_task_optimize_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationNNCFTask object "optimize" method input parameters validation
+        Check OTXSegmentationNNCFTask object "optimize" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationNNCFTask object. "optimize" method unexpected-type input parameters
+        OTXSegmentationNNCFTask object. "optimize" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -91,10 +91,10 @@ class TestNNCFTaskInputParamsValidation:
     def test_nncf_segmentation_task_export_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationNNCFTask object "export" method input parameters validation
+        Check OTXSegmentationNNCFTask object "export" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationNNCFTask object. "export" method unexpected-type input parameters
+        OTXSegmentationNNCFTask object. "export" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -122,10 +122,10 @@ class TestNNCFTaskInputParamsValidation:
     def test_nncf_segmentation_task_save_model_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationNNCFTask object "save_model" method input parameters validation
+        Check OTXSegmentationNNCFTask object "save_model" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationNNCFTask object, "output_model" non-ModelEntity object
+        OTXSegmentationNNCFTask object, "output_model" non-ModelEntity object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

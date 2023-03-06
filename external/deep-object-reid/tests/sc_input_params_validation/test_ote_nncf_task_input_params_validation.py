@@ -14,10 +14,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
 
-from torchreid_tasks.nncf_task import OTEClassificationNNCFTask
+from torchreid_tasks.nncf_task import OTXClassificationNNCFTask
 
 
-class MockNNCFTask(OTEClassificationNNCFTask):
+class MockNNCFTask(OTXClassificationNNCFTask):
     def __init__(self):
         pass
 
@@ -39,26 +39,26 @@ class TestNNCFTaskInputParamsValidation:
     def test_ote_nncf_classification_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationNNCFTask object initialization parameters validation
+        Check OTXClassificationNNCFTask object initialization parameters validation
 
         <b>Input data:</b>
-        OTEClassificationNNCFTask object initialization parameters with unexpected type
+        OTXClassificationNNCFTask object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEClassificationNNCFTask object initialization parameter
+        OTXClassificationNNCFTask object initialization parameter
         """
         with pytest.raises(ValueError):
-            OTEClassificationNNCFTask(task_environment="unexpected string")  # type: ignore
+            OTXClassificationNNCFTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_ote_nncf_classification_task_optimize_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationNNCFTask object "optimize" method input parameters validation
+        Check OTXClassificationNNCFTask object "optimize" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationNNCFTask object. "optimize" method unexpected-type input parameters
+        OTXClassificationNNCFTask object. "optimize" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -91,10 +91,10 @@ class TestNNCFTaskInputParamsValidation:
     def test_ote_nncf_classification_task_save_model_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationNNCFTask object "save_model" method input parameters validation
+        Check OTXClassificationNNCFTask object "save_model" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationNNCFTask object, "output_model" non-ModelEntity object
+        OTXClassificationNNCFTask object, "output_model" non-ModelEntity object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -108,10 +108,10 @@ class TestNNCFTaskInputParamsValidation:
     def test_ote_nncf_classification_task_export_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationNNCFTask object "export" method input parameters validation
+        Check OTXClassificationNNCFTask object "export" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationNNCFTask object. "export" method unexpected-type input parameters
+        OTXClassificationNNCFTask object. "export" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-from .openvino_models import OTEMaskRCNNModel, OTESSDModel
+from .openvino_models import OTXMaskRCNNModel, OTXSSDModel
 
 __all__ = [
-    'OTEMaskRCNNModel',
-    'OTESSDModel'
+    'OTXMaskRCNNModel',
+    'OTXSSDModel'
 ]

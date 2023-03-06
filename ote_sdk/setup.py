@@ -1,5 +1,5 @@
 """
-setup file for OTE SDK
+setup file for OTX SDK
 """
 
 # Copyright (C) 2021-2022 Intel Corporation
@@ -26,5 +26,5 @@ setup(
     "SPDX-License-Identifier: Apache-2.0",
     install_requires=install_requires,
     author="Intel",
-    description="OTE SDK Package",
+    description="OTX SDK Package",
 )

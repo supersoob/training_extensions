@@ -157,7 +157,7 @@ def construct_attr_selectable_validator(
 
 def convert_string_to_id(id_string: Optional[Union[str, ID]]) -> ID:
     """
-    This function converts an input string representing an ID into an OTE SDK ID object.
+    This function converts an input string representing an ID into an OTX SDK ID object.
     Inputs that are already in the form of an ID are left untouched.
 
     :param id_string: string, ID or None object that should be converted to an ID

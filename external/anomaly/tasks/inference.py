@@ -26,7 +26,7 @@ from typing import Dict, List, Optional, Union
 import torch
 from adapters.anomalib.callbacks import AnomalyInferenceCallback, ProgressCallback
 from adapters.anomalib.config import get_anomalib_config
-from adapters.anomalib.data import OTEAnomalyDataModule
+from adapters.anomalib.data import OTXAnomalyDataModule
 from adapters.anomalib.logger import get_logger
 from anomalib.models import AnomalyModule, get_model
 from anomalib.utils.callbacks import (
@@ -66,7 +66,7 @@ class InferenceTask(IInferenceTask, IEvaluationTask, IExportTask, IUnload):
         """Train, Infer, Export, Optimize and Deploy an Anomaly Classification Task.
 
         Args:
-            task_environment (TaskEnvironment): OTE Task environment.
+            task_environment (TaskEnvironment): OTX Task environment.
         """
         torch.backends.cudnn.enabled = True
         logger.info("Initializing the task environment.")
@@ -106,14 +106,14 @@ class InferenceTask(IInferenceTask, IEvaluationTask, IExportTask, IUnload):
         return config
 
     def load_model(self, ote_model: Optional[ModelEntity]) -> AnomalyModule:
-        """Create and Load Anomalib Module from OTE Model.
+        """Create and Load Anomalib Module from OTX Model.
 
-        This method checks if the task environment has a saved OTE Model,
-        and creates one. If the OTE model already exists, it returns the
+        This method checks if the task environment has a saved OTX Model,
+        and creates one. If the OTX model already exists, it returns the
         the model with the saved weights.
 
         Args:
-            ote_model (Optional[ModelEntity]): OTE Model from the
+            ote_model (Optional[ModelEntity]): OTX Model from the
                 task environment.
 
         Returns:
@@ -170,7 +170,7 @@ class InferenceTask(IInferenceTask, IEvaluationTask, IExportTask, IUnload):
         """
         logger.info("Performing inference on the validation set using the base torch model.")
         config = self.get_config()
-        datamodule = OTEAnomalyDataModule(config=config, dataset=dataset, task_type=self.task_type)
+        datamodule = OTXAnomalyDataModule(config=config, dataset=dataset, task_type=self.task_type)
 
         logger.info("Inference Configs '%s'", config)
 

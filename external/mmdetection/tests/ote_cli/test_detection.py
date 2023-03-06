@@ -1,4 +1,4 @@
-"""Tests for object detection with OTE CLI"""
+"""Tests for object detection with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

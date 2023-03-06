@@ -13,9 +13,9 @@
 # and limitations under the License.
 
 from .data_utils import get_anchor_boxes, get_sizes_from_dataset_entity, format_list_to_str, adaptive_tile_params
-from .mmdataset import OTEDataset, get_annotation_mmdet_format
+from .mmdataset import OTXDataset, get_annotation_mmdet_format
 
 __all__ = [
-    OTEDataset, get_annotation_mmdet_format, get_anchor_boxes, get_sizes_from_dataset_entity, format_list_to_str,
+    OTXDataset, get_annotation_mmdet_format, get_anchor_boxes, get_sizes_from_dataset_entity, format_list_to_str,
     adaptive_tile_params
 ]

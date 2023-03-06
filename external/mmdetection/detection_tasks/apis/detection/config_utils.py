@@ -36,7 +36,7 @@ from detection_tasks.extension.datasets.data_utils import get_anchor_boxes, \
 from mmdet.models.detectors import BaseDetector
 from mmdet.utils.logger import get_root_logger
 
-from .configuration import OTEDetectionConfig
+from .configuration import OTXDetectionConfig
 
 try:
     from sklearn.cluster import KMeans
@@ -88,7 +88,7 @@ def patch_config(config: Config, work_dir: str, labels: List[LabelEntity], domai
     remove_from_config(config, 'train_pipeline')
     remove_from_config(config, 'test_pipeline')
 
-    # Patch data pipeline, making it OTE-compatible.
+    # Patch data pipeline, making it OTX-compatible.
     patch_datasets(config, domain)
 
     # Remove FP16 config if running on CPU device and revert to FP32 
@@ -120,7 +120,7 @@ def patch_config(config: Config, work_dir: str, labels: List[LabelEntity], domai
 
 
 @check_input_parameters_type()
-def set_hyperparams(config: Config, hyperparams: OTEDetectionConfig):
+def set_hyperparams(config: Config, hyperparams: OTXDetectionConfig):
     config.optimizer.lr = float(hyperparams.learning_parameters.learning_rate)
     config.lr_config.warmup_iters = int(hyperparams.learning_parameters.learning_rate_warmup_iters)
     if config.lr_config.warmup_iters == 0:
@@ -182,8 +182,8 @@ def prepare_for_training(config: Union[Config, ConfigDict], train_dataset: Datas
     data_train.ote_dataset = train_dataset
     config.data.val.ote_dataset = val_dataset
     patch_adaptive_repeat_dataset(config, len(train_dataset))
-    config.custom_hooks.append({'type': 'OTEProgressHook', 'time_monitor': time_monitor, 'verbose': True})
-    config.log_config.hooks.append({'type': 'OTELoggerHook', 'curves': learning_curves})
+    config.custom_hooks.append({'type': 'OTXProgressHook', 'time_monitor': time_monitor, 'verbose': True})
+    config.log_config.hooks.append({'type': 'OTXLoggerHook', 'curves': learning_curves})
     return config
 
 
@@ -277,7 +277,7 @@ def set_data_classes(config: Config, labels: List[LabelEntity]):
 def patch_datasets(config: Config, domain: Domain):
 
     def patch_color_conversion(pipeline):
-        # Default data format for OTE is RGB, while mmdet uses BGR, so negate the color conversion flag.
+        # Default data format for OTX is RGB, while mmdet uses BGR, so negate the color conversion flag.
         for pipeline_step in pipeline:
             if pipeline_step.type == 'Normalize':
                 to_rgb = False
@@ -291,7 +291,7 @@ def patch_datasets(config: Config, domain: Domain):
     assert 'data' in config
     for subset in ('train', 'val', 'test'):
         cfg = get_data_cfg(config, subset)
-        cfg.type = 'OTEDataset'
+        cfg.type = 'OTXDataset'
         cfg.domain = domain
         cfg.ote_dataset = None
         cfg.labels = None

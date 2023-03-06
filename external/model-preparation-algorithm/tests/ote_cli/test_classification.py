@@ -1,4 +1,4 @@
-"""Tests for MPA Class-Incremental Learning for image classification with OTE CLI"""
+"""Tests for MPA Class-Incremental Learning for image classification with OTX CLI"""
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #

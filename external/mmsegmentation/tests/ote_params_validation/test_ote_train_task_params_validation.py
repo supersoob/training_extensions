@@ -12,10 +12,10 @@ from otx.api.test_suite.e2e_test_system import e2e_pytest_unit
 from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
-from segmentation_tasks.apis.segmentation.train_task import OTESegmentationTrainingTask
+from segmentation_tasks.apis.segmentation.train_task import OTXSegmentationTrainingTask
 
 
-class MockSegmentationTrainingTask(OTESegmentationTrainingTask):
+class MockSegmentationTrainingTask(OTXSegmentationTrainingTask):
     def __init__(self):
         pass
 
@@ -37,10 +37,10 @@ class TestOTESegmentationTrainingTaskInputParamsValidation:
     def test_train_task_train_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationTrainingTask object "train" method input parameters validation
+        Check OTXSegmentationTrainingTask object "train" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationTrainingTask object, "train" method unexpected-type input parameters
+        OTXSegmentationTrainingTask object, "train" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -71,10 +71,10 @@ class TestOTESegmentationTrainingTaskInputParamsValidation:
     def test_train_task_save_model_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationTrainingTask object "save_model" method input parameters validation
+        Check OTXSegmentationTrainingTask object "save_model" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationTrainingTask object, "model" non-ModelEntity object
+        OTXSegmentationTrainingTask object, "model" non-ModelEntity object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

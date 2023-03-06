@@ -23,7 +23,7 @@ except ImportError:
     _pytest_plugins_from_e2e = []
 
 
-def get_pytest_plugins_from_ote():
+def get_pytest_plugins_from_otx():
     """
     The function generates pytest_plugins variable that should be used
     in an algo backend' conftest.py file.
@@ -90,12 +90,12 @@ def otx_pytest_generate_tests_insertion(metafunc):
     in algo backend's conftest.py file to generate parameters of reallife training tests.
     """
     from .logging import get_logger
-    from .training_tests_helper import OTETrainingTestInterface
+    from .training_tests_helper import OTXTrainingTestInterface
 
     logger = get_logger()
     if metafunc.cls is None:
         return False
-    if not issubclass(metafunc.cls, OTETrainingTestInterface):
+    if not issubclass(metafunc.cls, OTXTrainingTestInterface):
         return False
 
     logger.debug(f"otx_pytest_generate_tests_insertion: begin handling {metafunc.cls}")

@@ -4,7 +4,7 @@
 
 import pytest
 
-from detection_tasks.apis.detection.train_task import OTEDetectionTrainingTask
+from detection_tasks.apis.detection.train_task import OTXDetectionTrainingTask
 from otx.api.configuration.configurable_parameters import ConfigurableParameters
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.label_schema import LabelSchemaEntity
@@ -15,7 +15,7 @@ from otx.api.tests.parameters_validation.validation_helper import (
 )
 
 
-class MockDetectionTrainingTask(OTEDetectionTrainingTask):
+class MockDetectionTrainingTask(OTXDetectionTrainingTask):
     def __init__(self):
         pass
 
@@ -37,10 +37,10 @@ class TestOTEDetectionTrainingTaskInputParamsValidation:
     def test_train_task_train_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionTrainingTask object "train" method input parameters validation
+        Check OTXDetectionTrainingTask object "train" method input parameters validation
 
         <b>Input data:</b>
-        OTEDetectionTrainingTask object, "train" method unexpected-type input parameters
+        OTXDetectionTrainingTask object, "train" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -71,10 +71,10 @@ class TestOTEDetectionTrainingTaskInputParamsValidation:
     def test_train_task_save_model_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDetectionTrainingTask object "save_model" method input parameters validation
+        Check OTXDetectionTrainingTask object "save_model" method input parameters validation
 
         <b>Input data:</b>
-        OTEDetectionTrainingTask object, "model" non-ModelEntity object
+        OTXDetectionTrainingTask object, "model" non-ModelEntity object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

@@ -33,7 +33,7 @@ from segmentation_tasks.apis.segmentation.config_utils import (
     set_num_classes,
     patch_color_conversion,
 )
-from segmentation_tasks.apis.segmentation.configuration import OTESegmentationConfig
+from segmentation_tasks.apis.segmentation.configuration import OTXSegmentationConfig
 
 
 class TestConfigUtilsInputParamsValidation:
@@ -115,7 +115,7 @@ class TestConfigUtilsInputParamsValidation:
         """
         correct_values_dict = {
             "config": Config(),
-            "hyperparams": OTESegmentationConfig(),
+            "hyperparams": OTXSegmentationConfig(),
         }
         unexpected_str = "unexpected string"
         unexpected_values = [

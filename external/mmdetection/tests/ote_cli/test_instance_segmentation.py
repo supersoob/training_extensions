@@ -1,4 +1,4 @@
-"""Tests for instance segmentation with OTE CLI"""
+"""Tests for instance segmentation with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

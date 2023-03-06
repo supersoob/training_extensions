@@ -59,8 +59,8 @@ from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
 from otx.api.utils.argument_checks import check_input_parameters_type
 from otx.api.utils.labels_utils import get_empty_label
 from otx.api.utils.vis_utils import get_actmap
-from torchreid_tasks.nncf_task import OTEClassificationNNCFTask
-from torchreid_tasks.utils import OTELoggerHook
+from torchreid_tasks.nncf_task import OTXClassificationNNCFTask
+from torchreid_tasks.utils import OTXLoggerHook
 from torchreid_tasks.utils import get_multihead_class_info as get_hierarchical_info
 
 from otx.api.configuration import cfg_helper
@@ -208,7 +208,7 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
         logger.info("Exporting completed")
 
     def _add_predictions_to_dataset(self, prediction_results, dataset, update_progress_callback):
-        """Loop over dataset again to assign predictions. Convert from MMClassification format to OTE format."""
+        """Loop over dataset again to assign predictions. Convert from MMClassification format to OTX format."""
         dataset_size = len(dataset)
         for i, (dataset_item, prediction_items) in enumerate(zip(dataset, prediction_results)):
             item_labels = []
@@ -333,8 +333,8 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
             logger.warning(f"train type {train_type} is not implemented yet. Running incremental training.")
 
         self._recipe_cfg = MPAConfig.fromfile(recipe)
-        self._patch_datasets(self._recipe_cfg)  # for OTE compatibility
-        self._patch_evaluation(self._recipe_cfg)  # for OTE compatibility
+        self._patch_datasets(self._recipe_cfg)  # for OTX compatibility
+        self._patch_evaluation(self._recipe_cfg)  # for OTX compatibility
         logger.info(f"initialized recipe = {recipe}")
 
     def _init_model_cfg(self):
@@ -380,7 +380,7 @@ class ClassificationInferenceTask(BaseTask, IInferenceTask, IExportTask, IEvalua
 
     def _patch_datasets(self, config: MPAConfig, domain=Domain.CLASSIFICATION):
         def patch_color_conversion(pipeline):
-            # Default data format for OTE is RGB, while mmdet uses BGR, so negate the color conversion flag.
+            # Default data format for OTX is RGB, while mmdet uses BGR, so negate the color conversion flag.
             for pipeline_step in pipeline:
                 if pipeline_step.type == "Normalize":
                     to_rgb = False
@@ -481,12 +481,12 @@ class ClassificationTrainTask(ClassificationInferenceTask):
             self._is_training = False
             return
 
-        # Set OTE LoggerHook & Time Monitor
+        # Set OTX LoggerHook & Time Monitor
         update_progress_callback = train_default_progress_callback
         if train_parameters is not None:
             update_progress_callback = train_parameters.update_progress
         self._time_monitor = TrainingProgressCallback(update_progress_callback)
-        self._learning_curves = defaultdict(OTELoggerHook.Curve)
+        self._learning_curves = defaultdict(OTXLoggerHook.Curve)
 
         stage_module = "ClsTrainer"
         self._data_cfg = self._init_train_data_cfg(dataset)
@@ -572,7 +572,7 @@ class ClassificationTrainTask(ClassificationInferenceTask):
         return output, best_acc
 
 
-class ClassificationNNCFTask(OTEClassificationNNCFTask):
+class ClassificationNNCFTask(OTXClassificationNNCFTask):
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         """ "

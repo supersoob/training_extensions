@@ -1,4 +1,4 @@
-"""Tests for anomaly segmentation with OTE CLI"""
+"""Tests for anomaly segmentation with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

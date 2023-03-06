@@ -33,7 +33,7 @@ from otx.api.utils.importing import get_impl_class
 from torchreid_tasks.utils import (ClassificationDatasetAdapter,
                                             generate_label_schema)
 
-from otx.api.test_suite.training_test_case import (OTETestCaseInterface,
+from otx.api.test_suite.training_test_case import (OTXTestCaseInterface,
                                                    generate_ote_integration_test_case_class)
 from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
 from otx.api.test_suite.training_tests_common import (make_path_be_abs,
@@ -41,22 +41,22 @@ from otx.api.test_suite.training_tests_common import (make_path_be_abs,
                                                       KEEP_CONFIG_FIELD_VALUE,
                                                       REALLIFE_USECASE_CONSTANT,
                                                       ROOT_PATH_KEY)
-from otx.api.test_suite.training_tests_helper import (OTETestHelper,
+from otx.api.test_suite.training_tests_helper import (OTXTestHelper,
                                                       DefaultOTETestCreationParametersInterface,
-                                                      OTETrainingTestInterface)
-from otx.api.test_suite.training_tests_actions import (OTETestTrainingAction,
+                                                      OTXTrainingTestInterface)
+from otx.api.test_suite.training_tests_actions import (OTXTestTrainingAction,
                                                        is_nncf_enabled,
                                                        BaseOTETestAction,
-                                                       OTETestTrainingEvaluationAction,
-                                                       OTETestExportAction,
-                                                       OTETestExportEvaluationAction,
-                                                       OTETestPotAction,
-                                                       OTETestPotEvaluationAction,
-                                                       OTETestNNCFAction,
-                                                       OTETestNNCFEvaluationAction,
-                                                       OTETestNNCFExportAction,
-                                                       OTETestNNCFExportEvaluationAction,
-                                                       OTETestNNCFGraphAction,
+                                                       OTXTestTrainingEvaluationAction,
+                                                       OTXTestExportAction,
+                                                       OTXTestExportEvaluationAction,
+                                                       OTXTestPotAction,
+                                                       OTXTestPotEvaluationAction,
+                                                       OTXTestNNCFAction,
+                                                       OTXTestNNCFEvaluationAction,
+                                                       OTXTestNNCFExportAction,
+                                                       OTXTestNNCFExportEvaluationAction,
+                                                       OTXTestNNCFGraphAction,
                                                        create_environment_and_task)
 
 
@@ -108,20 +108,20 @@ def _create_classification_dataset_and_labels_schema(dataset_params):
 def get_image_classification_test_action_classes() -> List[Type[BaseOTETestAction]]:
     return [
         ClassificationTestTrainingAction,
-        OTETestTrainingEvaluationAction,
-        OTETestExportAction,
-        OTETestExportEvaluationAction,
-        OTETestPotAction,
-        OTETestPotEvaluationAction,
+        OTXTestTrainingEvaluationAction,
+        OTXTestExportAction,
+        OTXTestExportEvaluationAction,
+        OTXTestPotAction,
+        OTXTestPotEvaluationAction,
         ClassificationTestNNCFAction,
-        OTETestNNCFEvaluationAction,
-        OTETestNNCFExportAction,
-        OTETestNNCFExportEvaluationAction,
-        OTETestNNCFGraphAction
+        OTXTestNNCFEvaluationAction,
+        OTXTestNNCFExportAction,
+        OTXTestNNCFExportEvaluationAction,
+        OTXTestNNCFGraphAction
     ]
 
 class ClassificationTrainingTestParameters(DefaultOTETestCreationParametersInterface):
-    def test_case_class(self) -> Type[OTETestCaseInterface]:
+    def test_case_class(self) -> Type[OTXTestCaseInterface]:
         return generate_ote_integration_test_case_class(
             get_image_classification_test_action_classes()
         )
@@ -199,10 +199,10 @@ def _get_dummy_compressed_model(task):
     return compressed_model
 
 
-# TODO: This function copies with minor change OTETestTrainingAction
+# TODO: This function copies with minor change OTXTestTrainingAction
 #             from otx.api.test_suite.
 #             Try to avoid copying of code.
-class ClassificationTestTrainingAction(OTETestTrainingAction):
+class ClassificationTestTrainingAction(OTXTestTrainingAction):
     _name = "training"
 
     def __init__(
@@ -275,7 +275,7 @@ class ClassificationTestTrainingAction(OTETestTrainingAction):
         data_collector.log_final_metric("metric_value", score_value)
 
 
-class ClassificationTestNNCFAction(OTETestNNCFAction):
+class ClassificationTestNNCFAction(OTXTestNNCFAction):
     _name = "nncf"
     _depends_stages_names = ["training"]
 
@@ -326,12 +326,12 @@ class ClassificationTestNNCFAction(OTETestNNCFAction):
         logger.info("NNCF optimization is finished")
 
 
-class TestOTEReallifeClassification(OTETrainingTestInterface):
+class TestOTEReallifeClassification(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
     PERFORMANCE_RESULTS = None # it is required for e2e system
-    helper = OTETestHelper(ClassificationTrainingTestParameters())
+    helper = OTXTestHelper(ClassificationTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -414,7 +414,7 @@ class TestOTEReallifeClassification(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,

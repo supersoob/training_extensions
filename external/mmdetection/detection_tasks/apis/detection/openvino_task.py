@@ -80,7 +80,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 from zipfile import ZipFile
 
 from mmdet.utils.logger import get_root_logger
-from .configuration import OTEDetectionConfig
+from .configuration import OTXDetectionConfig
 from . import model_wrappers
 
 logger = get_root_logger()
@@ -165,7 +165,7 @@ class OpenVINODetectionInferencer(BaseInferencerWithConverter):
     @check_input_parameters_type()
     def __init__(
         self,
-        hparams: OTEDetectionConfig,
+        hparams: OTXDetectionConfig,
         label_schema: LabelSchemaEntity,
         model_file: Union[str, bytes],
         weight_file: Union[str, bytes, None] = None,
@@ -173,7 +173,7 @@ class OpenVINODetectionInferencer(BaseInferencerWithConverter):
         num_requests: int = 1,
     ):
         """
-        Inferencer implementation for OTEDetection using OpenVINO backend.
+        Inferencer implementation for OTXDetection using OpenVINO backend.
 
         :param hparams: Hyper parameters that the model should use.
         :param label_schema: LabelSchemaEntity that was used during model training.
@@ -199,7 +199,7 @@ class OpenVINODetectionInferencer(BaseInferencerWithConverter):
             )
         }
         model = Model.create_model(
-            "OTE_SSD", model_adapter, configuration, preload=True
+            "OTX_SSD", model_adapter, configuration, preload=True
         )
         converter = DetectionToAnnotationConverter(label_schema)
 
@@ -218,7 +218,7 @@ class OpenVINOMaskInferencer(BaseInferencerWithConverter):
     @check_input_parameters_type()
     def __init__(
         self,
-        hparams: OTEDetectionConfig,
+        hparams: OTXDetectionConfig,
         label_schema: LabelSchemaEntity,
         model_file: Union[str, bytes],
         weight_file: Union[str, bytes, None] = None,
@@ -254,7 +254,7 @@ class OpenVINORotatedRectInferencer(BaseInferencerWithConverter):
     @check_input_parameters_type()
     def __init__(
         self,
-        hparams: OTEDetectionConfig,
+        hparams: OTXDetectionConfig,
         label_schema: LabelSchemaEntity,
         model_file: Union[str, bytes],
         weight_file: Union[str, bytes, None] = None,
@@ -286,7 +286,7 @@ class OpenVINORotatedRectInferencer(BaseInferencerWithConverter):
         super().__init__(configuration, model, converter)
 
 
-class OTEOpenVinoDataLoader(DataLoader):
+class OTXOpenVinoDataLoader(DataLoader):
     @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
     def __init__(self, dataset: DatasetEntity, inferencer: BaseInferencer):
         self.dataset = dataset
@@ -309,7 +309,7 @@ class OpenVINODetectionTask(
 ):
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
-        logger.info("Loading OpenVINO OTEDetectionTask")
+        logger.info("Loading OpenVINO OTXDetectionTask")
         self.task_environment = task_environment
         self.model = self.task_environment.model
         self.task_type = self.task_environment.model_template.task_type
@@ -320,7 +320,7 @@ class OpenVINODetectionTask(
 
     @property
     def hparams(self):
-        return self.task_environment.get_hyper_parameters(OTEDetectionConfig)
+        return self.task_environment.get_hyper_parameters(OTXDetectionConfig)
 
     def load_config(self) -> Dict:
         """ Load configurable parameters from model adapter
@@ -540,7 +540,7 @@ class OpenVINODetectionTask(
             )
 
         dataset = dataset.get_subset(Subset.TRAINING)
-        data_loader = OTEOpenVinoDataLoader(dataset, self.inferencer)
+        data_loader = OTXOpenVinoDataLoader(dataset, self.inferencer)
 
         with tempfile.TemporaryDirectory() as tempdir:
             xml_path = os.path.join(tempdir, "model.xml")

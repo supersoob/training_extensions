@@ -70,7 +70,7 @@ try:
 except ImportError:
     import warnings
     warnings.warn("ModelAPI was not found.")
-from torchreid_tasks.parameters import OTEClassificationParameters
+from torchreid_tasks.parameters import OTXClassificationParameters
 from torchreid_tasks.utils import get_multihead_class_info, get_actmap
 
 from zipfile import ZipFile
@@ -82,7 +82,7 @@ class OpenVINOClassificationInferencer(BaseInferencer):
     @check_input_parameters_type()
     def __init__(
         self,
-        hparams: OTEClassificationParameters,
+        hparams: OTXClassificationParameters,
         label_schema: LabelSchemaEntity,
         model_file: Union[str, bytes],
         weight_file: Union[str, bytes, None] = None,
@@ -90,7 +90,7 @@ class OpenVINOClassificationInferencer(BaseInferencer):
         num_requests: int = 1,
     ):
         """
-        Inferencer implementation for OTEDetection using OpenVINO backend.
+        Inferencer implementation for OTXDetection using OpenVINO backend.
         :param model: Path to model to load, `.xml`, `.bin` or `.onnx` file.
         :param hparams: Hyper parameters that the model should use.
         :param num_requests: Maximum number of requests that the inferencer can make.
@@ -140,7 +140,7 @@ class OpenVINOClassificationInferencer(BaseInferencer):
         return self.model.infer_sync(inputs)
 
 
-class OTEOpenVinoDataLoader(DataLoader):
+class OTXOpenVinoDataLoader(DataLoader):
     @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
     def __init__(self, dataset: DatasetEntity, inferencer: BaseInferencer):
         super().__init__(config=None)
@@ -163,7 +163,7 @@ class OpenVINOClassificationTask(IDeploymentTask, IInferenceTask, IEvaluationTas
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         self.task_environment = task_environment
-        self.hparams = self.task_environment.get_hyper_parameters(OTEClassificationParameters)
+        self.hparams = self.task_environment.get_hyper_parameters(OTXClassificationParameters)
         self.model = self.task_environment.model
         self.inferencer = self.load_inferencer()
 
@@ -284,7 +284,7 @@ class OpenVINOClassificationTask(IDeploymentTask, IInferenceTask, IEvaluationTas
             raise ValueError("POT is the only supported optimization type for OpenVino models")
 
         dataset = dataset.get_subset(Subset.TRAINING)
-        data_loader = OTEOpenVinoDataLoader(dataset, self.inferencer)
+        data_loader = OTXOpenVinoDataLoader(dataset, self.inferencer)
 
         with tempfile.TemporaryDirectory() as tempdir:
             xml_path = os.path.join(tempdir, "model.xml")

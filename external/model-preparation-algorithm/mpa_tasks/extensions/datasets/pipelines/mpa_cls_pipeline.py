@@ -14,7 +14,7 @@ from otx.api.utils.argument_checks import check_input_parameters_type
 @PIPELINES.register_module()
 class LoadImageFromOTEDataset:
     """
-    Pipeline element that loads an image from a OTE Dataset on the fly. Can do conversion to float 32 if needed.
+    Pipeline element that loads an image from a OTX Dataset on the fly. Can do conversion to float 32 if needed.
 
     Expected entries in the 'results' dict that should be passed to this pipeline element are:
         results['dataset_item']: dataset_item from which to load the image

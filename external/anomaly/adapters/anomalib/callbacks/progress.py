@@ -1,4 +1,4 @@
-"""Progressbar  and Score Reporting callback Callback for OTE task.
+"""Progressbar  and Score Reporting callback Callback for OTX task.
 
 TODO Since only one progressbar callback is supported HPO is combined into one callback. Remove this after the refactor
 """

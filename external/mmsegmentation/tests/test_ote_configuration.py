@@ -18,13 +18,13 @@ import pytest
 from otx.api.configuration.helper import convert, create
 from otx.api.test_suite.e2e_test_system import e2e_pytest_api
 
-from segmentation_tasks.apis.segmentation.configuration import OTESegmentationConfig
+from segmentation_tasks.apis.segmentation.configuration import OTXSegmentationConfig
 
 
 @e2e_pytest_api
 @pytest.mark.skip(reason="This test case will be deprecated soon")
 def test_configuration_yaml():
-    configuration = OTESegmentationConfig()
+    configuration = OTXSegmentationConfig()
     configuration_yaml_str = convert(configuration, str)
     configuration_yaml_converted = create(configuration_yaml_str)
     configuration_yaml_loaded = create(osp.join('segmentation_tasks', 'apis', 'segmentation', 'configuration.yaml'))

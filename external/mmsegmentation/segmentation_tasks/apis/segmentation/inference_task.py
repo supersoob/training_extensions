@@ -54,23 +54,23 @@ from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.models import build_segmentor
 from mmseg.parallel import MMDataCPU
 from segmentation_tasks.apis.segmentation.config_utils import (patch_config, prepare_for_testing, set_hyperparams)
-from segmentation_tasks.apis.segmentation.configuration import OTESegmentationConfig
+from segmentation_tasks.apis.segmentation.configuration import OTXSegmentationConfig
 from segmentation_tasks.apis.segmentation.ote_utils import InferenceProgressCallback, get_activation_map
 
 logger = logging.getLogger(__name__)
 
 
-class OTESegmentationInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
+class OTXSegmentationInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
     task_environment: TaskEnvironment
 
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         """"
-        Task for training semantic segmentation models using OTESegmentation.
+        Task for training semantic segmentation models using OTXSegmentation.
 
         """
 
-        logger.info(f"Loading OTESegmentationTask.")
+        logger.info(f"Loading OTXSegmentationTask.")
         self._scratch_space = tempfile.mkdtemp(prefix="ote-seg-scratch-")
         logger.info(f"Scratch space created at {self._scratch_space}")
 
@@ -107,7 +107,7 @@ class OTESegmentationInferenceTask(IInferenceTask, IExportTask, IEvaluationTask,
 
     @property
     def _hyperparams(self):
-        return self._task_environment.get_hyper_parameters(OTESegmentationConfig)
+        return self._task_environment.get_hyper_parameters(OTXSegmentationConfig)
 
     def _load_model(self, model: ModelEntity):
         if model is not None:

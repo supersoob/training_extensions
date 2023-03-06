@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-from .datasets import OTEDataset, get_annotation_mmdet_format
+from .datasets import OTXDataset, get_annotation_mmdet_format
 from .utils import (CancelTrainingHook, FixedMomentumUpdaterHook, LoadImageFromOTEDataset, EpochRunnerWithCancel,
-    LoadAnnotationFromOTEDataset, OTELoggerHook, OTEProgressHook, EarlyStoppingHook, ReduceLROnPlateauLrUpdaterHook)
+    LoadAnnotationFromOTEDataset, OTXLoggerHook, OTXProgressHook, EarlyStoppingHook, ReduceLROnPlateauLrUpdaterHook)

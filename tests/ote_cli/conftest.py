@@ -17,13 +17,13 @@ import pytest
 
 from otx.api.test_suite.pytest_insertions import *  # noqa #pylint: disable=unused-import
 
-pytest_plugins = get_pytest_plugins_from_ote()
+pytest_plugins = get_pytest_plugins_from_otx()
 
-ote_conftest_insertion(default_repository_name="ote/training_extensions/")
+otx_conftest_insertion(default_repository_name="ote/training_extensions/")
 
 
 def pytest_addoption(parser):
-    ote_pytest_addoption_insertion(parser)
+    otx_pytest_addoption_insertion(parser)
 
 
 @pytest.fixture(autouse=True, scope="session")

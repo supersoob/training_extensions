@@ -5,7 +5,7 @@
 import numpy as np
 import pytest
 from detection_tasks.extension.datasets.mmdataset import (
-    OTEDataset,
+    OTXDataset,
     get_annotation_mmdet_format,
 )
 
@@ -85,7 +85,7 @@ class TestOTEDatasetInputParamsValidation:
     @staticmethod
     def dataset():
         pipeline = [{"type": "LoadImageFromFile", "to_float32": True}]
-        return OTEDataset(
+        return OTXDataset(
             ote_dataset=DatasetEntity(),
             labels=[label_entity()],
             pipeline=pipeline,
@@ -97,14 +97,14 @@ class TestOTEDatasetInputParamsValidation:
     def test_ote_dataset_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDataset object initialization parameters validation
+        Check OTXDataset object initialization parameters validation
 
         <b>Input data:</b>
-        OTEDataset object initialization parameters with unexpected type
+        OTXDataset object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEDataset object initialization parameter
+        OTXDataset object initialization parameter
         """
         label = label_entity()
 
@@ -134,17 +134,17 @@ class TestOTEDatasetInputParamsValidation:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTEDataset,
+            class_or_function=OTXDataset,
         )
 
     @e2e_pytest_unit
     def test_ote_dataset_prepare_train_img_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDataset object "prepare_train_img" method input parameters validation
+        Check OTXDataset object "prepare_train_img" method input parameters validation
 
         <b>Input data:</b>
-        OTEDataset object, "idx" non-integer type parameter
+        OTXDataset object, "idx" non-integer type parameter
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -158,10 +158,10 @@ class TestOTEDatasetInputParamsValidation:
     def test_ote_dataset_prepare_test_img_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDataset object "prepare_test_img" method input parameters validation
+        Check OTXDataset object "prepare_test_img" method input parameters validation
 
         <b>Input data:</b>
-        OTEDataset object, "idx" non-integer type parameter
+        OTXDataset object, "idx" non-integer type parameter
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -175,10 +175,10 @@ class TestOTEDatasetInputParamsValidation:
     def test_ote_dataset_pre_pipeline_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDataset object "pre_pipeline" method input parameters validation
+        Check OTXDataset object "pre_pipeline" method input parameters validation
 
         <b>Input data:</b>
-        OTEDataset object, "results" unexpected type object
+        OTXDataset object, "results" unexpected type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -199,10 +199,10 @@ class TestOTEDatasetInputParamsValidation:
     def test_ote_dataset_get_ann_info_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEDataset object "get_ann_info" method input parameters validation
+        Check OTXDataset object "get_ann_info" method input parameters validation
 
         <b>Input data:</b>
-        OTEDataset object, "idx" non-integer type parameter
+        OTXDataset object, "idx" non-integer type parameter
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

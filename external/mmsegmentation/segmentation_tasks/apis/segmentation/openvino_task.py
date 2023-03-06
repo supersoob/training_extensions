@@ -61,7 +61,7 @@ from compression.graph.model_utils import compress_model_weights, get_nodes_by_t
 from compression.pipeline.initializer import create_pipeline
 from otx.api.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
 
-from .configuration import OTESegmentationConfig
+from .configuration import OTXSegmentationConfig
 from openvino.model_zoo.model_api.models import Model
 from openvino.model_zoo.model_api.adapters import create_core, OpenvinoAdapter
 from .ote_utils import get_activation_map
@@ -75,7 +75,7 @@ class OpenVINOSegmentationInferencer(BaseInferencer):
     @check_input_parameters_type()
     def __init__(
         self,
-        hparams: OTESegmentationConfig,
+        hparams: OTXSegmentationConfig,
         label_schema: LabelSchemaEntity,
         model_file: Union[str, bytes],
         weight_file: Union[str, bytes, None] = None,
@@ -83,7 +83,7 @@ class OpenVINOSegmentationInferencer(BaseInferencer):
         num_requests: int = 1,
     ):
         """
-        Inferencer implementation for OTESegmentation using OpenVINO backend.
+        Inferencer implementation for OTXSegmentation using OpenVINO backend.
 
         :param hparams: Hyper parameters that the model should use.
         :param label_schema: LabelSchemaEntity that was used during model training.
@@ -117,7 +117,7 @@ class OpenVINOSegmentationInferencer(BaseInferencer):
         return self.model.infer_sync(inputs)
 
 
-class OTEOpenVinoDataLoader(DataLoader):
+class OTXOpenVinoDataLoader(DataLoader):
     @check_input_parameters_type({"dataset": DatasetParamTypeCheck})
     def __init__(self, dataset: DatasetEntity, inferencer: BaseInferencer):
         self.dataset = dataset
@@ -151,7 +151,7 @@ class OpenVINOSegmentationTask(IDeploymentTask, IInferenceTask, IEvaluationTask,
 
     @property
     def hparams(self):
-        return self.task_environment.get_hyper_parameters(OTESegmentationConfig)
+        return self.task_environment.get_hyper_parameters(OTXSegmentationConfig)
 
     def load_inferencer(self) -> OpenVINOSegmentationInferencer:
         return OpenVINOSegmentationInferencer(self.hparams,
@@ -254,7 +254,7 @@ class OpenVINOSegmentationTask(IDeploymentTask, IInferenceTask, IEvaluationTask,
             raise ValueError("POT is the only supported optimization type for OpenVino models")
 
         dataset = dataset.get_subset(Subset.TRAINING)
-        data_loader = OTEOpenVinoDataLoader(dataset, self.inferencer)
+        data_loader = OTXOpenVinoDataLoader(dataset, self.inferencer)
 
         with tempfile.TemporaryDirectory() as tempdir:
             xml_path = os.path.join(tempdir, "model.xml")

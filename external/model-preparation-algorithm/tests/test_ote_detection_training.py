@@ -13,7 +13,7 @@ import pytest
 from otx.api.entities.label import Domain
 from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
 from otx.api.test_suite.training_test_case import (
-    OTETestCaseInterface,
+    OTXTestCaseInterface,
     generate_ote_integration_test_case_class,
 )
 from otx.api.test_suite.training_tests_common import (
@@ -24,8 +24,8 @@ from otx.api.test_suite.training_tests_common import (
 )
 from otx.api.test_suite.training_tests_helper import (
     DefaultOTETestCreationParametersInterface,
-    OTETestHelper,
-    OTETrainingTestInterface,
+    OTXTestHelper,
+    OTXTrainingTestInterface,
 )
 
 from tests.mpa_common import (
@@ -43,7 +43,7 @@ def ote_test_domain_fx():
 
 
 class DetectionClsIncrTrainingTestParameters(DefaultOTETestCreationParametersInterface):
-    def test_case_class(self) -> Type[OTETestCaseInterface]:
+    def test_case_class(self) -> Type[OTXTestCaseInterface]:
         return generate_ote_integration_test_case_class(get_test_action_classes())
 
     def test_bunches(self) -> List[Dict[str, Any]]:
@@ -81,13 +81,13 @@ def get_dummy_compressed_model(task):
     return compressed_model
 
 
-class TestOTEReallifeMPADet(OTETrainingTestInterface):
+class TestOTEReallifeMPADet(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
 
     PERFORMANCE_RESULTS = None  # it is required for e2e system
-    helper = OTETestHelper(DetectionClsIncrTrainingTestParameters())
+    helper = OTXTestHelper(DetectionClsIncrTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -192,7 +192,7 @@ class TestOTEReallifeMPADet(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,

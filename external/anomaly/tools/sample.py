@@ -1,6 +1,6 @@
 """`sample.py`.
 
-This is a sample python script showing how to train an end-to-end OTE Anomaly Classification Task.
+This is a sample python script showing how to train an end-to-end OTX Anomaly Classification Task.
 """
 
 # Copyright (C) 2021 Intel Corporation
@@ -53,7 +53,7 @@ logger = get_logger(__name__)
 
 # pylint: disable=too-many-instance-attributes
 class OteAnomalyTask:
-    """OTE Anomaly Classification Task."""
+    """OTX Anomaly Classification Task."""
 
     def __init__(
         self,
@@ -340,7 +340,7 @@ def parse_args() -> Namespace:
 
     """
     parser = argparse.ArgumentParser(
-        description="Sample showcasing how to run Anomaly Classification Task using OTE SDK"
+        description="Sample showcasing how to run Anomaly Classification Task using OTX SDK"
     )
     parser.add_argument(
         "--model_template_path",

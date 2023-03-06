@@ -28,7 +28,7 @@ from ..datasets import get_annotation_mmdet_format
 @PIPELINES.register_module()
 class LoadImageFromOTEDataset:
     """
-    Pipeline element that loads an image from a OTE Dataset on the fly. Can do conversion to float 32 if needed.
+    Pipeline element that loads an image from a OTX Dataset on the fly. Can do conversion to float 32 if needed.
 
     Expected entries in the 'results' dict that should be passed to this pipeline element are:
         results['dataset_item']: dataset_item from which to load the image
@@ -75,7 +75,7 @@ class LoadImageFromOTEDataset:
 @PIPELINES.register_module()
 class LoadAnnotationFromOTEDataset:
     """
-    Pipeline element that loads an annotation from a OTE Dataset on the fly.
+    Pipeline element that loads an annotation from a OTX Dataset on the fly.
 
     Expected entries in the 'results' dict that should be passed to this pipeline element are:
         results['dataset_item']: dataset_item from which to load the annotation

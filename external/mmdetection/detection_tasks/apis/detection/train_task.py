@@ -40,16 +40,16 @@ from otx.api.utils.argument_checks import (
 
 from mmdet.apis import train_detector
 from detection_tasks.apis.detection.config_utils import cluster_anchors, prepare_for_training, set_hyperparams
-from detection_tasks.apis.detection.inference_task import OTEDetectionInferenceTask
+from detection_tasks.apis.detection.inference_task import OTXDetectionInferenceTask
 from detection_tasks.apis.detection.ote_utils import TrainingProgressCallback
-from detection_tasks.extension.utils.hooks import OTELoggerHook
+from detection_tasks.extension.utils.hooks import OTXLoggerHook
 from mmdet.datasets import build_dataset
 from mmdet.utils.logger import get_root_logger
 
 logger = get_root_logger()
 
 
-class OTEDetectionTrainingTask(OTEDetectionInferenceTask, ITrainingTask):
+class OTXDetectionTrainingTask(OTXDetectionInferenceTask, ITrainingTask):
 
     def _generate_training_metrics(self, learning_curves, map) -> Optional[List[MetricsGroup]]:
         """
@@ -120,7 +120,7 @@ class OTEDetectionTrainingTask(OTEDetectionInferenceTask, ITrainingTask):
         if train_parameters is not None:
             update_progress_callback = train_parameters.update_progress
         time_monitor = TrainingProgressCallback(update_progress_callback)
-        learning_curves = defaultdict(OTELoggerHook.Curve)
+        learning_curves = defaultdict(OTXLoggerHook.Curve)
         training_config = prepare_for_training(config, train_dataset, val_dataset, time_monitor, learning_curves)
         self._training_work_dir = training_config.work_dir
         mm_train_dataset = build_dataset(training_config.data.train)

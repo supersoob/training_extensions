@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-from .hooks import CancelTrainingHook, FixedMomentumUpdaterHook, OTELoggerHook, OTEProgressHook
+from .hooks import CancelTrainingHook, FixedMomentumUpdaterHook, OTXLoggerHook, OTXProgressHook
 from .pipelines import LoadImageFromOTEDataset, LoadAnnotationFromOTEDataset
 from .runner import EpochRunnerWithCancel, IterBasedRunnerWithCancel
 
@@ -23,6 +23,6 @@ __all__ = [
     "EpochRunnerWithCancel",
     "IterBasedRunnerWithCancel",
     "LoadAnnotationFromOTEDataset",
-    "OTELoggerHook",
-    "OTEProgressHook",
+    "OTXLoggerHook",
+    "OTXProgressHook",
 ]

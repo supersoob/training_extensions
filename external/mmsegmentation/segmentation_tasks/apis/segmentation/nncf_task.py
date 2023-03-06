@@ -44,11 +44,11 @@ from otx.api.utils.argument_checks import (
 )
 
 from mmseg.apis import train_segmentor
-from segmentation_tasks.apis.segmentation import OTESegmentationInferenceTask
+from segmentation_tasks.apis.segmentation import OTXSegmentationInferenceTask
 from segmentation_tasks.apis.segmentation.config_utils import prepare_for_training
-from segmentation_tasks.apis.segmentation.configuration import OTESegmentationConfig
+from segmentation_tasks.apis.segmentation.configuration import OTXSegmentationConfig
 from segmentation_tasks.apis.segmentation.ote_utils import OptimizationProgressCallback
-from segmentation_tasks.extension.utils.hooks import OTELoggerHook
+from segmentation_tasks.extension.utils.hooks import OTXLoggerHook
 from mmseg.apis.train import build_val_dataloader
 from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.integration.nncf import check_nncf_is_enabled
@@ -60,7 +60,7 @@ from mmseg.integration.nncf.config import compose_nncf_config
 logger = logging.getLogger(__name__)
 
 
-class OTESegmentationNNCFTask(OTESegmentationInferenceTask, IOptimizationTask):
+class OTXSegmentationNNCFTask(OTXSegmentationInferenceTask, IOptimizationTask):
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         """"
@@ -195,7 +195,7 @@ class OTESegmentationNNCFTask(OTESegmentationInferenceTask, IOptimizationTask):
         time_monitor = OptimizationProgressCallback(update_progress_callback,
                                                     loading_stage_progress_percentage=5,
                                                     initialization_stage_progress_percentage=5)
-        learning_curves = defaultdict(OTELoggerHook.Curve)
+        learning_curves = defaultdict(OTXLoggerHook.Curve)
         training_config = prepare_for_training(config, train_dataset, val_dataset, time_monitor, learning_curves)
 
         self._training_work_dir = training_config.work_dir
@@ -238,7 +238,7 @@ class OTESegmentationNNCFTask(OTESegmentationInferenceTask, IOptimizationTask):
     @check_input_parameters_type()
     def save_model(self, output_model: ModelEntity):
         buffer = io.BytesIO()
-        hyperparams = self._task_environment.get_hyper_parameters(OTESegmentationConfig)
+        hyperparams = self._task_environment.get_hyper_parameters(OTXSegmentationConfig)
         hyperparams_str = ids_to_strings(cfg_helper.convert(hyperparams, dict, enum_to_str=True))
         labels = {label.name: label.color.rgb_tuple for label in self._labels}
         modelinfo = {

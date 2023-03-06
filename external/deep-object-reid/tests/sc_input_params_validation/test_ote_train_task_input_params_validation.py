@@ -12,10 +12,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
 
-from torchreid_tasks.train_task import OTEClassificationTrainingTask
+from torchreid_tasks.train_task import OTXClassificationTrainingTask
 
 
-class MockClassificationTrainingTask(OTEClassificationTrainingTask):
+class MockClassificationTrainingTask(OTXClassificationTrainingTask):
     def __init__(self):
         pass
 
@@ -37,26 +37,26 @@ class TestOTEClassificationTrainingTaskInputParamsValidation:
     def test_ote_classification_train_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationTrainingTask object initialization parameters validation
+        Check OTXClassificationTrainingTask object initialization parameters validation
 
         <b>Input data:</b>
         "task_environment" non-TaskEnvironment object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEClassificationTrainingTask object initialization parameter
+        OTXClassificationTrainingTask object initialization parameter
         """
         with pytest.raises(ValueError):
-            OTEClassificationTrainingTask(task_environment="unexpected string")  # type: ignore
+            OTXClassificationTrainingTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_ote_classification_train_task_save_model_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationTrainingTask object "save_model" method input parameters validation
+        Check OTXClassificationTrainingTask object "save_model" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationTrainingTask object, "model" non-ModelEntity object
+        OTXClassificationTrainingTask object, "model" non-ModelEntity object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -70,10 +70,10 @@ class TestOTEClassificationTrainingTaskInputParamsValidation:
     def test_ote_classification_train_task_train_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationTrainingTask object "train" method input parameters validation
+        Check OTXClassificationTrainingTask object "train" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationTrainingTask object, "train" method unexpected-type input parameters
+        OTXClassificationTrainingTask object, "train" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

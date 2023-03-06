@@ -15,10 +15,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
-from segmentation_tasks.apis.segmentation.configuration import OTESegmentationConfig
+from segmentation_tasks.apis.segmentation.configuration import OTXSegmentationConfig
 from segmentation_tasks.apis.segmentation.openvino_task import (
     OpenVINOSegmentationInferencer,
-    OTEOpenVinoDataLoader,
+    OTXOpenVinoDataLoader,
     OpenVINOSegmentationTask,
 )
 
@@ -182,14 +182,14 @@ class TestOTEOpenVinoDataLoaderInputParamsValidation:
     def test_openvino_data_loader_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEOpenVinoDataLoader object initialization parameters validation
+        Check OTXOpenVinoDataLoader object initialization parameters validation
 
         <b>Input data:</b>
-        OTEOpenVinoDataLoader object initialization parameters with unexpected type
+        OTXOpenVinoDataLoader object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEOpenVinoDataLoader object initialization parameter
+        OTXOpenVinoDataLoader object initialization parameter
         """
         classification_inferencer = MockOpenVinoInferencer()
         correct_values_dict = {
@@ -207,24 +207,24 @@ class TestOTEOpenVinoDataLoaderInputParamsValidation:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTEOpenVinoDataLoader,
+            class_or_function=OTXOpenVinoDataLoader,
         )
 
     @e2e_pytest_unit
     def test_openvino_data_loader_getitem_input_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEOpenVinoDataLoader object "__getitem__" method input parameters validation
+        Check OTXOpenVinoDataLoader object "__getitem__" method input parameters validation
 
         <b>Input data:</b>
-        OTEOpenVinoDataLoader object. "__getitem__" method unexpected-type input parameters
+        OTXOpenVinoDataLoader object. "__getitem__" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
         input parameter for "__getitem__" method
         """
         classification_inferencer = MockOpenVinoInferencer()
-        data_loader = OTEOpenVinoDataLoader(
+        data_loader = OTXOpenVinoDataLoader(
             dataset=DatasetEntity(), inferencer=classification_inferencer
         )
         with pytest.raises(ValueError):
@@ -246,7 +246,7 @@ class TestOpenVINOSegmentationInferencerInputParamsValidation:
         OpenVINOSegmentationInferencer object initialization parameter
         """
         correct_values_dict = {
-            "hparams": OTESegmentationConfig("test header"),
+            "hparams": OTXSegmentationConfig("test header"),
             "label_schema": LabelSchemaEntity(),
             "model_file": "some model data",
         }

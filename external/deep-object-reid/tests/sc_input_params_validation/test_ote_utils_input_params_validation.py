@@ -9,7 +9,7 @@ from otx.api.tests.parameters_validation.validation_helper import (
 from torchreid_tasks.utils import (
     ClassificationDatasetAdapter,
     active_score_from_probs,
-    OTEClassificationDataset,
+    OTXClassificationDataset,
     generate_label_schema,
     get_actmap,
     get_multiclass_predictions,
@@ -106,14 +106,14 @@ class TestOTEClassificationDatasetInputParamsValidation:
     def test_ote_classification_dataset_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationDataset object initialization parameters validation
+        Check OTXClassificationDataset object initialization parameters validation
 
         <b>Input data:</b>
-        OTEClassificationDataset object initialization parameters with unexpected type
+        OTXClassificationDataset object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEClassificationDataset initialization parameter
+        OTXClassificationDataset initialization parameter
         """
         dataset, labels_list = load_test_dataset()
 
@@ -142,14 +142,14 @@ class TestOTEClassificationDatasetInputParamsValidation:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTEClassificationDataset,
+            class_or_function=OTXClassificationDataset,
         )
 
     @e2e_pytest_unit
     def test_ote_classification_dataset_getitem_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationDataset object "__getitem__" method input parameters validation
+        Check OTXClassificationDataset object "__getitem__" method input parameters validation
 
         <b>Input data:</b>
         "idx" non-integer parameter
@@ -159,7 +159,7 @@ class TestOTEClassificationDatasetInputParamsValidation:
         input parameter for "__getitem__" method
         """
         dataset, labels_list = load_test_dataset()
-        ote_classification_dataset = OTEClassificationDataset(
+        ote_classification_dataset = OTXClassificationDataset(
             ote_dataset=dataset,
             labels=labels_list
         )

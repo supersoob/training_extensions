@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from detection_tasks.extension.datasets import OTEDataset
+from detection_tasks.extension.datasets import OTXDataset
 from mmdet.datasets.builder import DATASETS
 from mpa.utils.logger import get_logger
 from mpa_tasks.utils.data_utils import get_old_new_img_indices
@@ -11,7 +11,7 @@ logger = get_logger()
 
 
 @DATASETS.register_module()
-class MPADetDataset(OTEDataset):
+class MPADetDataset(OTXDataset):
     def __init__(self, **kwargs):
         dataset_cfg = kwargs.copy()
         _ = dataset_cfg.pop("org_type", None)

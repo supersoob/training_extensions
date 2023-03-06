@@ -22,7 +22,7 @@ from detection_tasks.apis.detection.config_utils import (
     set_data_classes,
     set_hyperparams,
 )
-from detection_tasks.apis.detection.configuration import OTEDetectionConfig
+from detection_tasks.apis.detection.configuration import OTXDetectionConfig
 from mmcv import Config
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.label import Domain, LabelEntity
@@ -113,7 +113,7 @@ class TestConfigUtilsInputParamsValidation:
         """
         correct_values_dict = {
             "config": Config(),
-            "hyperparams": OTEDetectionConfig(header="config header"),
+            "hyperparams": OTXDetectionConfig(header="config header"),
         }
         unexpected_str = "unexpected string"
         unexpected_values = [

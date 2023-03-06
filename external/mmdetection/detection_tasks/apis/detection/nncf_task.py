@@ -45,10 +45,10 @@ from otx.api.utils.argument_checks import (
 from mmdet.apis import train_detector
 from mmdet.apis.fake_input import get_fake_input
 from detection_tasks.apis.detection.config_utils import prepare_for_training, remove_from_config
-from detection_tasks.apis.detection.configuration import OTEDetectionConfig
-from detection_tasks.apis.detection.inference_task import OTEDetectionInferenceTask
+from detection_tasks.apis.detection.configuration import OTXDetectionConfig
+from detection_tasks.apis.detection.inference_task import OTXDetectionInferenceTask
 from detection_tasks.apis.detection.ote_utils import OptimizationProgressCallback
-from detection_tasks.extension.utils.hooks import OTELoggerHook
+from detection_tasks.extension.utils.hooks import OTXLoggerHook
 from mmdet.apis.train import build_val_dataloader
 from mmdet.datasets import build_dataloader, build_dataset
 from mmdet.integration.nncf import check_nncf_is_enabled
@@ -62,7 +62,7 @@ from mmdet.utils.logger import get_root_logger
 logger = get_root_logger()
 
 
-class OTEDetectionNNCFTask(OTEDetectionInferenceTask, IOptimizationTask):
+class OTXDetectionNNCFTask(OTXDetectionInferenceTask, IOptimizationTask):
 
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
@@ -212,7 +212,7 @@ class OTEDetectionNNCFTask(OTEDetectionInferenceTask, IOptimizationTask):
         time_monitor = OptimizationProgressCallback(update_progress_callback,
                                                     loading_stage_progress_percentage=5,
                                                     initialization_stage_progress_percentage=5)
-        learning_curves = defaultdict(OTELoggerHook.Curve)
+        learning_curves = defaultdict(OTXLoggerHook.Curve)
         training_config = prepare_for_training(config, train_dataset, val_dataset, time_monitor, learning_curves)
         mm_train_dataset = build_dataset(training_config.data.train)
 
@@ -272,7 +272,7 @@ class OTEDetectionNNCFTask(OTEDetectionInferenceTask, IOptimizationTask):
     @check_input_parameters_type()
     def save_model(self, output_model: ModelEntity):
         buffer = io.BytesIO()
-        hyperparams = self._task_environment.get_hyper_parameters(OTEDetectionConfig)
+        hyperparams = self._task_environment.get_hyper_parameters(OTXDetectionConfig)
         hyperparams_str = ids_to_strings(cfg_helper.convert(hyperparams, dict, enum_to_str=True))
         labels = {label.name: label.color.rgb_tuple for label in self._labels}
         # WA for scheduler resetting in NNCF

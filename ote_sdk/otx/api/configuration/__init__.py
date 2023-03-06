@@ -3,7 +3,7 @@
 #
 
 """
-This module contains base elements that make up OTE ConfigurableParameters, as well as a collection of helper functions
+This module contains base elements that make up OTX ConfigurableParameters, as well as a collection of helper functions
 to interact with them.
 
 The configuration helper module can be imported as `otx_config_helper` and implements the following:

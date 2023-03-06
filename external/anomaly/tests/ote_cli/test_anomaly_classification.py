@@ -1,4 +1,4 @@
-"""Tests for anomaly classification with OTE CLI"""
+"""Tests for anomaly classification with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

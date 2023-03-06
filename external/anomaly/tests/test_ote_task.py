@@ -49,16 +49,16 @@ class TestAnomalyClassification:
     @staticmethod
     def test_ote_config(task_path, template_path):
         """
-        Test generation of OTE config object from model template and conversion to Anomalib format. Also checks if
+        Test generation of OTX config object from model template and conversion to Anomalib format. Also checks if
         default values are overwritten in Anomalib config.
         """
         train_batch_size = 16
 
         ote_config, task_name = get_config_and_task_name(f"{task_path}/configs/{template_path}/template.yaml")
 
-        # change parameter value in OTE config
+        # change parameter value in OTX config
         ote_config.learning_parameters.train_batch_size = train_batch_size
-        # convert OTE -> Anomalib
+        # convert OTX -> Anomalib
         anomalib_config = get_anomalib_config(task_name, ote_config)
         # check if default parameter was overwritten
         assert anomalib_config.learning_parameters.train_batch_size == train_batch_size

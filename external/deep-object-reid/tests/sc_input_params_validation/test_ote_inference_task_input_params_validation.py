@@ -11,10 +11,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
 )
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 
-from torchreid_tasks.inference_task import OTEClassificationInferenceTask
+from torchreid_tasks.inference_task import OTXClassificationInferenceTask
 
 
-class MockClassificationInferenceTask(OTEClassificationInferenceTask):
+class MockClassificationInferenceTask(OTXClassificationInferenceTask):
     def __init__(self):
         pass
 
@@ -36,26 +36,26 @@ class TestOTEClassificationInferenceTaskInputParamsValidation:
     def test_ote_classification_inference_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationInferenceTask object initialization parameters validation
+        Check OTXClassificationInferenceTask object initialization parameters validation
 
         <b>Input data:</b>
-        OTEClassificationInferenceTask object initialization parameters with unexpected type
+        OTXClassificationInferenceTask object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEClassificationInferenceTask initialization parameter
+        OTXClassificationInferenceTask initialization parameter
         """
         with pytest.raises(ValueError):
-            OTEClassificationInferenceTask(task_environment="unexpected string")  # type: ignore
+            OTXClassificationInferenceTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_ote_classification_inference_task_infer_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationInferenceTask object "infer" method input parameters validation
+        Check OTXClassificationInferenceTask object "infer" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationInferenceTask object. "infer" method unexpected-type input parameters
+        OTXClassificationInferenceTask object. "infer" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -84,10 +84,10 @@ class TestOTEClassificationInferenceTaskInputParamsValidation:
     def test_ote_classification_inference_task_evaluate_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationInferenceTask object "evaluate" method input parameters validation
+        Check OTXClassificationInferenceTask object "evaluate" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationInferenceTask object. "evaluate" method unexpected-type input parameters
+        OTXClassificationInferenceTask object. "evaluate" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -122,10 +122,10 @@ class TestOTEClassificationInferenceTaskInputParamsValidation:
     def test_ote_classification_inference_task_export_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEClassificationInferenceTask object "export" method input parameters validation
+        Check OTXClassificationInferenceTask object "export" method input parameters validation
 
         <b>Input data:</b>
-        OTEClassificationInferenceTask object. "export" method unexpected-type input parameters
+        OTXClassificationInferenceTask object. "export" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

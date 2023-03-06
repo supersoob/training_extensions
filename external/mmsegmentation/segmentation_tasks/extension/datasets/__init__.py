@@ -14,12 +14,12 @@
 
 from .mmdataset import (load_dataset_items,
                         create_annotation_from_hard_seg_map,
-                        OTEDataset,
+                        OTXDataset,
                         get_annotation_mmseg_format)
 
 __all__ = [
     'load_dataset_items',
     'create_annotation_from_hard_seg_map',
-    "OTEDataset",
+    "OTXDataset",
     "get_annotation_mmseg_format",
 ]

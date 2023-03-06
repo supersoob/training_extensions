@@ -69,11 +69,11 @@ from otx.api.usecases.exportable_code import demo
 logger = get_logger(__name__)
 
 
-class OTEOpenVINOAnomalyDataloader(DataLoader):
-    """Dataloader for loading OTE dataset into OTE OpenVINO Inferencer.
+class OTXOpenVINOAnomalyDataloader(DataLoader):
+    """Dataloader for loading OTX dataset into OTX OpenVINO Inferencer.
 
     Args:
-        dataset (DatasetEntity): OTE dataset entity
+        dataset (DatasetEntity): OTX dataset entity
         inferencer (OpenVINOInferencer): OpenVINO Inferencer
     """
 
@@ -279,7 +279,7 @@ class OpenVINOTask(IInferenceTask, IEvaluationTask, IOptimizationTask, IDeployme
         )
 
         logger.info("Starting POT optimization.")
-        data_loader = OTEOpenVINOAnomalyDataloader(config=self.config, dataset=dataset, inferencer=self.inferencer)
+        data_loader = OTXOpenVINOAnomalyDataloader(config=self.config, dataset=dataset, inferencer=self.inferencer)
 
         with tempfile.TemporaryDirectory() as tempdir:
             xml_path = os.path.join(tempdir, "model.xml")

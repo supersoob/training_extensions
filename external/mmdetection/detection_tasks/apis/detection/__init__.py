@@ -16,12 +16,12 @@
 from .config_utils import (config_from_string, config_to_string, patch_config,
                            prepare_for_testing, prepare_for_training,
                            save_config_to_file, set_hyperparams)
-from .configuration import OTEDetectionConfig
-from .inference_task import OTEDetectionInferenceTask
-from .nncf_task import OTEDetectionNNCFTask
+from .configuration import OTXDetectionConfig
+from .inference_task import OTXDetectionInferenceTask
+from .nncf_task import OTXDetectionNNCFTask
 from .openvino_task import OpenVINODetectionTask
 from .ote_utils import generate_label_schema, get_task_class, load_template
-from .train_task import OTEDetectionTrainingTask
+from .train_task import OTXDetectionTrainingTask
 
 __all__ = [
     config_from_string,
@@ -30,10 +30,10 @@ __all__ = [
     get_task_class,
     load_template,
     OpenVINODetectionTask,
-    OTEDetectionConfig,
-    OTEDetectionInferenceTask,
-    OTEDetectionNNCFTask,
-    OTEDetectionTrainingTask,
+    OTXDetectionConfig,
+    OTXDetectionInferenceTask,
+    OTXDetectionNNCFTask,
+    OTXDetectionTrainingTask,
     patch_config,
     prepare_for_testing,
     prepare_for_training,

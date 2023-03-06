@@ -220,14 +220,14 @@ class BaseTask:
             update_or_add_custom_hook(
                 self._recipe_cfg,
                 ConfigDict(
-                    type="OTEProgressHook",
+                    type="OTXProgressHook",
                     time_monitor=self._time_monitor,
                     verbose=True,
                     priority=71,
                 ),
             )
         if self._learning_curves is not None:
-            self._recipe_cfg.log_config.hooks.append({"type": "OTELoggerHook", "curves": self._learning_curves})
+            self._recipe_cfg.log_config.hooks.append({"type": "OTXLoggerHook", "curves": self._learning_curves})
 
         logger.info("initialized.")
 

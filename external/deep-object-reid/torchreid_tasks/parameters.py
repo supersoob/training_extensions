@@ -30,7 +30,7 @@ from otx.api.configuration.enums import ModelLifecycle, AutoHPOState
 from .parameters_enums import POTQuantizationPreset
 
 @attrs
-class OTEClassificationParameters(ConfigurableParameters):
+class OTXClassificationParameters(ConfigurableParameters):
     header = string_attribute("Configuration for an image classification task")
     description = header
 

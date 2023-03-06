@@ -29,17 +29,17 @@ from otx.api.entities.label_schema import LabelSchemaEntity
 from otx.api.entities.model_template import TaskType
 from otx.api.test_suite.training_tests_actions import (
     BaseOTETestAction,
-    OTETestExportAction,
-    OTETestExportEvaluationAction,
-    OTETestNNCFAction,
-    OTETestNNCFEvaluationAction,
-    OTETestNNCFExportAction,
-    OTETestNNCFExportEvaluationAction,
-    OTETestNNCFGraphAction,
-    OTETestPotAction,
-    OTETestPotEvaluationAction,
-    OTETestTrainingAction,
-    OTETestTrainingEvaluationAction,
+    OTXTestExportAction,
+    OTXTestExportEvaluationAction,
+    OTXTestNNCFAction,
+    OTXTestNNCFEvaluationAction,
+    OTXTestNNCFExportAction,
+    OTXTestNNCFExportEvaluationAction,
+    OTXTestNNCFGraphAction,
+    OTXTestPotAction,
+    OTXTestPotEvaluationAction,
+    OTXTestTrainingAction,
+    OTXTestTrainingEvaluationAction,
 )
 from otx.api.test_suite.training_tests_common import ROOT_PATH_KEY, make_paths_be_abs
 from tasks import NNCFTask
@@ -97,20 +97,20 @@ def _create_anomaly_dataset_and_labels_schema(
 
 
 def get_anomaly_domain_test_action_classes(
-    anomaly_domain_test_train_action: OTETestTrainingAction,
+    anomaly_domain_test_train_action: OTXTestTrainingAction,
 ) -> List[Type[BaseOTETestAction]]:
     return [
         anomaly_domain_test_train_action,
-        OTETestTrainingEvaluationAction,
-        OTETestExportAction,
-        OTETestExportEvaluationAction,
-        OTETestPotAction,
-        OTETestPotEvaluationAction,
-        OTETestNNCFAction,
-        OTETestNNCFEvaluationAction,
-        OTETestNNCFExportAction,
-        OTETestNNCFExportEvaluationAction,
-        OTETestNNCFGraphAction,
+        OTXTestTrainingEvaluationAction,
+        OTXTestExportAction,
+        OTXTestExportEvaluationAction,
+        OTXTestPotAction,
+        OTXTestPotEvaluationAction,
+        OTXTestNNCFAction,
+        OTXTestNNCFEvaluationAction,
+        OTXTestNNCFExportAction,
+        OTXTestNNCFExportEvaluationAction,
+        OTXTestNNCFGraphAction,
     ]
 
 

@@ -15,10 +15,10 @@ from otx.api.tests.parameters_validation.validation_helper import (
     check_value_error_exception_raised,
 )
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
-from segmentation_tasks.apis.segmentation.inference_task import OTESegmentationInferenceTask
+from segmentation_tasks.apis.segmentation.inference_task import OTXSegmentationInferenceTask
 
 
-class MockSegmentationInferenceTask(OTESegmentationInferenceTask):
+class MockSegmentationInferenceTask(OTXSegmentationInferenceTask):
     def __init__(self):
         pass
 
@@ -40,26 +40,26 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_segmentation_inference_task_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationInferenceTask object initialization parameters validation
+        Check OTXSegmentationInferenceTask object initialization parameters validation
 
         <b>Input data:</b>
         "task_environment" non-TaskEnvironment object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTESegmentationInferenceTask object initialization parameter
+        OTXSegmentationInferenceTask object initialization parameter
         """
         with pytest.raises(ValueError):
-            OTESegmentationInferenceTask(task_environment="unexpected string")  # type: ignore
+            OTXSegmentationInferenceTask(task_environment="unexpected string")  # type: ignore
 
     @e2e_pytest_unit
     def test_ote_segmentation_inference_task_infer_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationInferenceTask object "infer" method input parameters validation
+        Check OTXSegmentationInferenceTask object "infer" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationInferenceTask object. "infer" method unexpected-type input parameters
+        OTXSegmentationInferenceTask object. "infer" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -88,10 +88,10 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_segmentation_inference_task_evaluate_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationInferenceTask object "evaluate" method input parameters validation
+        Check OTXSegmentationInferenceTask object "evaluate" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationInferenceTask object. "evaluate" method unexpected-type input parameters
+        OTXSegmentationInferenceTask object. "evaluate" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -126,10 +126,10 @@ class TestInferenceTaskInputParamsValidation:
     def test_ote_segmentation_inference_task_export_params_validation(self):
         """
         <b>Description:</b>
-        Check OTESegmentationInferenceTask object "export" method input parameters validation
+        Check OTXSegmentationInferenceTask object "export" method input parameters validation
 
         <b>Input data:</b>
-        OTESegmentationInferenceTask object. "export" method unexpected-type input parameters
+        OTXSegmentationInferenceTask object. "export" method unexpected-type input parameters
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

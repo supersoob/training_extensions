@@ -13,8 +13,8 @@ from segmentation_tasks.extension.utils.hooks import (
     CancelTrainingHook,
     EnsureCorrectBestCheckpointHook,
     FixedMomentumUpdaterHook,
-    OTELoggerHook,
-    OTEProgressHook,
+    OTXLoggerHook,
+    OTXProgressHook,
 )
 
 
@@ -96,14 +96,14 @@ class TestOTELoggerHook:
     def test_ote_logger_hook_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTELoggerHook object initialization parameters validation
+        Check OTXLoggerHook object initialization parameters validation
 
         <b>Input data:</b>
-        OTELoggerHook object initialization parameters with unexpected type
+        OTXLoggerHook object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTELoggerHook object initialization parameter
+        OTXLoggerHook object initialization parameter
         """
         correct_values_dict = {}
         unexpected_str = "unexpected string"
@@ -114,7 +114,7 @@ class TestOTELoggerHook:
             (
                 "curves",
                 {
-                    "expected": OTELoggerHook.Curve(),
+                    "expected": OTXLoggerHook.Curve(),
                     "unexpected": unexpected_str,
                 },
             ),
@@ -130,23 +130,23 @@ class TestOTELoggerHook:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTELoggerHook,
+            class_or_function=OTXLoggerHook,
         )
 
     @e2e_pytest_unit
     def test_ote_logger_hook_log_params_validation(self):
         """
         <b>Description:</b>
-        Check OTELoggerHook object "log" method input parameters validation
+        Check OTXLoggerHook object "log" method input parameters validation
 
         <b>Input data:</b>
-        OTELoggerHook object, "runner" non-BaseRunner type object
+        OTXLoggerHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
         input parameter for "log" method
         """
-        hook = OTELoggerHook()
+        hook = OTXLoggerHook()
         with pytest.raises(ValueError):
             hook.log(runner="unexpected string")  # type: ignore
 
@@ -154,16 +154,16 @@ class TestOTELoggerHook:
     def test_ote_logger_hook_after_train_epoch_params_validation(self):
         """
         <b>Description:</b>
-        Check OTELoggerHook object "after_train_epoch" method input parameters validation
+        Check OTXLoggerHook object "after_train_epoch" method input parameters validation
 
         <b>Input data:</b>
-        OTELoggerHook object, "runner" non-BaseRunner type object
+        OTXLoggerHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
         input parameter for "after_train_epoch" method
         """
-        hook = OTELoggerHook()
+        hook = OTXLoggerHook()
         with pytest.raises(ValueError):
             hook.after_train_epoch(runner="unexpected string")  # type: ignore
 
@@ -176,20 +176,20 @@ class TestOTEProgressHook:
         )
 
     def hook(self):
-        return OTEProgressHook(time_monitor=self.time_monitor())
+        return OTXProgressHook(time_monitor=self.time_monitor())
 
     @e2e_pytest_unit
     def test_ote_progress_hook_init_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object initialization parameters validation
+        Check OTXProgressHook object initialization parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object initialization parameters with unexpected type
+        OTXProgressHook object initialization parameters with unexpected type
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
-        OTEProgressHook object initialization parameter
+        OTXProgressHook object initialization parameter
         """
         correct_values_dict = {"time_monitor": self.time_monitor()}
         unexpected_str = "unexpected string"
@@ -202,17 +202,17 @@ class TestOTEProgressHook:
         check_value_error_exception_raised(
             correct_parameters=correct_values_dict,
             unexpected_values=unexpected_values,
-            class_or_function=OTEProgressHook,
+            class_or_function=OTXProgressHook,
         )
 
     @e2e_pytest_unit
     def test_ote_progress_hook_before_run_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "before_run" method input parameters validation
+        Check OTXProgressHook object "before_run" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -226,10 +226,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_before_epoch_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "before_epoch" method input parameters validation
+        Check OTXProgressHook object "before_epoch" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -243,10 +243,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_after_epoch_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "after_epoch" method input parameters validation
+        Check OTXProgressHook object "after_epoch" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -260,10 +260,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_before_iter_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "before_iter" method input parameters validation
+        Check OTXProgressHook object "before_iter" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -277,10 +277,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_after_iter_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "after_iter" method input parameters validation
+        Check OTXProgressHook object "after_iter" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -294,10 +294,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_before_val_iter_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "before_val_iter" method input parameters validation
+        Check OTXProgressHook object "before_val_iter" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -311,10 +311,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_after_val_iter_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "after_val_iter" method input parameters validation
+        Check OTXProgressHook object "after_val_iter" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as
@@ -328,10 +328,10 @@ class TestOTEProgressHook:
     def test_ote_progress_hook_after_run_params_validation(self):
         """
         <b>Description:</b>
-        Check OTEProgressHook object "after_run" method input parameters validation
+        Check OTXProgressHook object "after_run" method input parameters validation
 
         <b>Input data:</b>
-        OTEProgressHook object, "runner" non-BaseRunner type object
+        OTXProgressHook object, "runner" non-BaseRunner type object
 
         <b>Expected results:</b>
         Test passes if ValueError exception is raised when unexpected type object is specified as

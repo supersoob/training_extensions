@@ -1,4 +1,4 @@
-"""Tests for rotated object detection with OTE CLI"""
+"""Tests for rotated object detection with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

@@ -56,7 +56,7 @@ from otx.api.utils.vis_utils import get_actmap
 
 from mmdet.apis import export_model
 from detection_tasks.apis.detection.config_utils import patch_config, prepare_for_testing, set_hyperparams
-from detection_tasks.apis.detection.configuration import OTEDetectionConfig
+from detection_tasks.apis.detection.configuration import OTXDetectionConfig
 from detection_tasks.apis.detection.ote_utils import InferenceProgressCallback
 from mmdet.datasets import build_dataloader, build_dataset
 from mmdet.models import build_detector
@@ -68,16 +68,16 @@ from mmdet.utils.logger import get_root_logger
 logger = get_root_logger()
 
 
-class OTEDetectionInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
+class OTXDetectionInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IUnload):
 
     _task_environment: TaskEnvironment
 
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
         """"
-        Task for inference object detection models using OTEDetection.
+        Task for inference object detection models using OTXDetection.
         """
-        logger.info('Loading OTEDetectionTask')
+        logger.info('Loading OTXDetectionTask')
 
         print('ENVIRONMENT:')
         for name, val in collect_env().items():
@@ -124,7 +124,7 @@ class OTEDetectionInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IU
 
     @property
     def _hyperparams(self):
-        return self._task_environment.get_hyper_parameters(OTEDetectionConfig)
+        return self._task_environment.get_hyper_parameters(OTXDetectionConfig)
 
     def _load_model(self, model: ModelEntity):
         if model is not None:
@@ -196,7 +196,7 @@ class OTEDetectionInferenceTask(IInferenceTask, IExportTask, IEvaluationTask, IU
 
 
     def _add_predictions_to_dataset(self, prediction_results, dataset, confidence_threshold=0.0):
-        """ Loop over dataset again to assign predictions. Convert from MMDetection format to OTE format. """
+        """ Loop over dataset again to assign predictions. Convert from MMDetection format to OTX format. """
         for dataset_item, (all_results, feature_vector, saliency_map) in zip(dataset, prediction_results):
             width = dataset_item.width
             height = dataset_item.height

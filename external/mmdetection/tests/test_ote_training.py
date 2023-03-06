@@ -33,9 +33,9 @@ from otx.api.test_suite.training_tests_common import (make_path_be_abs,
                                                       KEEP_CONFIG_FIELD_VALUE,
                                                       REALLIFE_USECASE_CONSTANT,
                                                       ROOT_PATH_KEY)
-from otx.api.test_suite.training_tests_helper import (OTETestHelper,
+from otx.api.test_suite.training_tests_helper import (OTXTestHelper,
                                                       DefaultOTETestCreationParametersInterface,
-                                                      OTETrainingTestInterface)
+                                                      OTXTrainingTestInterface)
 
 
 logger = logging.getLogger(__name__)
@@ -303,12 +303,12 @@ def data_collector_fx(request) -> DataCollector:
     logger.info('data_collector is released')
 
 
-class TestOTEReallifeObjectDetection(OTETrainingTestInterface):
+class TestOTEReallifeObjectDetection(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
     PERFORMANCE_RESULTS = None # it is required for e2e system
-    helper = OTETestHelper(ObjectDetectionTrainingTestParameters())
+    helper = OTXTestHelper(ObjectDetectionTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -321,7 +321,7 @@ class TestOTEReallifeObjectDetection(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,
@@ -345,12 +345,12 @@ class TestOTEReallifeObjectDetection(OTETrainingTestInterface):
                                cur_test_expected_metrics_callback_fx)
 
 
-class TestInstanceSegmentation(OTETrainingTestInterface):
+class TestInstanceSegmentation(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
     PERFORMANCE_RESULTS = None # it is required for e2e system
-    helper = OTETestHelper(InstanceSegmentationTrainingTestParameters())
+    helper = OTXTestHelper(InstanceSegmentationTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -363,7 +363,7 @@ class TestInstanceSegmentation(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,

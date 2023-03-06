@@ -1,4 +1,4 @@
-"""Tests for semantic segmentation with OTE CLI"""
+"""Tests for semantic segmentation with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

@@ -48,9 +48,9 @@ from otx.api.usecases.tasks.interfaces.export_interface import ExportType, IExpo
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
 from otx.api.utils.shape_factory import ShapeFactory
 
-from detection_tasks.apis.detection import (OpenVINODetectionTask, OTEDetectionConfig,
-                                           OTEDetectionInferenceTask,
-                                           OTEDetectionNNCFTask, OTEDetectionTrainingTask)
+from detection_tasks.apis.detection import (OpenVINODetectionTask, OTXDetectionConfig,
+                                           OTXDetectionInferenceTask,
+                                           OTXDetectionNNCFTask, OTXDetectionTrainingTask)
 from detection_tasks.apis.detection.ote_utils import generate_label_schema
 from mmdet.integration.nncf.utils import is_nncf_enabled
 
@@ -89,7 +89,7 @@ class ModelTemplate(unittest.TestCase):
 @e2e_pytest_api
 @pytest.mark.skip(reason="This test case will be deprecated soon")
 def test_configuration_yaml():
-    configuration = OTEDetectionConfig()
+    configuration = OTXDetectionConfig()
     configuration_yaml_str = convert(configuration, str)
     configuration_yaml_converted = create(configuration_yaml_str)
     configuration_yaml_loaded = create(osp.join('detection_tasks', 'apis', 'detection', 'configuration.yaml'))
@@ -119,7 +119,7 @@ class Sample(unittest.TestCase):
 @pytest.mark.skip(reason="This test case will be deprecated soon")
 class API(unittest.TestCase):
     """
-    Collection of tests for OTE API and OTE Model Templates
+    Collection of tests for OTX API and OTX Model Templates
     """
 
     def init_environment(
@@ -205,7 +205,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=500)
         detection_environment, dataset = self.init_environment(hyper_parameters, model_template, 64)
 
-        detection_task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        detection_task = OTXDetectionTrainingTask(task_environment=detection_environment)
 
         executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='train_thread')
 
@@ -249,7 +249,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=5)
         detection_environment, dataset = self.init_environment(hyper_parameters, model_template, 50)
 
-        task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        task = OTXDetectionTrainingTask(task_environment=detection_environment)
         self.addCleanup(task._delete_scratch_space)
 
         print('Task initialized, model training starts.')
@@ -279,7 +279,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=2)
         detection_environment, dataset = self.init_environment(hyper_parameters, model_template, 50)
 
-        task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        task = OTXDetectionTrainingTask(task_environment=detection_environment)
         self.addCleanup(task._delete_scratch_space)
 
         original_model = ModelEntity(
@@ -290,7 +290,7 @@ class API(unittest.TestCase):
 
         # Create NNCFTask
         detection_environment.model = original_model
-        nncf_task = OTEDetectionNNCFTask(task_environment=detection_environment)
+        nncf_task = OTXDetectionNNCFTask(task_environment=detection_environment)
         self.addCleanup(nncf_task._delete_scratch_space)
 
         # Rewrite some parameters to spend less time
@@ -323,7 +323,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=10)
         detection_environment, dataset = self.init_environment(hyper_parameters, model_template, 50)
 
-        task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        task = OTXDetectionTrainingTask(task_environment=detection_environment)
         self.addCleanup(task._delete_scratch_space)
 
         print('Task initialized, model inference starts.')
@@ -349,7 +349,7 @@ class API(unittest.TestCase):
         detection_environment, dataset = self.init_environment(hyper_parameters, model_template, 50)
         val_dataset = dataset.get_subset(Subset.VALIDATION)
 
-        train_task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        train_task = OTXDetectionTrainingTask(task_environment=detection_environment)
         self.addCleanup(train_task._delete_scratch_space)
 
         trained_model = ModelEntity(
@@ -361,7 +361,7 @@ class API(unittest.TestCase):
 
         # Create InferenceTask
         detection_environment.model = trained_model
-        inference_task = OTEDetectionInferenceTask(task_environment=detection_environment)
+        inference_task = OTXDetectionInferenceTask(task_environment=detection_environment)
         self.addCleanup(inference_task._delete_scratch_space)
 
         performance_after_load = self.eval(inference_task, trained_model, val_dataset)
@@ -376,7 +376,7 @@ class API(unittest.TestCase):
         inference_task.export(ExportType.OPENVINO, exported_model)
 
     @staticmethod
-    def eval(task: OTEDetectionTrainingTask, model: ModelEntity, dataset: DatasetEntity) -> Performance:
+    def eval(task: OTXDetectionTrainingTask, model: ModelEntity, dataset: DatasetEntity) -> Performance:
         start_time = time.time()
         result_dataset = task.infer(dataset.with_empty_annotations())
         end_time = time.time()
@@ -418,7 +418,7 @@ class API(unittest.TestCase):
             hyper_parameters, model_template, 250, task_type=task_type)
 
         val_dataset = dataset.get_subset(Subset.VALIDATION)
-        task = OTEDetectionTrainingTask(task_environment=detection_environment)
+        task = OTXDetectionTrainingTask(task_environment=detection_environment)
         self.addCleanup(task._delete_scratch_space)
 
         print('Task initialized, model training starts.')
@@ -456,7 +456,7 @@ class API(unittest.TestCase):
 
         # Reload task with the first model.
         detection_environment.model = first_model
-        task = OTEDetectionTrainingTask(detection_environment)
+        task = OTXDetectionTrainingTask(detection_environment)
         self.assertEqual(task._task_environment.model.id, first_model.id)
 
         print('Reevaluating model.')
@@ -515,7 +515,7 @@ class API(unittest.TestCase):
 
                 detection_environment.model = nncf_model
 
-                nncf_task = OTEDetectionNNCFTask(task_environment=detection_environment)
+                nncf_task = OTXDetectionNNCFTask(task_environment=detection_environment)
 
                 nncf_task.optimize(OptimizationType.NNCF, dataset, nncf_model, OptimizationParameters())
                 nncf_task.save_model(nncf_model)
@@ -533,7 +533,7 @@ class API(unittest.TestCase):
                 else:
                     assert nncf_model.precision[0] == nncf_task._precision_from_config[0]
             else:
-                print('Skipped test of OTEDetectionNNCFTask. Required NNCF module.')
+                print('Skipped test of OTXDetectionNNCFTask. Required NNCF module.')
 
     @e2e_pytest_api
     def test_training_gen3_ssd(self):

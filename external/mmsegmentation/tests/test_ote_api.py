@@ -40,7 +40,7 @@ from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.entities.train_parameters import TrainParameters
 from otx.api.tests.test_helpers import generate_random_annotated_image
 
-from segmentation_tasks.apis.segmentation import OTESegmentationTrainingTask
+from segmentation_tasks.apis.segmentation import OTXSegmentationTrainingTask
 
 
 DEFAULT_TEMPLATE_DIR = osp.join('configs', 'custom-sematic-segmentation', 'ocr-lite-hrnet-18-mod2')
@@ -49,7 +49,7 @@ DEFAULT_TEMPLATE_DIR = osp.join('configs', 'custom-sematic-segmentation', 'ocr-l
 @pytest.mark.skip(reason="This test case will be deprecated soon")
 class API(unittest.TestCase):
     """
-    Collection of tests for OTE API and OTE Model Templates
+    Collection of tests for OTX API and OTX Model Templates
     """
 
     @staticmethod
@@ -147,7 +147,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=5)
         segmentation_environment, dataset = self.init_environment(hyper_parameters, model_template, 12)
 
-        task = OTESegmentationTrainingTask(task_environment=segmentation_environment)
+        task = OTXSegmentationTrainingTask(task_environment=segmentation_environment)
         self.addCleanup(task._delete_scratch_space)
 
         print('Task initialized, model training starts.')
@@ -173,7 +173,7 @@ class API(unittest.TestCase):
         hyper_parameters, model_template = self.setup_configurable_parameters(DEFAULT_TEMPLATE_DIR, num_iters=10)
         segmentation_environment, dataset = self.init_environment(hyper_parameters, model_template, 12)
 
-        task = OTESegmentationTrainingTask(task_environment=segmentation_environment)
+        task = OTXSegmentationTrainingTask(task_environment=segmentation_environment)
         self.addCleanup(task._delete_scratch_space)
 
         print('Task initialized, model inference starts.')

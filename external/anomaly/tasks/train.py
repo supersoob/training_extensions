@@ -19,7 +19,7 @@ from typing import Optional
 
 import torch
 from adapters.anomalib.callbacks import ProgressCallback
-from adapters.anomalib.data import OTEAnomalyDataModule
+from adapters.anomalib.data import OTXAnomalyDataModule
 from adapters.anomalib.logger import get_logger
 from anomalib.models import AnomalyModule, get_model
 from anomalib.utils.callbacks import (
@@ -67,7 +67,7 @@ class TrainingTask(InferenceTask, ITrainingTask):
 
         logger.info("Training Configs '%s'", config)
 
-        datamodule = OTEAnomalyDataModule(config=config, dataset=dataset, task_type=self.task_type)
+        datamodule = OTXAnomalyDataModule(config=config, dataset=dataset, task_type=self.task_type)
         callbacks = [
             ProgressCallback(parameters=train_parameters),
             MinMaxNormalizationCallback(),
@@ -88,14 +88,14 @@ class TrainingTask(InferenceTask, ITrainingTask):
         logger.info("Training completed.")
 
     def load_model(self, ote_model: Optional[ModelEntity]) -> AnomalyModule:
-        """Create and Load Anomalib Module from OTE Model.
+        """Create and Load Anomalib Module from OTX Model.
 
-        This method checks if the task environment has a saved OTE Model,
-        and creates one. If the OTE model already exists, it returns the
+        This method checks if the task environment has a saved OTX Model,
+        and creates one. If the OTX model already exists, it returns the
         the model with the saved weights.
 
         Args:
-            ote_model (Optional[ModelEntity]): OTE Model from the
+            ote_model (Optional[ModelEntity]): OTX Model from the
                 task environment.
 
         Returns:

@@ -31,9 +31,9 @@ from otx.api.entities.train_parameters import default_progress_callback, TrainPa
 from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
 from scripts.default_config import imagedata_kwargs, lr_scheduler_kwargs, optimizer_kwargs
 from torchreid.apis.training import run_lr_finder, run_training
-from torchreid_tasks.inference_task import OTEClassificationInferenceTask
+from torchreid_tasks.inference_task import OTXClassificationInferenceTask
 from torchreid_tasks.monitors import DefaultMetricsMonitor
-from torchreid_tasks.utils import (OTEClassificationDataset, TrainingProgressCallback)
+from torchreid_tasks.utils import (OTXClassificationDataset, TrainingProgressCallback)
 from torchreid.ops import DataParallel
 from torchreid.utils import (load_pretrained_weights, set_random_seed,
                              check_isfile, resume_from_checkpoint)
@@ -45,7 +45,7 @@ from otx.api.utils.argument_checks import (
 logger = logging.getLogger(__name__)
 
 
-class OTEClassificationTrainingTask(OTEClassificationInferenceTask, ITrainingTask):
+class OTXClassificationTrainingTask(OTXClassificationInferenceTask, ITrainingTask):
 
     @check_input_parameters_type()
     def __init__(self, task_environment: TaskEnvironment):
@@ -113,10 +113,10 @@ class OTEClassificationTrainingTask(OTEClassificationInferenceTask, ITrainingTas
         set_random_seed(self._cfg.train.seed)
         train_subset = dataset.get_subset(Subset.TRAINING)
         val_subset = dataset.get_subset(Subset.VALIDATION)
-        self._cfg.custom_datasets.roots = [OTEClassificationDataset(train_subset, self._labels, self._multilabel,
+        self._cfg.custom_datasets.roots = [OTXClassificationDataset(train_subset, self._labels, self._multilabel,
                                                                     self._hierarchical, self._multihead_class_info,
                                                                     keep_empty_label=self._empty_label in self._labels),
-                                           OTEClassificationDataset(val_subset, self._labels, self._multilabel,
+                                           OTXClassificationDataset(val_subset, self._labels, self._multilabel,
                                                                     self._hierarchical, self._multihead_class_info,
                                                                     keep_empty_label=self._empty_label in self._labels)]
         datamanager = torchreid.data.ImageDataManager(**imagedata_kwargs(self._cfg))

@@ -1,4 +1,4 @@
-"""Tests for image classification with OTE CLI"""
+"""Tests for image classification with OTX CLI"""
 
 # Copyright (C) 2021 Intel Corporation
 #

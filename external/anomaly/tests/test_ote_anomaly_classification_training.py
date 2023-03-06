@@ -27,11 +27,11 @@ from otx.api.entities.subset import Subset
 from otx.api.entities.train_parameters import TrainParameters
 from otx.api.test_suite.e2e_test_system import DataCollector, e2e_pytest_performance
 from otx.api.test_suite.training_test_case import (
-    OTETestCaseInterface,
+    OTXTestCaseInterface,
     generate_ote_integration_test_case_class,
 )
 from otx.api.test_suite.training_tests_actions import (
-    OTETestTrainingAction,
+    OTXTestTrainingAction,
     create_environment_and_task,
 )
 from otx.api.test_suite.training_tests_common import (
@@ -43,8 +43,8 @@ from otx.api.test_suite.training_tests_common import (
 )
 from otx.api.test_suite.training_tests_helper import (
     DefaultOTETestCreationParametersInterface,
-    OTETestHelper,
-    OTETrainingTestInterface,
+    OTXTestHelper,
+    OTXTrainingTestInterface,
 )
 
 from tests.anomaly_common import (
@@ -63,7 +63,7 @@ def ote_test_domain_fx():
 
 
 class AnomalyClassificationTrainingTestParameters(DefaultOTETestCreationParametersInterface):
-    def test_case_class(self) -> Type[OTETestCaseInterface]:
+    def test_case_class(self) -> Type[OTXTestCaseInterface]:
         return generate_ote_integration_test_case_class(
             get_anomaly_domain_test_action_classes(AnomalyDetectionTestTrainingAction)
         )
@@ -121,10 +121,10 @@ class AnomalyClassificationTrainingTestParameters(DefaultOTETestCreationParamete
         return deepcopy(DEFAULT_TEST_PARAMETERS)
 
 
-# TODO:pfinashx: This function copies with minor change OTETestTrainingAction
+# TODO:pfinashx: This function copies with minor change OTXTestTrainingAction
 #             from otx.api.test_suite.
 #             Try to avoid copying of code.
-class AnomalyDetectionTestTrainingAction(OTETestTrainingAction):
+class AnomalyDetectionTestTrainingAction(OTXTestTrainingAction):
     _name = "training"
 
     def __init__(self, dataset, labels_schema, template_path, patience, batch_size):
@@ -207,13 +207,13 @@ class AnomalyDetectionTestTrainingAction(OTETestTrainingAction):
         return results
 
 
-class TestOTEReallifeAnomalyClassification(OTETrainingTestInterface):
+class TestOTEReallifeAnomalyClassification(OTXTrainingTestInterface):
     """
     The main class of running test in this file.
     """
 
     PERFORMANCE_RESULTS = None  # it is required for e2e system
-    helper = OTETestHelper(AnomalyClassificationTrainingTestParameters())
+    helper = OTXTestHelper(AnomalyClassificationTrainingTestParameters())
 
     @classmethod
     def get_list_of_tests(cls, usecase: Optional[str] = None):
@@ -301,7 +301,7 @@ class TestOTEReallifeAnomalyClassification(OTETrainingTestInterface):
     @pytest.fixture
     def test_case_fx(self, current_test_parameters_fx, params_factories_for_test_actions_fx):
         """
-        This fixture returns the test case class OTEIntegrationTestCase that should be used for the current test.
+        This fixture returns the test case class OTXIntegrationTestCase that should be used for the current test.
         Note that the cache from the test helper allows to store the instance of the class
         between the tests.
         If the main parameters used for this test are the same as the main parameters used for the previous test,

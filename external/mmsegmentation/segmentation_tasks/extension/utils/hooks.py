@@ -90,7 +90,7 @@ class EnsureCorrectBestCheckpointHook(Hook):
 
 
 @HOOKS.register_module()
-class OTELoggerHook(LoggerHook):
+class OTXLoggerHook(LoggerHook):
 
     class Curve:
         def __init__(self):
@@ -140,7 +140,7 @@ class OTELoggerHook(LoggerHook):
 
 
 @HOOKS.register_module()
-class OTEProgressHook(Hook):
+class OTXProgressHook(Hook):
     @check_input_parameters_type()
     def __init__(self, time_monitor: TimeMonitorCallback, verbose: bool = False):
         super().__init__()

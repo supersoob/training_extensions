@@ -44,8 +44,8 @@ from mmseg.datasets.pipelines import Compose
 @check_input_parameters_type()
 def get_annotation_mmseg_format(dataset_item: DatasetItemEntity, labels: List[LabelEntity]) -> dict:
     """
-    Function to convert a OTE annotation to mmsegmentation format. This is used both
-    in the OTEDataset class defined in this file as in the custom pipeline
+    Function to convert a OTX annotation to mmsegmentation format. This is used both
+    in the OTXDataset class defined in this file as in the custom pipeline
     element 'LoadAnnotationFromOTEDataset'
 
     :param dataset_item: DatasetItem for which to get annotations
@@ -62,10 +62,10 @@ def get_annotation_mmseg_format(dataset_item: DatasetItemEntity, labels: List[La
 
 
 @DATASETS.register_module()
-class OTEDataset(CustomDataset):
+class OTXDataset(CustomDataset):
     """
-    Wrapper that allows using a OTE dataset to train mmsegmentation models. This wrapper is not based on the filesystem,
-    but instead loads the items here directly from the OTE Dataset object.
+    Wrapper that allows using a OTX dataset to train mmsegmentation models. This wrapper is not based on the filesystem,
+    but instead loads the items here directly from the OTX Dataset object.
 
     The wrapper overwrites some methods of the CustomDataset class: prepare_train_img, prepare_test_img and prepipeline
     Naming of certain attributes might seem a bit peculiar but this is due to the conventions set in CustomDataset. For
@@ -77,7 +77,7 @@ class OTEDataset(CustomDataset):
     class _DataInfoProxy:
         """
         This class is intended to be a wrapper to use it in CustomDataset-derived class as `self.data_infos`.
-        Instead of using list `data_infos` as in CustomDataset, our implementation of dataset OTEDataset
+        Instead of using list `data_infos` as in CustomDataset, our implementation of dataset OTXDataset
         uses this proxy class with overriden __len__ and __getitem__; this proxy class
         forwards data access operations to ote_dataset and converts the dataset items to the view
         convenient for mmsegmentation.
@@ -131,12 +131,12 @@ class OTEDataset(CustomDataset):
         # Instead of using list data_infos as in CustomDataset, this implementation of dataset
         # uses a proxy class with overriden __len__ and __getitem__; this proxy class
         # forwards data access operations to ote_dataset.
-        # Note that list `data_infos` cannot be used here, since OTE dataset class does not have interface to
+        # Note that list `data_infos` cannot be used here, since OTX dataset class does not have interface to
         # get only annotation of a data item, so we would load the whole data item (including image)
         # even if we need only checking aspect ratio of the image; due to it
         # this implementation of dataset does not uses such tricks as skipping images with wrong aspect ratios or
         # small image size, since otherwise reading the whole dataset during initialization will be required.
-        self.data_infos = OTEDataset._DataInfoProxy(self.ote_dataset, self.project_labels)
+        self.data_infos = OTXDataset._DataInfoProxy(self.ote_dataset, self.project_labels)
 
         self.pipeline = Compose(pipeline)
 
