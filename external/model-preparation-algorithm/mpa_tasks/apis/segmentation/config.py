@@ -4,6 +4,9 @@
 
 from attr import attrs
 from mpa_tasks.apis import BaseConfig, LearningRateSchedule
+from otx.api.configuration.model_lifecycle import ModelLifecycle
+from segmentation_tasks.apis.segmentation.configuration_enums import Models
+
 from otx.api.configuration.elements import (  # configurable_boolean,
     ParameterGroup,
     add_parameter_group,
@@ -12,8 +15,6 @@ from otx.api.configuration.elements import (  # configurable_boolean,
     selectable,
     string_attribute,
 )
-from otx.api.configuration.model_lifecycle import ModelLifecycle
-from segmentation_tasks.apis.segmentation.configuration_enums import Models
 
 
 @attrs

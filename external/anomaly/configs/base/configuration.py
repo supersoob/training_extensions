@@ -18,6 +18,8 @@ from sys import maxsize
 
 from attr import attrs
 from configs.base.configuration_enums import POTQuantizationPreset
+from otx.api.configuration.model_lifecycle import ModelLifecycle
+
 from otx.api.configuration import ConfigurableParameters
 from otx.api.configuration.elements import (
     ParameterGroup,
@@ -28,7 +30,6 @@ from otx.api.configuration.elements import (
     selectable,
     string_attribute,
 )
-from otx.api.configuration.model_lifecycle import ModelLifecycle
 
 
 @attrs

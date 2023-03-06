@@ -25,7 +25,6 @@ from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.detection import DetectionConfig
-from otx.api.configuration import cfg_helper
 from otx.api.configuration.helper.utils import config_to_bytes, ids_to_strings
 from otx.api.entities.annotation import Annotation
 from otx.api.entities.datasets import DatasetEntity
@@ -67,6 +66,8 @@ from otx.api.usecases.tasks.interfaces.training_interface import ITrainingTask
 from otx.api.usecases.tasks.interfaces.unload_interface import IUnload
 from otx.api.utils.argument_checks import check_input_parameters_type
 from otx.api.utils.vis_utils import get_actmap
+
+from otx.api.configuration import cfg_helper
 
 logger = get_logger()
 

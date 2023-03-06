@@ -28,7 +28,6 @@ from typing import Optional
 
 import torch
 import yaml
-from otx.api.configuration.helper import create
 from otx.api.entities.model import ModelEntity
 from otx.api.entities.model_template import TaskType
 from otx.api.entities.subset import Subset
@@ -38,6 +37,7 @@ from otx.api.entities.train_parameters import TrainParameters, UpdateProgressCal
 from ote_cli.datasets import get_dataset_class
 from ote_cli.utils.importing import get_impl_class
 from ote_cli.utils.io import generate_label_schema, read_model, save_model_data
+from otx.api.configuration.helper import create
 
 try:
     import hpopt

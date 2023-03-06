@@ -9,7 +9,6 @@ import cv2
 import numpy as np
 from detection_tasks.apis.detection.ote_utils import get_task_class
 from mmcv.utils import get_logger
-from otx.api.configuration.helper import create
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.inference_parameters import InferenceParameters
 from otx.api.entities.label import Domain
@@ -23,6 +22,8 @@ from otx.api.entities.subset import Subset
 from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.usecases.tasks.interfaces.export_interface import ExportType
 from otx.api.usecases.tasks.interfaces.optimization_interface import OptimizationType
+
+from otx.api.configuration.helper import create
 
 logger = get_logger(name="sample")
 

@@ -22,7 +22,6 @@ from collections import deque
 
 import cv2
 import numpy as np
-from otx.api.configuration.helper import create
 from otx.api.entities.annotation import AnnotationSceneEntity, AnnotationSceneKind
 from otx.api.entities.datasets import DatasetEntity, DatasetItemEntity
 from otx.api.entities.image import Image
@@ -39,6 +38,7 @@ from ote_cli.utils.parser import (
     add_hyper_parameters_sub_parser,
     gen_params_dict_from_args,
 )
+from otx.api.configuration.helper import create
 
 ESC_BUTTON = 27
 

@@ -19,7 +19,6 @@ Model quality evaluation tool.
 import argparse
 import json
 
-from otx.api.configuration.helper import create
 from otx.api.entities.inference_parameters import InferenceParameters
 from otx.api.entities.resultset import ResultSetEntity
 from otx.api.entities.subset import Subset
@@ -35,6 +34,7 @@ from ote_cli.utils.parser import (
     add_hyper_parameters_sub_parser,
     gen_params_dict_from_args,
 )
+from otx.api.configuration.helper import create
 
 
 def init_arguments(parser, parse_template_only=False):

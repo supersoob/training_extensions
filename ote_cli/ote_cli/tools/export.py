@@ -19,7 +19,6 @@ Model exporting tool.
 import argparse
 import os
 
-from otx.api.configuration.helper import create
 from otx.api.entities.model import ModelEntity, ModelOptimizationType
 from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.usecases.adapters.model_adapter import ModelAdapter
@@ -29,6 +28,7 @@ from ote_cli.registry import find_and_parse_model_template
 from ote_cli.utils.importing import get_impl_class
 from ote_cli.utils.io import read_binary, read_label_schema, save_model_data
 from ote_cli.utils.nncf import is_checkpoint_nncf
+from otx.api.configuration.helper import create
 
 
 def parse_args():

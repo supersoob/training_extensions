@@ -16,7 +16,6 @@ from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.classification import ClassificationConfig
-from otx.api.configuration import cfg_helper
 from otx.api.configuration.helper.utils import ids_to_strings
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.inference_parameters import (
@@ -63,6 +62,8 @@ from otx.api.utils.vis_utils import get_actmap
 from torchreid_tasks.nncf_task import OTEClassificationNNCFTask
 from torchreid_tasks.utils import OTELoggerHook
 from torchreid_tasks.utils import get_multihead_class_info as get_hierarchical_info
+
+from otx.api.configuration import cfg_helper
 
 logger = get_logger()
 

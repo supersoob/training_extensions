@@ -15,7 +15,6 @@ from mpa.utils.config_utils import MPAConfig
 from mpa.utils.logger import get_logger
 from mpa_tasks.apis import BaseTask, TrainType
 from mpa_tasks.apis.segmentation import SegmentationConfig
-from otx.api.configuration import cfg_helper
 from otx.api.configuration.helper.utils import ids_to_strings
 from otx.api.entities.datasets import DatasetEntity
 from otx.api.entities.inference_parameters import InferenceParameters
@@ -66,6 +65,8 @@ from segmentation_tasks.apis.segmentation.ote_utils import (
     get_activation_map,
 )
 from segmentation_tasks.extension.utils.hooks import OTELoggerHook
+
+from otx.api.configuration import cfg_helper
 
 logger = get_logger()
 

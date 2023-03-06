@@ -54,7 +54,6 @@ from otx.api.entities.scored_label import ScoredLabel
 from otx.api.entities.task_environment import TaskEnvironment
 from otx.api.serialization.label_mapper import LabelSchemaMapper, label_schema_to_bytes
 from otx.api.usecases.evaluation.metrics_helper import MetricsHelper
-from otx.api.usecases.exportable_code import demo
 from otx.api.usecases.tasks.interfaces.deployment_interface import IDeploymentTask
 from otx.api.usecases.tasks.interfaces.evaluate_interface import IEvaluationTask
 from otx.api.usecases.tasks.interfaces.inference_interface import IInferenceTask
@@ -64,6 +63,8 @@ from otx.api.usecases.tasks.interfaces.optimization_interface import (
 )
 from otx.api.utils.anomaly_utils import create_detection_annotation_from_anomaly_heatmap
 from otx.api.utils.segmentation_utils import create_annotation_from_segmentation_map
+
+from otx.api.usecases.exportable_code import demo
 
 logger = get_logger(__name__)
 
