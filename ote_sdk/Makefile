@@ -7,7 +7,7 @@ include ../../Makefile.variable
 # Redefine MyPy Config location because ote_sdk has some custom configurations
 MYPY_CONFIG = .mypy.ini
 PYLINT_CONFIG= .pylintrc
-OTE_SDK = ./ote_sdk
+OTE_SDK = ./otx/api
 VIRTUALENV_DIR = .venv-ote_sdk
 VIRTUALENV_BIN = $(VIRTUALENV_DIR)/bin
 ACTIVATE = $(VIRTUALENV_BIN)/activate

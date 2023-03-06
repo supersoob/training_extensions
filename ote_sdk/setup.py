@@ -17,10 +17,10 @@ with open("requirements.txt", "r", encoding="UTF-8") as f:
             install_requires.append(line)
 
 setup(
-    name="OTE SDK",
+    name="otx",
     version="1.0",
     packages=find_packages(),
-    package_data={"otx.api": ["py.typed", "usecases/exportable_code/demo/*"]},
+    package_data={"otx": ["py.typed", "usecases/exportable_code/demo/*"]},
     url="",
     license="Copyright (c) 2021-2022 Intel Corporation. "
     "SPDX-License-Identifier: Apache-2.0",

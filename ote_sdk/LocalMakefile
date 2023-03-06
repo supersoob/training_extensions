@@ -8,7 +8,7 @@ include ../../Makefile.variable
 MYPY_CONFIG = .mypy.ini
 PYLINT_CONFIG= .pylintrc
 
-OTE_SDK = ./ote_sdk
+OTE_SDK = ./otx/api
 
 .PHONY: pipeline
 
