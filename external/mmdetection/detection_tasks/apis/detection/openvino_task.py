@@ -19,7 +19,7 @@ import json
 import multiprocessing
 import numpy as np
 import os
-import ote_sdk.usecases.exportable_code.demo as demo
+import otx.api.usecases.exportable_code.demo as demo
 import tempfile
 import warnings
 from addict import Dict as ADDict
