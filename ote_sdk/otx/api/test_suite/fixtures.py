@@ -393,7 +393,7 @@ def data_collector_fx(
     setup["scenario"] = otx_test_scenario_fx
     setup["test"] = request.node.name
     setup["subject"] = otx_test_domain_fx
-    setup["project"] = "ote"
+    setup["project"] = "otx"
     if "test_parameters" in setup:
         assert isinstance(setup["test_parameters"], dict)
         if "dataset_name" not in setup:

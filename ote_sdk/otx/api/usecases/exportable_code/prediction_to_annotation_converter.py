@@ -90,7 +90,7 @@ class DetectionToAnnotationConverter(IPredictionToAnnotationConverter):
         annotation_scene = AnnotationSceneEntity(
             id=ID(),
             kind=AnnotationSceneKind.PREDICTION,
-            editor="ote",
+            editor="otx",
             creation_date=now(),
             annotations=annotations,
         )

@@ -8,7 +8,7 @@ from otx.api.tests.fixtures.general import (  # noqa #pylint: disable=unused-imp
 
 pytest_plugins = get_pytest_plugins_from_otx()  # noqa: F405
 
-otx_conftest_insertion(default_repository_name="ote/training_extensions/")  # noqa: F405
+otx_conftest_insertion(default_repository_name="otx/training_extensions/")  # noqa: F405
 
 
 def pytest_addoption(parser):

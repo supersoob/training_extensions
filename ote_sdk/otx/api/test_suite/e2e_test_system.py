@@ -47,7 +47,7 @@ def _generate_e2e_pytest_decorators():
         REQ_DUMMY = "Dummy requirement"
 
     class OTXComponent(MarkMeta):
-        OTX = "ote"
+        OTX = "otx"
 
     def _e2e_pytest_api(func):
         @pytest.mark.components(OTXComponent.OTX)
