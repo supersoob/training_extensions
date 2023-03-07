@@ -7,3 +7,4 @@ pytest
 coverage
 pytest-timeout
 pytest-mock
+bandit
