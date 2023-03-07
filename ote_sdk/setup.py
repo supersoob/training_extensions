@@ -20,11 +20,11 @@ setup(
     name="otx",
     version="1.0",
     packages=find_packages(),
-    package_data={"otx": ["py.typed", "usecases/exportable_code/demo/*"]},
+    package_data={"otx": ["api/py.typed", "api/usecases/exportable_code/demo/*"]},
     url="",
-    license="Copyright (c) 2021-2022 Intel Corporation. "
+    license="Copyright (c) 2021-2023 Intel Corporation. "
     "SPDX-License-Identifier: Apache-2.0",
     install_requires=install_requires,
     author="Intel",
-    description="OTX SDK Package",
+    description="OTX API Package",
 )
