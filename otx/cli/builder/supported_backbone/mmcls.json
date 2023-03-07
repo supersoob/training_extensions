@@ -341,7 +341,7 @@
           "deit-base"
         ]
       },
-      "available": []
+      "available": ["CLASSIFICATION"]
     }
   }
 }
