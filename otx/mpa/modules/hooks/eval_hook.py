@@ -36,6 +36,10 @@ class CustomEvalHook(EvalHook):
                 self.metric = "accuracy"
             elif metric.count("accuracy") > 0:
                 self.metric = "top-1"
+
+            if "f1_score" in metric:
+                self.metric = "f1_score"
+
         super().__init__(*args, **kwargs, save_best=self.metric, rule="greater")
         self.ema_eval_start_epoch = ema_eval_start_epoch
 
