@@ -89,6 +89,12 @@ class ClsStage(Stage):
         output = layer(torch.rand([1] + list(input_shape)))
         if isinstance(output, (tuple, list)):
             output = output[-1]
+        if layer.__class__.__name__ == "VisionTransformer":
+            """
+            mmcls.VisionTransformer outputs Tuple[List[...]] and the last index of List is the final logit.
+            """
+            _, output = output
+
         in_channels = output.shape[1]
         if cfg.model.get("neck") is not None:
             if cfg.model.neck.get("in_channels") is not None:
