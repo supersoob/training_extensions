@@ -10,10 +10,15 @@ from typing import Optional, Tuple
 import cv2
 import imagesize
 import numpy as np
+import PIL
 
 from otx.api.entities.annotation import Annotation
 from otx.api.entities.media import IMedia2DEntity
 from otx.api.entities.shapes.rectangle import Rectangle
+
+
+PIL.Image.MAX_IMAGE_PIXELS = 933120000
+PIL.ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class Image(IMedia2DEntity):
@@ -75,7 +80,8 @@ class Image(IMedia2DEntity):
             np.ndarray: NumPy representation of the image.
         """
         if self.__data is None:
-            return cv2.cvtColor(cv2.imread(self.__file_path), cv2.COLOR_BGR2RGB)
+            # return cv2.cvtColor(cv2.imread(self.__file_path), cv2.COLOR_BGR2RGB)
+            return np.array(PIL.Image.open(self.__file_path).convert("RGB"))
         return self.__data
 
     @numpy.setter
