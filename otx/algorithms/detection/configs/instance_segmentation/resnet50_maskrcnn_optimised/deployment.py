@@ -3,7 +3,7 @@
 _base_ = ["../../base/deployments/base_instance_segmentation_dynamic.py"]
 
 ir_config = dict(
-    output_names=["boxes", "labels", "masks", "tile_prob"],
+    output_names=["boxes", "labels", "masks", "tile_prob"],    
 )
 
 backend_config = dict(

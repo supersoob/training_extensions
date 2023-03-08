@@ -158,16 +158,16 @@ class BaseInferencerWithConverter(BaseInferencer):
         """
         segm = isinstance(self.converter, (MaskToAnnotationConverter, RotatedRectToAnnotationConverter))
         # TODO[EUGENE]:
-        adapter = OpenvinoAdapter(
-            create_core(),
-            "/home/yuchunli/git/otx/demo/aerial-efficientnet-optimised/exported/classifier.xml",
-            "/home/yuchunli/git/otx/demo/aerial-efficientnet-optimised/exported/classifier.bin",
-            device="CPU",
-            max_num_requests=1,
-        )
-        tile_classifier = Model(model_adapter=adapter, preload=True)
+        # adapter = OpenvinoAdapter(
+        #     create_core(),
+        #     "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.xml",
+        #     "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.bin",
+        #     device="CPU",
+        #     max_num_requests=1,
+        # )
+        # tile_classifier = Model(model_adapter=adapter, preload=True)
 
-        # tile_classifier = None
+        tile_classifier = None
 
         tiler = Tiler(tile_size=tile_size, overlap=overlap, max_number=max_number, model=self.model, segm=segm,
                       tile_classifier=tile_classifier)
@@ -402,8 +402,11 @@ class OpenVINODetectionTask(IDeploymentTask, IInferenceTask, IEvaluationTask, IO
             max_number = self.config["tiling_parameters"]["tile_max_number"]["value"]
             logger.info("Run inference with tiling")
 
+        import time
+        total_time = 0
         dataset_size = len(dataset)
         for i, dataset_item in enumerate(dataset, 1):
+            start_time = time.perf_counter()
             if tile_enabled:
                 predicted_scene, features = self.inferencer.predict_tile(
                     dataset_item.numpy,
@@ -440,6 +443,13 @@ class OpenVINODetectionTask(IDeploymentTask, IInferenceTask, IEvaluationTask, IO
                     process_saliency_maps=process_saliency_maps,
                 )
             update_progress_callback(int(i / dataset_size * 100), None)
+            end_time = time.perf_counter() - start_time
+            logger.info(f"{end_time} seconds")
+            total_time += end_time
+
+        logger.info(f"Avg time per image: {total_time/len(dataset)} seconds")
+        logger.info(f"Total time: {total_time}")
+
         logger.info("OpenVINO inference completed")
         return dataset
 

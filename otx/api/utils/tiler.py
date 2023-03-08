@@ -121,7 +121,8 @@ class Tiler:
         """
         features = (None, None)
         offset_x, offset_y, tile_dict, tile_meta = self.preprocess_tile(image, coord)
-        run_process = self.tile_classifier.infer_sync(tile_dict)['prob'] > 0.45 if self.tile_classifier else True
+        prob = self.tile_classifier.infer_sync(tile_dict)['prob'] if self.tile_classifier else 1
+        run_process = prob > 0.45 if self.tile_classifier else True
         if run_process:
             raw_predictions = self.model.infer_sync(tile_dict)
             output = self.model.postprocess(raw_predictions, tile_meta)
