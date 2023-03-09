@@ -1,0 +1,13 @@
+data:
+  train:
+    ann-files: null
+    data-roots: /home/sungchul/workspace/src/training_extensions/otx-workspace-AIE/POA_attribution/splitted_dataset/train
+  val:
+    ann-files: null
+    data-roots: /home/sungchul/workspace/src/training_extensions/otx-workspace-AIE/POA_attribution/splitted_dataset/val
+  test:
+    ann-files: null
+    data-roots: null
+  unlabeled:
+    file-list: null
+    data-roots: null
