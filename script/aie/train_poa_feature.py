@@ -10,14 +10,14 @@ if __name__ == "__main__":
     # subprocess.run(command_build, shell=True)
 
     GPU = 2
-    # os.makedirs("otx-workspace-AIE/POA_attribution/clip_vit_freeze", exist_ok=True)
-    # command_train = (
-    #     f"CUDA_VISIBLE_DEVICES={GPU} otx train "
-    #     f"--save-model-to /local/sungchul/logs/aie/poa/clip_vit_freeze "
-    #     f"--work-dir otx-workspace-AIE/POA_attribution/clip_vit_freeze "
-    #     f"2>&1 | tee otx-workspace-AIE/POA_attribution/clip_vit_freeze/output.log")
+    os.makedirs("otx-workspace-AIE/POA_attribution/clip_vit_freeze", exist_ok=True)
+    command_train = (
+        f"CUDA_VISIBLE_DEVICES={GPU} otx train "
+        f"--save-model-to /local/sungchul/logs/aie/poa/clip_vit_freeze "
+        f"--work-dir otx-workspace-AIE/POA_attribution/clip_vit_freeze "
+        f"2>&1 | tee otx-workspace-AIE/POA_attribution/clip_vit_freeze/output.log")
 
-    # subprocess.run(command_train, shell=True)
+    subprocess.run(command_train, shell=True)
 
     os.makedirs("otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze", exist_ok=True)
     command_train = (
@@ -28,11 +28,11 @@ if __name__ == "__main__":
 
     subprocess.run(command_train, shell=True)
 
-    # os.makedirs("otx-workspace-AIE/POA_attribution/otx_pretrained_freeze", exist_ok=True)
-    # command_train = (
-    #     f"CUDA_VISIBLE_DEVICES={GPU} otx train "
-    #     f"--save-model-to /local/sungchul/logs/aie/poa/otx_pretrained_freeze "
-    #     f"--work-dir otx-workspace-AIE/POA_attribution/otx_pretrained_freeze "
-    #     f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_pretrained_freeze/output.log")
+    os.makedirs("otx-workspace-AIE/POA_attribution/otx_pretrained_freeze", exist_ok=True)
+    command_train = (
+        f"CUDA_VISIBLE_DEVICES={GPU} otx train "
+        f"--save-model-to /local/sungchul/logs/aie/poa/otx_pretrained_freeze "
+        f"--work-dir otx-workspace-AIE/POA_attribution/otx_pretrained_freeze "
+        f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_pretrained_freeze/output.log")
 
-    # subprocess.run(command_train, shell=True)
+    subprocess.run(command_train, shell=True)
