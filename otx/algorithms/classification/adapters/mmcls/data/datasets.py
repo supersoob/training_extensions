@@ -529,8 +529,6 @@ class AIEDataset(OTXClsDataset):
         feature = self.features[index]["feature"].astype(np.float32)
         label_str = self.features[index][self.label]
         label = self.LABELS_MAP[self.label][label_str]
-        if label == 0:
-            print()
         
         results = {"img": to_tensor(feature), "gt_label": label}
         return self.pipeline(results)
