@@ -64,7 +64,7 @@ def patch_datasets(
             cfg.domain = domain
             cfg.otx_dataset = None
             cfg.labels = None
-            cfg.update(kwargs)
+            # cfg.update(kwargs)
 
             update_pipeline(cfg)
 

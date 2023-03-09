@@ -45,7 +45,7 @@ class EarlyStoppingHook(Hook):
 
     rule_map = {"greater": lambda x, y: x > y, "less": lambda x, y: x < y}
     init_value_map = {"greater": -inf, "less": inf}
-    greater_keys = ["acc", "top", "AR@", "auc", "precision", "mAP", "mDice", "mIoU", "mAcc", "aAcc", "MHAcc"]
+    greater_keys = ["acc", "top", "AR@", "auc", "precision", "mAP", "mDice", "mIoU", "mAcc", "aAcc", "MHAcc", "f1_score"]
     less_keys = ["loss"]
 
     def __init__(

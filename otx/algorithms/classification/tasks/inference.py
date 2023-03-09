@@ -477,6 +477,10 @@ class ClassificationInferenceTask(
             **options_for_patch_datasets,
         )  # for OTX compatibility
         patch_evaluation(self._recipe_cfg, **options_for_patch_evaluation)  # for OTX compatibility
+
+        # for AIE
+        self._recipe_cfg["evaluation"].metric = "f1_score"
+        self._recipe_cfg.early_stop_metric = "f1_score"
         logger.info(f"initialized recipe = {recipe}")
 
     # TODO: make cfg_path loaded from custom model cfg file corresponding to train_type

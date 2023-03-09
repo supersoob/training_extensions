@@ -306,8 +306,8 @@ class Stage(object):
 
         if distributed:
             dataset_len = dataset_len // dist.get_world_size()
-        if dataset_len < samples_per_gpu:
-            dataloader_cfg.samples_per_gpu = dataset_len
+        # if dataset_len < samples_per_gpu:
+        #     dataloader_cfg.samples_per_gpu = dataset_len
         cfg.data[f"{subset}_dataloader"] = dataloader_cfg
 
     @staticmethod
