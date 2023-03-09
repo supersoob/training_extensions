@@ -19,6 +19,7 @@ from .datasets import (
     OTXHierarchicalClsDataset,
     OTXMultilabelClsDataset,
     SelfSLDataset,
+    AIEDataset,
 )
 from .pipelines import (
     GaussianBlur,
@@ -34,6 +35,7 @@ __all__ = [
     "OTXMultilabelClsDataset",
     "OTXHierarchicalClsDataset",
     "SelfSLDataset",
+    "AIEDataset",
     "PostAug",
     "PILImageToNDArray",
     "LoadImageFromOTXDataset",

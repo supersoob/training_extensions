@@ -3,4 +3,4 @@
 #
 
 # flake8: noqa
-from . import frozen_backbone_classifier, sam_classifier, semisl_classifier, supcon_classifier
+from . import aie_classifier, sam_classifier, semisl_classifier, supcon_classifier

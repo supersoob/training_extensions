@@ -461,3 +461,90 @@ class SelfSLDataset(Dataset):
             results[k + "2"] = v
 
         return results
+    
+
+import pickle
+from mmcls.datasets.pipelines import to_tensor
+@DATASETS.register_module()
+class AIEDataset(OTXClsDataset):
+    LABELS_MAP = {
+        "poa": {
+            "No": 0,
+            "Yes": 1
+        },
+        "acat": {
+            "Digital Media": 0,
+            "Paid Social Media": 1,
+            "Print": 2,
+            "Out of Home Media": 3,
+            "Out of Home": 4
+        },
+        "atype": {
+            "NonPartner.com": 0,
+            "Member.com": 1,
+            "Online Display": 2,
+            "Magazine/Newspaper": 3,
+            "Billboard/Transit": 4,
+            "Collateral": 5,
+            "Misc": 6,
+            "IndustryPartner.com": 7
+        }
+    }
+    def __init__(self, *args, **kwargs):
+        self.features = self.load_pickle(kwargs["features"])
+        self.labels = kwargs["labels"]
+        if len(self.labels) == 2:
+            self.label = "poa"
+        elif len(self.labels) == 5:
+            self.label = "acat"
+        elif len(self.labels) == 8:
+            self.label = "atype"
+        else:
+            raise ValueError(f"len(self.labels) == {len(self.labels)} : {self.labels}")
+
+        self.pipeline = Compose([build_from_cfg(p, PIPELINES) for p in kwargs["pipeline"]])
+        self.gt_labels = []
+        self.load_annotations()
+        self.class_acc = False
+
+    def load_annotations(self):
+        for feature in self.features:
+            self.gt_labels.append(self.LABELS_MAP[self.label][feature[self.label]])
+        self.gt_labels = np.array(self.gt_labels)
+
+    def get_gt_labels(self):
+        return self.gt_labels
+
+    def load_pickle(self, filename: str) -> Any:
+        with open(filename, "rb")  as f:
+            data = pickle.load(f)
+        return data
+    
+    def __len__(self):
+        """Get dataset length."""
+        return len(self.features)
+
+    def __getitem__(self, index: int):
+        """Get item from dataset."""
+        feature = self.features[index]["feature"].astype(np.float32)
+        label_str = self.features[index][self.label]
+        label = self.LABELS_MAP[self.label][label_str]
+        if label == 0:
+            print()
+        
+        results = {"img": to_tensor(feature), "gt_label": label}
+        return self.pipeline(results)
+
+    def evaluate(self,
+                 results,
+                 metric='accuracy',
+                 metric_options=None,
+                 indices=None,
+                 logger=None):
+        if metric_options is None:
+            if len(self.labels) < 5:
+                metric_options = {'topk': (1,)}
+            else:
+                metric_options = {'topk': (1, 5)}
+
+        return super().evaluate(results, metric, metric_options, logger)
