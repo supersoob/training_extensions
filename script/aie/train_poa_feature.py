@@ -19,20 +19,20 @@ if __name__ == "__main__":
 
     # subprocess.run(command_train, shell=True)
 
-    # os.makedirs("otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze", exist_ok=True)
-    # command_train = (
-    #     f"CUDA_VISIBLE_DEVICES={GPU} otx train "
-    #     f"--save-model-to /local/sungchul/logs/aie/poa/otx_clip_pretrained_freeze "
-    #     f"--work-dir otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze "
-    #     f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze/output.log")
-
-    # subprocess.run(command_train, shell=True)
-
-    os.makedirs("otx-workspace-AIE/POA_attribution/otx_pretrained_freeze", exist_ok=True)
+    os.makedirs("otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze", exist_ok=True)
     command_train = (
         f"CUDA_VISIBLE_DEVICES={GPU} otx train "
-        f"--save-model-to /local/sungchul/logs/aie/poa/otx_pretrained_freeze "
-        f"--work-dir otx-workspace-AIE/POA_attribution/otx_pretrained_freeze "
-        f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_pretrained_freeze/output.log")
+        f"--save-model-to /local/sungchul/logs/aie/poa/otx_clip_pretrained_freeze "
+        f"--work-dir otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze "
+        f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_clip_pretrained_freeze/output.log")
 
     subprocess.run(command_train, shell=True)
+
+    # os.makedirs("otx-workspace-AIE/POA_attribution/otx_pretrained_freeze", exist_ok=True)
+    # command_train = (
+    #     f"CUDA_VISIBLE_DEVICES={GPU} otx train "
+    #     f"--save-model-to /local/sungchul/logs/aie/poa/otx_pretrained_freeze "
+    #     f"--work-dir otx-workspace-AIE/POA_attribution/otx_pretrained_freeze "
+    #     f"2>&1 | tee otx-workspace-AIE/POA_attribution/otx_pretrained_freeze/output.log")
+
+    # subprocess.run(command_train, shell=True)
