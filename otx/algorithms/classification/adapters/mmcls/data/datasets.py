@@ -468,18 +468,18 @@ from mmcls.datasets.pipelines import to_tensor
 @DATASETS.register_module()
 class AIEDataset(OTXClsDataset):
     LABELS_MAP = {
-        "poa": {
+        "POA_attribution": {
             "No": 0,
             "Yes": 1
         },
-        "acat": {
+        "activity_category": {
             "Digital Media": 0,
             "Paid Social Media": 1,
             "Print": 2,
             "Out of Home Media": 3,
             "Out of Home": 4
         },
-        "atype": {
+        "activity_type": {
             "NonPartner.com": 0,
             "Member.com": 1,
             "Online Display": 2,
@@ -494,11 +494,11 @@ class AIEDataset(OTXClsDataset):
         self.features = self.load_pickle(kwargs["features"])
         self.labels = kwargs["labels"]
         if len(self.labels) == 2:
-            self.label = "poa"
+            self.label = "POA_attribution"
         elif len(self.labels) == 5:
-            self.label = "acat"
+            self.label = "activity_category"
         elif len(self.labels) == 8:
-            self.label = "atype"
+            self.label = "activity_type"
         else:
             raise ValueError(f"len(self.labels) == {len(self.labels)} : {self.labels}")
 
