@@ -158,16 +158,16 @@ class BaseInferencerWithConverter(BaseInferencer):
         """
         segm = isinstance(self.converter, (MaskToAnnotationConverter, RotatedRectToAnnotationConverter))
         # TODO[EUGENE]:
-        # adapter = OpenvinoAdapter(
-        #     create_core(),
-        #     "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.xml",
-        #     "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.bin",
-        #     device="CPU",
-        #     max_num_requests=1,
-        # )
-        # tile_classifier = Model(model_adapter=adapter, preload=True)
+        adapter = OpenvinoAdapter(
+            create_core(),
+            "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.xml",
+            "/home/yuchunli/git/otx/demo/coliform-efficient-optimised/exported/classifier.bin",
+            device="CPU",
+            max_num_requests=1,
+        )
+        tile_classifier = Model(model_adapter=adapter, preload=True)
 
-        tile_classifier = None
+        # tile_classifier = None
 
         tiler = Tiler(tile_size=tile_size, overlap=overlap, max_number=max_number, model=self.model, segm=segm,
                       tile_classifier=tile_classifier)

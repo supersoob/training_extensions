@@ -15,6 +15,7 @@ from otx.api.entities.image import Image
 from otx.api.entities.model_template import TaskType
 from otx.core.data.adapter.base_dataset_adapter import BaseDatasetAdapter
 
+from datumaro import Polygon, Bbox
 
 class DetectionDatasetAdapter(BaseDatasetAdapter):
     """Detection adapter inherited from BaseDatasetAdapter.
@@ -39,8 +40,10 @@ class DetectionDatasetAdapter(BaseDatasetAdapter):
                         if (
                             self.task_type in (TaskType.INSTANCE_SEGMENTATION, TaskType.ROTATED_DETECTION)
                         ):
-                            if self._is_normal_polygon(ann):
+                            if isinstance(ann, Polygon):
                                 shapes.append(self._get_polygon_entity(ann, image.width, image.height))
+                            if isinstance(ann, Bbox):
+                                continue
                         if self.task_type is TaskType.DETECTION and ann.type == AnnotationType.bbox:
                             if self._is_normal_bbox(ann.points[0], ann.points[1], ann.points[2], ann.points[3]):
                                 shapes.append(self._get_normalized_bbox_entity(ann, image.width, image.height))
