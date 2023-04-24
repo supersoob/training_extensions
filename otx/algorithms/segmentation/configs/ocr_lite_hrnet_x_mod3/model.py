@@ -24,31 +24,22 @@ _base_ = [
 model = dict(
     type="OTXEncoderDecoder",
     pretrained=None,
+
+
     decode_head=dict(
-        type="CustomFCNHead",
+        type='CustomFCNHead',
         in_channels=[18, 60, 80, 160, 320],
         in_index=[0, 1, 2, 3, 4],
-        input_transform="multiple_select",
-        channels=60,
+        input_transform='resize_concat',
+        channels=sum([18, 60, 80, 160, 320]),
         kernel_size=1,
         num_convs=1,
         concat_input=False,
         dropout_ratio=-1,
         num_classes=2,
-        norm_cfg=dict(type="BN", requires_grad=True),
+        norm_cfg=dict(type='BN', requires_grad=True),
         align_corners=False,
-        enable_aggregator=True,
-        aggregator_min_channels=60,
-        aggregator_merge_norm=None,
-        aggregator_use_concat=False,
-        loss_decode=[
-            dict(
-                type="CrossEntropyLoss",
-                use_sigmoid=False,
-                loss_weight=1.0,
-            ),
-        ],
-    ),
+        loss_decode=[dict(type='CrossEntropyLoss', loss_weight=1.0)]),
 )
 
 load_from = "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions\
