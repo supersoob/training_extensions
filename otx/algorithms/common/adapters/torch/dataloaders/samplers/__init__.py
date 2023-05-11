@@ -7,5 +7,6 @@
 
 from .balanced_sampler import BalancedSampler
 from .cls_incr_sampler import ClsIncrSampler
+from .random_budget_sampler import RandomBudgetSampler
 
-__all__ = ["BalancedSampler", "ClsIncrSampler"]
+__all__ = ["BalancedSampler", "ClsIncrSampler", "RandomBudgetSampler"]

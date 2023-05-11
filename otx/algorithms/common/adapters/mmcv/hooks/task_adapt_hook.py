@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from otx.algorithms.common.adapters.torch.dataloaders.samplers import (
     BalancedSampler,
     ClsIncrSampler,
+    RandomBudgetSampler,
 )
 from otx.algorithms.common.utils.logger import get_logger
 
@@ -50,13 +51,13 @@ class TaskAdaptHook(Hook):
 
     def before_epoch(self, runner):
         """Produce a proper sampler for task-adaptation."""
+        dataset = runner.data_loader.dataset
+        batch_size = runner.data_loader.batch_size
+        num_workers = runner.data_loader.num_workers
+        collate_fn = runner.data_loader.collate_fn
+        worker_init_fn = runner.data_loader.worker_init_fn
+        rank, world_size = get_dist_info()
         if self.sampler_flag:
-            dataset = runner.data_loader.dataset
-            batch_size = runner.data_loader.batch_size
-            num_workers = runner.data_loader.num_workers
-            collate_fn = runner.data_loader.collate_fn
-            worker_init_fn = runner.data_loader.worker_init_fn
-            rank, world_size = get_dist_info()
             if self.sampler_type == "balanced":
                 sampler = BalancedSampler(
                     dataset, batch_size, efficient_mode=self.efficient_mode, num_replicas=world_size, rank=rank
@@ -65,6 +66,18 @@ class TaskAdaptHook(Hook):
                 sampler = ClsIncrSampler(
                     dataset, batch_size, efficient_mode=self.efficient_mode, num_replicas=world_size, rank=rank
                 )
+            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=300)
+            runner.data_loader = DataLoader(
+                dataset,
+                batch_size=batch_size,
+                sampler=sampler,
+                num_workers=num_workers,
+                collate_fn=collate_fn,
+                pin_memory=False,
+                worker_init_fn=worker_init_fn,
+            )
+        elif len(dataset) > 300:
+            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=300)
             runner.data_loader = DataLoader(
                 dataset,
                 batch_size=batch_size,
