@@ -66,7 +66,7 @@ class TaskAdaptHook(Hook):
                 sampler = ClsIncrSampler(
                     dataset, batch_size, efficient_mode=self.efficient_mode, num_replicas=world_size, rank=rank
                 )
-            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=300)
+            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=100)
             runner.data_loader = DataLoader(
                 dataset,
                 batch_size=batch_size,
@@ -76,8 +76,8 @@ class TaskAdaptHook(Hook):
                 pin_memory=False,
                 worker_init_fn=worker_init_fn,
             )
-        elif len(dataset) > 300:
-            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=300)
+        elif len(dataset) > 100:
+            sampler = RandomBudgetSampler(dataset, batch_size, num_replicas=world_size, rank=rank, budget_size=100)
             runner.data_loader = DataLoader(
                 dataset,
                 batch_size=batch_size,
