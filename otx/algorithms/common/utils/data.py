@@ -134,6 +134,7 @@ def get_old_new_img_indices(labels, new_classes, dataset):
             ids_new.append(i)
         else:
             ids_old.append(i)
+        breakpoint()
     return {"old": ids_old, "new": ids_new}
 
 
